@@ -1,5 +1,4 @@
-using MA97
+using HSL
 using Base.Test
 
-# write your own tests here
-@test 1 == 1
+include("test_ma97.jl")
