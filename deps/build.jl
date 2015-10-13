@@ -8,11 +8,6 @@ libblas = library_dependency("libblas", aliases=["libvecLibFort", "libopenblas"]
 liblapack = library_dependency("liblapack", aliases=["libvecLibFort", "libopenblas"])
 libmetis4 = library_dependency("libmetis", aliases=["libmetis4"])  # METIS 5 not ok!
 
-# METIS
-# @windows_only begin
-#   using WinRPM
-#   provides(WinRPM.RPM, "metis4", libmetis4, os = :Windows)
-# end
 
 so = "so"
 all_load = "-whole_archive"
