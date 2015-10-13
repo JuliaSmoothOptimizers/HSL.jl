@@ -329,6 +329,9 @@ end
 
 
 # Overload backslash to solve with MA97.
+if VERSION ≥ v"0.4.0"
+  import Base.\
+end
 \(ma97 :: Ma97, b :: Array{Float64}) = ma97_solve(ma97, b)
 
 
