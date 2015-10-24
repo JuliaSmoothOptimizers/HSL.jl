@@ -218,7 +218,7 @@ function ma97_csc{Ti <: Integer}(n :: Int, colptr :: Vector{Ti}, rowval :: Vecto
         (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cint}),
           1,    M.n,  M.colptr,  M.rowval,  C_NULL,       M.__akeep,      &(M.control),      &(M.info),      C_NULL)
 
-  if M.info.flag != 0
+  if M.info.flag < 0
     ccall((:ma97_free_akeep_d, libhsl_ma97), Void, (Ptr{Ptr{Void}},), M.__akeep)
     throw(Ma97Exception("Ma97: Error during symbolic analysis", M.info.flag))
   end
@@ -253,7 +253,7 @@ function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{
         (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cint}),
          M.n,  nz,   M.rowval,  M.colptr,  C_NULL,       M.__akeep,      &(M.control),      &(M.info),      C_NULL)
 
-  if M.info.flag != 0
+  if M.info.flag < 0
     ccall((:ma97_free_akeep_d, libhsl_ma97), Void, (Ptr{Ptr{Void}},), M.__akeep)
     throw(Ma97Exception, ("Ma97: Error during symbolic analysis", M.info.flag))
   end
@@ -277,7 +277,7 @@ function ma97_factorize(ma97 :: Ma97; matrix_type :: Symbol=:real_indef)
         (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cdouble}),
          t,    C_NULL,    C_NULL,    ma97.nzval,   ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info),   C_NULL)
 
-  if ma97.info.flag != 0
+  if ma97.info.flag < 0
     ma97_finalize(ma97)
     throw(Ma97Exception, ("Ma97: Error during numerical factorization", ma97.info.flag))
   end
@@ -321,7 +321,7 @@ function ma97_solve!(ma97 :: Ma97, b :: Array{Float64}; job :: Symbol=:A)
         (Cint, Cint, Ptr{Cdouble}, Cint,   Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}),
          j,    nrhs, b,            ma97.n, ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info))
 
-  if ma97.info.flag != 0
+  if ma97.info.flag < 0
     ma97_finalize(ma97)
     throw(Ma97Exception, ("Ma97: Error during solve", ma97.info.flag))
   end
@@ -359,7 +359,7 @@ function ma97_solve!(A :: SparseMatrixCSC{Float64,Int}, b :: Array{Float64}; mat
         (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Cint, Ptr{Cdouble}, Cint, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cdouble}),
          t,    M.colptr,  M.rowval,  M.nzval,      nrhs, b,            M.n,  M.__akeep,      M.__fkeep,      &(M.control),      &(M.info),      C_NULL)
 
-  if M.info.flag != 0
+  if M.info.flag < 0
     ma97_finalize(M)
     throw(Ma97Exception, ("Ma97: Error during combined factorize/solve", M.info.flag))
   end
@@ -392,7 +392,7 @@ function ma97_inquire(ma97 :: Ma97; matrix_type :: Symbol=:real_indef)
     ret = d
   end
 
-  if ma97.info.flag != 0
+  if ma97.info.flag < 0
     ma97_finalize(ma97)
     throw(Ma97Exception, ("Ma97: Error during inquiry", ma97.info.flag))
   end
