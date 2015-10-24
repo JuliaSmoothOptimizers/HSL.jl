@@ -76,3 +76,10 @@ equivalent call
 (r, x) = ma97_least_squares(A, b)
 ```
 is also defined, and is equivalent to the above.
+
+## TODO List
+
+- [ ] Convenient constructor for rectangular matrices to enable `\`
+- [ ] Real single precision arithmetic
+- [ ] Complex single precision arithmetic
+- [ ] Complex double precision arithmetic
