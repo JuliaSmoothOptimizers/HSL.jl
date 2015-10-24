@@ -1,4 +1,4 @@
-The MA97.jl package is licensed under the MIT "Expat" License:
+The HSL.jl package is licensed under the MIT "Expat" License:
 
 > Copyright (c) 2015: Dominique Orban.
 >
