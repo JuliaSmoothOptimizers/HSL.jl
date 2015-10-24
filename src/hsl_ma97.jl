@@ -239,6 +239,8 @@ function Ma97(A :: SparseMatrixCSC{Float64,Int})
   return ma97_csc(T.n, T.colptr, T.rowval, T.nzval)
 end
 
+Ma97(A :: Array{Float64,2}) = Ma97(sparse(A))
+
 
 """Instantiate an object of type `Ma97` and perform the
 symbolic analysis on a matrix described in sparse CSC format.
