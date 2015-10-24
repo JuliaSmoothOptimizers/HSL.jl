@@ -57,3 +57,16 @@ x_exact = A \ b
 
 d = ma97_inquire(ma97, matrix_type=:real_spd)
 @assert ma97.info.flag == 0
+
+# Test rectangular A.
+A = rand(10, 6)
+b = rand(10)
+(r, x) = ma97_least_squares(A, b)
+x_exact = A \ b
+@assert norm(x - x_exact) ≤ 1.0e-8 * norm(x_exact)
+
+A = rand(6, 10)
+b = rand(6)
+(x, y) = ma97_min_norm(A, b)
+x_exact = A \ b
+@assert norm(x - x_exact) ≤ 1.0e-8 * norm(x_exact)

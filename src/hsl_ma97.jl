@@ -3,7 +3,8 @@ export ma97_csc, ma97_coord,
        ma97_factorize, ma97_factorise,
        ma97_solve, ma97_solve!,
        ma97_inquire, ma97_enquire,
-       ma97_alter
+       ma97_alter,
+       ma97_min_norm, ma97_least_squares
 export Ma97Exception
 
 
@@ -339,6 +340,9 @@ end
 factorization and solution phases.
 """
 function ma97_solve(A :: SparseMatrixCSC{Float64,Int}, b :: Array{Float64}; matrix_type :: Symbol=:real_indef)
+  (m, n) = size(A)
+  m < n && (return ma97_min_norm(A, b))
+  m > n && (return ma97_least_squares(A, b))
   x = copy(b)
   ma97_solve!(A, x, matrix_type=matrix_type)
   return x
@@ -364,6 +368,8 @@ function ma97_solve!(A :: SparseMatrixCSC{Float64,Int}, b :: Array{Float64}; mat
     throw(Ma97Exception, ("Ma97: Error during combined factorize/solve", M.info.flag))
   end
 end
+
+ma97_solve(A :: Array{Float64,2}, b :: Array{Float64}; matrix_type :: Symbol=:real_indef) = ma97_solve(sparse(A), b, matrix_type=matrix_type)
 
 
 """Obtain information on the pivots after a successful factorization or solve.
@@ -410,8 +416,58 @@ function ma97_alter(ma97 :: Ma97, d :: Array{Float64, 2})
         (Ptr{Cdouble}, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}),
          d,            ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info))
 
-  if ma97.info.flag != 0
+  if ma97.info.flag < 0
     ma97_finalize(ma97)
     throw(Ma97Exception, ("Ma97: Error during alteration", ma97.info.flag))
   end
 end
+
+
+# Note: it seems inconvenient to have in-place versions of min_norm and
+# least_squares because the user would have to provide a storage array
+# of length n+m, which is not the size of the solution x alone.
+
+"""Solve the minimum-norm problem
+
+    minimize ‖x‖  subject to Ax=b,
+
+where A has shape m-by-n with m < n,
+by solving the saddle-point system
+
+    [ I  A' ] [ x ]   [ 0 ]
+    [ A     ] [ y ] = [ b ].
+"""
+function ma97_min_norm(A :: SparseMatrixCSC{Float64,Int}, b :: Vector{Float64})
+  (m, n) = size(A)
+  K = [ speye(n)  spzeros(n, m) ; A  0.0 * speye(m) ]
+  rhs = [ zeros(n) ; b ]
+  xy97 = ma97_solve(K, rhs)
+  x97 = xy97[1:n]
+  y97 = xy97[n+1:n+m]
+  return (x97, y97)
+end
+
+ma97_min_norm(A :: Array{Float64,2}, b :: Vector{Float64}) = ma97_min_norm(sparse(A), b)
+
+
+"""Solve the least-squares problem
+
+    minimize ‖Ax - b‖,
+
+where A has shape m-by-n with m > n,
+by solving the saddle-point system
+
+    [ I   A ] [ r ]   [ b ]
+    [ A'    ] [ x ] = [ 0 ].
+"""
+function ma97_least_squares(A :: SparseMatrixCSC{Float64,Int}, b :: Vector{Float64})
+  (m, n) = size(A)
+  K = [ speye(m)  spzeros(m,n) ; A'  0.0 * speye(n) ]
+  rhs = [ b ; zeros(n) ]
+  rx97 = ma97_solve(K, rhs)
+  r97 = rx97[1:m]
+  x97 = rx97[m+1:m+n]
+  return (r97, x97)
+end
+
+ma97_least_squares(A :: Array{Float64,2}, b :: Vector{Float64}) = ma97_least_squares(sparse(A), b)
