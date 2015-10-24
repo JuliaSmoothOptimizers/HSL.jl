@@ -17,19 +17,18 @@ noall_load = "-no-whole-archive"
   all_load = "-all_load"
   noall_load = "-noall_load"
   using Homebrew
-  Homebrew.add("homebrew/science/metis4")
-  provides(Homebrew.HB, "metis4", libmetis4, os = :Darwin)
+  provides(Homebrew.HB, "homebrew/science/metis4", libmetis4, os=:Darwin)
   push!(Libdl.DL_LOAD_PATH, joinpath(Homebrew.prefix("metis4"), "lib"))
 end
 
-provides(AptGet, "libblas-dev", libblas, os = :Linux)
-provides(AptGet, "liblapack-dev", liblapack, os = :Linux)
+provides(AptGet, "libblas-dev", libblas, os=:Linux)
+provides(AptGet, "liblapack-dev", liblapack, os=:Linux)
 
 provides(Sources,
          URI("http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-4.0.3.tar.gz"),
          libmetis4,
          SHA="5efa35de80703c1b2c4d0de080fafbcf4e0d363a21149a1ad2f96e0144841a55",
-         unpacked_dir="metis-4.0.3", os = :Unix)
+         unpacked_dir="metis-4.0.3", os=:Unix)
 
 metis_depsdir = BinDeps.depsdir(libmetis4)
 metis_srcdir = joinpath(metis_depsdir, "src", "metis-4.0.3")
@@ -50,7 +49,7 @@ provides(SimpleBuild,
                   # `cp $metis_srcdir/Lib/*.h $metis_prefix/include`  # broken
                 end)
              end)
-          end), [libmetis4], os = :Unix)
+          end), [libmetis4], os=:Unix)
 
 # HSL package-specific dependencies.
 libhsl_ma97 = library_dependency("libhsl_ma97", depends=[libblas, liblapack, libmetis4])
@@ -85,6 +84,6 @@ provides(SimpleBuild,
               `make install`
               `gfortran -fPIC -shared -Wl,$all_load $libdir/libhsl_ma97.a -lblas -llapack -L$metis_libpath -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma97.dylib`
             end)
-          end), libhsl_ma97, os = :Unix)
+          end), libhsl_ma97, os=:Unix)
 
 @BinDeps.install @compat Dict(:libhsl_ma97 => :libhsl_ma97)
