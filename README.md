@@ -80,6 +80,7 @@ is also defined, and is equivalent to the above.
 ## TODO List
 
 - [ ] Convenient constructor for rectangular matrices to enable `\`
+- [ ] Convenient access to control parameters, especially pivot tolerance
 - [ ] Real single precision arithmetic
 - [ ] Complex single precision arithmetic
 - [ ] Complex double precision arithmetic
