@@ -70,3 +70,24 @@ b = rand(6)
 (x, y) = ma97_min_norm(A, b)
 x_exact = A \ b
 @assert norm(x - x_exact) ≤ 1.0e-8 * norm(x_exact)
+
+#  Test if errors are thrown correctly
+A = randn(10,5)
+try
+	Ma97(A)
+catch E
+	@assert isa(E,Ma97Exception)
+end
+
+A = rand(6, 10)
+b = rand(3)
+try
+	(x, y) = ma97_min_norm(A, b)
+catch E
+	@assert isa(E,Ma97Exception)
+end
+try
+	 ma97_solve(ma97, b)
+catch E
+	@assert isa(E,Ma97Exception)
+end

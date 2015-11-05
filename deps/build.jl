@@ -75,7 +75,7 @@ hsl_src_archive = joinpath(BinDeps.downloadsdir(libhsl_ma97), "hsl_ma97-2.3.0.ta
 
 provides(SimpleBuild,
          (@build_steps begin
-            BinDeps.ChecksumValidator("e3133eba520abcabaf1700106f8a1310d4286c61721f707e94fb7d45a220abf2", hsl_src_archive)
+            BinDeps.ChecksumValidator("552114617bddbc722ef014856463d0d29c2398abda60a05debccb7a6e8e1db7a", hsl_src_archive)
             CreateDirectory(srcdir)
             FileUnpacker(hsl_src_archive, srcdir, "hsl_ma97-2.3.0")
             (@build_steps begin

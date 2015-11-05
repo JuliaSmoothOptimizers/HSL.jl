@@ -234,7 +234,7 @@ symbolic analysis on a sparse Julia matrix.
 """
 function Ma97(A :: SparseMatrixCSC{Float64,Int})
   m, n = size(A)
-  m == n || throw(Ma97Exception, "Ma97: input matrix must be square", 0)
+  m == n || throw(Ma97Exception("Ma97: input matrix must be square", 0))
   T = tril(convert(SparseMatrixCSC{Float64,Cint}, A))
   return ma97_csc(T.n, T.colptr, T.rowval, T.nzval)
 end
@@ -258,7 +258,7 @@ function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{
 
   if M.info.flag < 0
     ccall((:ma97_free_akeep_d, libhsl_ma97), Void, (Ptr{Ptr{Void}},), M.__akeep)
-    throw(Ma97Exception, ("Ma97: Error during symbolic analysis", M.info.flag))
+    throw(Ma97Exception("Ma97: Error during symbolic analysis", M.info.flag))
   end
 
   finalizer(M, ma97_finalize)
@@ -282,7 +282,7 @@ function ma97_factorize(ma97 :: Ma97; matrix_type :: Symbol=:real_indef)
 
   if ma97.info.flag < 0
     ma97_finalize(ma97)
-    throw(Ma97Exception, ("Ma97: Error during numerical factorization", ma97.info.flag))
+    throw(Ma97Exception("Ma97: Error during numerical factorization", ma97.info.flag))
   end
 end
 
@@ -316,7 +316,7 @@ end
 `b` should have size `n` by `nrhs`.
 """
 function ma97_solve!(ma97 :: Ma97, b :: Array{Float64}; job :: Symbol=:A)
-  size(b, 1) == ma97.n || throw(Ma97Exception, ("Ma97: rhs size mismatch", 0))
+  size(b, 1) == ma97.n || throw(Ma97Exception("Ma97: rhs size mismatch", 0))
   nrhs = size(b, 2)
 
   j = jobs97[job]
@@ -326,7 +326,7 @@ function ma97_solve!(ma97 :: Ma97, b :: Array{Float64}; job :: Symbol=:A)
 
   if ma97.info.flag < 0
     ma97_finalize(ma97)
-    throw(Ma97Exception, ("Ma97: Error during solve", ma97.info.flag))
+    throw(Ma97Exception("Ma97: Error during solve", ma97.info.flag))
   end
 end
 
@@ -359,7 +359,7 @@ sides, `b` should have size `n` by `nrhs`.
 function ma97_solve!(A :: SparseMatrixCSC{Float64,Int}, b :: Array{Float64}; matrix_type :: Symbol=:real_indef)
   t = matrix_types97[matrix_type]
   M = Ma97(A)
-  size(b, 1) == M.n || throw(Ma97Exception, ("Ma97: rhs size mismatch", 0))
+  size(b, 1) == M.n || throw(Ma97Exception("Ma97: rhs size mismatch", 0))
   nrhs = size(b, 2)
   ccall((:ma97_factor_solve_d, libhsl_ma97), Void,
         (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble}, Cint, Ptr{Cdouble}, Cint, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cdouble}),
@@ -367,7 +367,7 @@ function ma97_solve!(A :: SparseMatrixCSC{Float64,Int}, b :: Array{Float64}; mat
 
   if M.info.flag < 0
     ma97_finalize(M)
-    throw(Ma97Exception, ("Ma97: Error during combined factorize/solve", M.info.flag))
+    throw(Ma97Exception("Ma97: Error during combined factorize/solve", M.info.flag))
   end
 end
 
@@ -402,7 +402,7 @@ function ma97_inquire(ma97 :: Ma97; matrix_type :: Symbol=:real_indef)
 
   if ma97.info.flag < 0
     ma97_finalize(ma97)
-    throw(Ma97Exception, ("Ma97: Error during inquiry", ma97.info.flag))
+    throw(Ma97Exception("Ma97: Error during inquiry", ma97.info.flag))
   end
 
   return ret
@@ -413,14 +413,14 @@ ma97_enquire = ma97_inquire
 
 function ma97_alter(ma97 :: Ma97, d :: Array{Float64, 2})
   m, n = size(d)
-  (m == ma97.n && n == 2) || throw(Ma97Exception, ("Ma97: input array d must be n x 2", 0))
+  (m == ma97.n && n == 2) || throw(Ma97Exception("Ma97: input array d must be n x 2", 0))
   ccall((:ma97_alter_d, libhsl_ma97), Void,
         (Ptr{Cdouble}, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}),
          d,            ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info))
 
   if ma97.info.flag < 0
     ma97_finalize(ma97)
-    throw(Ma97Exception, ("Ma97: Error during alteration", ma97.info.flag))
+    throw(Ma97Exception("Ma97: Error during alteration", ma97.info.flag))
   end
 end
 
