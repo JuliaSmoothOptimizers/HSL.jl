@@ -1,7 +1,5 @@
 # HSL
 
-[![Build Status](https://travis-ci.org/dpo/HSL.jl.svg?branch=master)](https://travis-ci.org/dpo/HSL.jl)
-
 These are the beginnings of a set of interfaces to
 [HSL](http://www.hsl.rl.ac.uk) packages for sparse linear algebra.
 
