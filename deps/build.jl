@@ -9,8 +9,8 @@ liblapack = library_dependency("liblapack")
 libmetis4 = library_dependency("libmetis")  # METIS 5 not ok!
 
 so = "so"
-all_load = "-whole_archive"
-noall_load = "-no-whole-archive"
+all_load = "--whole-archive"
+noall_load = "--no-whole-archive"
 
 @osx_only begin
   so = "dylib"
