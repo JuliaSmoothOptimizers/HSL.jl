@@ -80,7 +80,7 @@ provides(SimpleBuild,
             FileUnpacker(hsl_src_archive, srcdir, "hsl_ma97-2.3.0")
             (@build_steps begin
               ChangeDirectory(hslsrc)
-              `./configure CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --prefix=$prefix --with-blas=-lblas --with-lapack=-llapack --with-metis="-L$metis_libpath -lmetis"`
+              `./configure F77=gfortran CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --prefix=$prefix --with-blas=-lblas --with-lapack=-llapack --with-metis="-L$metis_libpath -lmetis"`
               `make install`
               `gfortran -fPIC -shared -Wl,$all_load $libdir/libhsl_ma97.a -lblas -llapack -L$metis_libpath -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma97.dylib`
             end)
