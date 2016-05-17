@@ -10,7 +10,7 @@ In all cases, users are responsible for obtaining HSL packages.
 ## Installing
 
 ```JULIA
-julia> Pkg.clone("https://github.com/dpo/HSL.jl.git")
+julia> Pkg.clone("https://github.com/JuliaOptimizers/HSL.jl.git")
 ```
 
 The source archive, as obtained from the HSL download process, should be placed
@@ -56,7 +56,7 @@ When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
 ```
 solves for the minimum-norm solution, i.e., *x* such that *Ax = b* and *x +
 Aᵀ y = 0*. This is equivalent to `A \ b` when `A` is a dense array in Julia 0.3,
-and also when `A` is a sparse matrix in Julia 0.4. The equivalent call
+and also when `A` is a sparse matrix in Julia 0.4. The call
 ```JULIA
 (x, y) = ma97_min_norm(A, b)
 ```
@@ -69,7 +69,7 @@ When *m* > *n* and has full column rank,
 solves for the least-squares solution, i.e., *x* such that *r = b - Ax*
 satisfies *Aᵀ r = 0*. This is again equivalent to `A \ b` when `A` is a dense
 array in Julia 0.3, and also when `A` is a sparse matrix in Julia 0.4. The
-equivalent call
+call
 ```JULIA
 (r, x) = ma97_least_squares(A, b)
 ```
