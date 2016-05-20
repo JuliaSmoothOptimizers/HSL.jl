@@ -387,7 +387,10 @@ An inquiry on a positive definite matrix returns one vector with the pivot value
 function ma97_inquire(ma97 :: Ma97; matrix_type :: Symbol=:real_indef)
   if matrix_type in [:real_indef, :herm_indef, :cmpl_indef]
     piv_order = zeros(Cint, ma97.n)
-    d = zeros(Cdouble, ma97.n, 2)
+    # AMBUSH ALERT: although Julia will call the C interface of the library
+    # Julia stores arrays column-major as Fortran does. Though the C interface
+    # documentation says d should be n x 2, we must declare 2 x n.
+    d = zeros(Cdouble, 2, ma97.n)
     ccall((:ma97_enquire_indef_d, libhsl_ma97), Void,
           (Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cint}, Ptr{Cdouble}),
            ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info),   piv_order, d)
@@ -412,7 +415,7 @@ ma97_enquire = ma97_inquire
 
 
 function ma97_alter(ma97 :: Ma97, d :: Array{Float64, 2})
-  m, n = size(d)
+  n, m = size(d)
   (m == ma97.n && n == 2) || throw(Ma97Exception("Ma97: input array d must be n x 2", 0))
   ccall((:ma97_alter_d, libhsl_ma97), Void,
         (Ptr{Cdouble}, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}),
