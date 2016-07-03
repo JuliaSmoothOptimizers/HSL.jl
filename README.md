@@ -10,7 +10,7 @@ In all cases, users are responsible for obtaining HSL packages.
 ## Installing
 
 ```JULIA
-julia> Pkg.clone("https://github.com/JuliaOptimizers/HSL.jl.git")
+julia> Pkg.clone("https://github.com/JuliaSmoothOptimizers/HSL.jl.git")
 ```
 
 The source archive, as obtained from the HSL download process, should be placed
