@@ -9,6 +9,17 @@ export Ma97Exception
 
 
 """Main control type for MA97.
+
+Optional arguments:
+
+* print_level: integer controling the verbosit level. Accepted values are:
+    * <0: no printing
+    * 0: errors and warnings only (default)
+    * 1: errors, warnings and basic diagnostics
+    * 2: errors, warning and full diagnostics
+* unit_diagnostics: Fortran file unit for diagnostics (default: 6)
+* unit_error: Fortran file unit for errors (default: 6)
+* unit_warning: Fortran file unit for warnings (default: 6)
 """
 type Ma97_Control
 
@@ -59,12 +70,16 @@ type Ma97_Control
   "spare real storage currently unused"
   rspare :: Vector{Cdouble}
 
-  function Ma97_Control()
+  function Ma97_Control(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6)
     control = new(0, 0, 0, 0.0, 0, 0, 0, 0.0,
                   0.0, 0, 0, 0, 0, 0, 0, 0, 0.0,
                   zeros(Cint, 5), zeros(Cdouble, 10))
     ccall((:ma97_default_control_d, libhsl_ma97), Void, (Ptr{Ma97_Control},), &control)
     control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
+    control.print_level = print_level
+    control.unit_diagnostics = unit_diagnostics
+    control.unit_error = unit_error
+    control.unit_warning = unit_warning
     return control
   end
 end
@@ -209,8 +224,8 @@ end
 """Instantiate an object of type `Ma97` and perform the
 symbolic analysis on a matrix described in sparse CSC format.
 """
-function ma97_csc{Ti <: Integer}(n :: Int, colptr :: Vector{Ti}, rowval :: Vector{Ti}, nzval :: Vector{Float64})
-  control = Ma97_Control()
+function ma97_csc{Ti <: Integer}(n :: Int, colptr :: Vector{Ti}, rowval :: Vector{Ti}, nzval :: Vector{Float64}; kwargs...)
+  control = Ma97_Control(; kwargs...)
   info = Ma97_Info()
   M = Ma97([convert(Ptr{Void}, C_NULL)], [convert(Ptr{Void}, C_NULL)], n, colptr, rowval, nzval, control, info)
 
@@ -232,21 +247,21 @@ end
 """Instantiate an object of type `Ma97` and perform the
 symbolic analysis on a sparse Julia matrix.
 """
-function Ma97(A :: SparseMatrixCSC{Float64,Int})
+function Ma97(A :: SparseMatrixCSC{Float64,Int}; kwargs...)
   m, n = size(A)
   m == n || throw(Ma97Exception("Ma97: input matrix must be square", 0))
   T = tril(convert(SparseMatrixCSC{Float64,Cint}, A))
-  return ma97_csc(T.n, T.colptr, T.rowval, T.nzval)
+  return ma97_csc(T.n, T.colptr, T.rowval, T.nzval; kwargs...)
 end
 
-Ma97(A :: Array{Float64,2}) = Ma97(sparse(A))
+Ma97(A :: Array{Float64,2}; kwargs...) = Ma97(sparse(A); kwargs...)
 
 
 """Instantiate an object of type `Ma97` and perform the
 symbolic analysis on a matrix described in sparse coordinate format.
 """
-function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{Float64})
-  control = Ma97_Control()
+function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{Float64}; kwargs...)
+  control = Ma97_Control(; kwargs...)
   info = Ma97_Info()
   M = Ma97([convert(Ptr{Void}, C_NULL)], [convert(Ptr{Void}, C_NULL)], n, cols, rows, nzval, control, info)
   nz = length(cols)
