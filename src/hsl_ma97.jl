@@ -243,7 +243,7 @@ Ma97(A :: Array{Float64,2}) = Ma97(sparse(A))
 
 
 """Instantiate an object of type `Ma97` and perform the
-symbolic analysis on a matrix described in sparse CSC format.
+symbolic analysis on a matrix described in sparse coordinate format.
 """
 function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{Float64})
   control = Ma97_Control()
