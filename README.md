@@ -82,3 +82,7 @@ is also defined, and is equivalent to the above.
 - [ ] Real single precision arithmetic
 - [ ] Complex single precision arithmetic
 - [ ] Complex double precision arithmetic
+
+This content is released under the [MIT](http://opensource.org/licenses/MIT) License.
+<a rel="license" href="http://opensource.org/licenses/MIT">
+<img alt="MIT license" height="40" src="http://upload.wikimedia.org/wikipedia/commons/c/c3/License_icon-mit.svg" /></a>
