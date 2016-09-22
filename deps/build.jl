@@ -17,6 +17,7 @@ noall_load = "--no-whole-archive"
   all_load = "-all_load"
   noall_load = "-noall_load"
   using Homebrew
+  Homebrew.add("homebrew/science/metis4")
   provides(Homebrew.HB, "homebrew/science/metis4", libmetis4, os=:Darwin)
   push!(Libdl.DL_LOAD_PATH, joinpath(Homebrew.prefix("metis4"), "lib"))
 end
