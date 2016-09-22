@@ -98,7 +98,7 @@ end
                             )
 
 
-@compat const ordering_names97 = Dict{Int,ASCIIString}(
+@compat const ordering_names97 = Dict{Int,AbstractString}(
                                    0 => "user supplied or none",
                                    1 => "AMD",
                                    2 => "minimum degree",
@@ -130,7 +130,7 @@ end
 
 "Exception type raised in case of error."
 type Ma97Exception <: Exception
-  msg  :: ASCIIString
+  msg  :: AbstractString
   flag :: Int
 end
 
