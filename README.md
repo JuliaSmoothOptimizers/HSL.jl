@@ -13,6 +13,14 @@ In all cases, users are responsible for obtaining HSL packages.
 julia> Pkg.clone("https://github.com/JuliaSmoothOptimizers/HSL.jl.git")
 ```
 
+At this point, make sure that there isn't a stray METIS library on your library
+path. You especially want to make sure that METIS 5 is not accessible because
+the HSL library currently interfaced only supports METIS 4. If you have such
+library accessible, it is important to remove it from the library path, at
+least temporarily. For example, if you are on OSX and are using Homebrew, you
+can hide METIS 5 with `brew unlink metis`. After the install procedure is
+complete, it is fine to link `metis` again with `brew link metis`.
+
 The source archive, as obtained from the HSL download process, should be placed
 as is in `Pkg.dir("HSL", "deps", "downloads")`. The `HSL` Julia module will
 take care of compilation. Once the source archives have been placed in the
