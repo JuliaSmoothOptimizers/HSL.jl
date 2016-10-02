@@ -81,7 +81,7 @@ provides(SimpleBuild,
               ChangeDirectory(hslsrc)
               `./configure F77=gfortran CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --prefix=$prefix --with-blas=-lblas --with-lapack=-llapack --with-metis="-L$metis_libpath -lmetis"`
               `make install`
-              `gfortran -fPIC -shared -Wl,$all_load $libdir/libhsl_ma97.a -lblas -llapack -L$metis_libpath -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma97.dylib`
+              `gfortran -fPIC -shared -Wl,$all_load $libdir/libhsl_ma97.a -lblas -llapack -L$metis_libpath -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma97.$so`
             end)
           end), libhsl_ma97, os=:Unix)
 
