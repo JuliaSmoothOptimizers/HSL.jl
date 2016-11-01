@@ -12,7 +12,7 @@ so = "so"
 all_load = "--whole-archive"
 noall_load = "--no-whole-archive"
 
-@osx_only begin
+@static if is_apple()
   so = "dylib"
   all_load = "-all_load"
   noall_load = "-noall_load"
@@ -55,11 +55,11 @@ libhsl_ma97 = library_dependency("libhsl_ma97", depends=[libblas, liblapack, lib
 
 # Users should place hsl_ma97-2.3.0.tar.gz in ~/.julia/v0.x/HSL/deps/downloads
 
-@unix_only begin
+@static if is_unix()
   # Set metis_libpath for all Unix platforms.
   # TODO: update this when there are more providers.
   metis_libpath = joinpath(metis_prefix, "lib")
-  @osx_only begin
+  @static if is_apple()
     # It's different on OSX because we used Homebrew.
     metis_libpath = joinpath(Homebrew.prefix("homebrew/science/metis4"), "lib")
   end
