@@ -285,7 +285,7 @@ end
 been performed and must have succeeded. Indicate the matrix type by
 way of the `matrix_type` named argument. Accepted values are
 
-* `:read_spd` for a real symmetric and positive definite matrix
+* `:real_spd` for a real symmetric and positive definite matrix
 * `:real_indef` for a real symmetric and indefinite matrix.
 """
 function ma97_factorize(ma97 :: Ma97; matrix_type :: Symbol=:real_indef)
