@@ -87,9 +87,9 @@ is also defined, and is equivalent to the above.
 
 - [ ] Convenient constructor for rectangular matrices to enable `\`
 - [ ] Convenient access to control parameters, especially pivot tolerance
-- [ ] Real single precision arithmetic
-- [ ] Complex single precision arithmetic
-- [ ] Complex double precision arithmetic
+- [X] Real single precision arithmetic [(e59c501)](https://github.com/JuliaSmoothOptimizers/HSL.jl/commit/e59c5015297bad38357c7cf64bd0dc5fa68e3ba5)
+- [X] Complex single precision arithmetic [(e59c501)](https://github.com/JuliaSmoothOptimizers/HSL.jl/commit/e59c5015297bad38357c7cf64bd0dc5fa68e3ba5)
+- [X] Complex double precision arithmetic [(e59c501)](https://github.com/JuliaSmoothOptimizers/HSL.jl/commit/e59c5015297bad38357c7cf64bd0dc5fa68e3ba5)
 
 This content is released under the [MIT](http://opensource.org/licenses/MIT) License.
 <a rel="license" href="http://opensource.org/licenses/MIT">
