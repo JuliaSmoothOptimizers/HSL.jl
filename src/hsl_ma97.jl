@@ -9,10 +9,6 @@ export Ma97Exception
 
 typealias Ma97Data Union{Float32, Float64, Complex64, Complex128}
 typealias Ma97Real Union{Cfloat, Cdouble}
-const data_map = Dict{Type, Type}(Float32 => Cfloat,
-                                  Float64 => Cdouble,
-                                  Complex64 => Cfloat,
-                                  Complex128 => Cdouble)
 
 
 """Main control type for MA97.

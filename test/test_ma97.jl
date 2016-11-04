@@ -1,6 +1,6 @@
 for T in (Float32, Float64, Complex64, Complex128)
 
-  println("testing with $T data")
+  info("Testing hsl_ma97 with $T data")
   matrix_type = T in (Complex64, Complex128) ? :herm_indef : :real_indef
 
   ϵ = sqrt(eps(real(T)))
