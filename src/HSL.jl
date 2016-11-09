@@ -16,5 +16,6 @@ const data_map = Dict{Type, Type}(Float32 => Cfloat,
 
 # package-specific definitions
 isdefined(:libhsl_ma97) && include("hsl_ma97.jl")
+isdefined(:libhsl_ma57) && include("hsl_ma57.jl")
 
 end
