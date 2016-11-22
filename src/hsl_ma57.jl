@@ -88,11 +88,16 @@ end
                                  :real_indef =>  4   # real symmetric indefinite
                                )
 
+# MA57 computes the factorization PSASP' = LDL', i.e.,
+# Ax=b becomes S⁻¹P'LDL'PS⁻¹x = b.
+# The computations are arranged so the system is rewritten equivalently
+# (S⁻¹P'LPS) (S⁻¹P'DPS⁻¹) (SP'L'PS⁻¹)x = b.
+
 @compat const jobs57 = Dict{Symbol,Int}(
                          :A    => 1,  # solve Ax = b
-                         :LS   => 2,  # solve LSx = PSb
-                         :DS   => 3,  # solve DS⁻¹x = Sb
-                         :LPS  => 4,  # solve L'P'S⁻¹x = S⁻¹b
+                         :LS   => 2,  # solve LPSx = PSb
+                         :DS   => 3,  # solve DPS⁻¹x = PSb
+                         :LPS  => 4,  # solve L'PS⁻¹x = PS⁻¹b
                        )
 
 
