@@ -14,6 +14,19 @@ function test_ma57(A, M, b, xexact)
   P = speye(M.n)[p, :]
   @test vecnorm(P * S * A * S * P' - L * D * L') ≤ ϵ * vecnorm(A)
 
+  # test partial solves
+  b1 = S \ (P' * (L \ (P * (S * b))))
+  x1 = ma57_solve(M, b, job=:LS)
+  @test norm(x1 - b1) ≤ ϵ * norm(b1)
+
+  b2 = S * (P' * (full(D) \ (P * (S * b))))
+  x2 = ma57_solve(M, b, job=:DS)
+  @test norm(x2 - b2) ≤ ϵ * norm(b2)
+
+  b3 = S * (P' * (L' \ (P * (S \ b))))
+  x3 = ma57_solve(M, b, job=:LPS)
+  @test norm(x3 - b3) ≤ ϵ * norm(b3)
+
   # alter the D factor
   d1 = abs(diag(D))
   d2 = [diag(D, 1) ; 0]
