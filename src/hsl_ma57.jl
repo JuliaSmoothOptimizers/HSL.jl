@@ -135,7 +135,7 @@ end
 """Instantiate an object of type `Ma57` and perform the
 symbolic analysis on a sparse Julia matrix.
 """
-function Ma57{T <: Ma57Data}(A :: SparseMatrixCSC{T,Int}; kwargs...)
+function Ma57{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}; kwargs...)
   m, n = size(A)
   m == n || throw(Ma57Exception("Ma57: input matrix must be square", 0))
   L = tril(convert(SparseMatrixCSC{data_map[T],Int32}, A))
@@ -152,12 +152,13 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
     """Instantiate an object of type `Ma57` and perform the
     symbolic analysis on a matrix described in sparse coordinate format.
     """
-    function ma57_coord{Ti <: Int32}(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
+    function ma57_coord{Ti <: Integer}(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
       control = Ma57_Control{$(data_map[typ])}(; kwargs...)
       info = Ma57_Info{$(data_map[typ])}()
       nz = length(cols)
       M = Ma57{$typ}(convert(Int32, n), convert(Int32, nz),
-                     rows, cols, nzval, control, info)
+                     convert(Vector{Int32}, rows), convert(Vector{Int32}, cols),
+                     nzval, control, info)
 
       iwork = Vector{Int32}(5 * n)
 
@@ -237,7 +238,7 @@ end
 factorization phases. An MA57 instance is returned, that can subsequently
 be passed to other functions, e.g., `ma57_solve()`.
 """
-function ma57_factorize{T <: Ma57Data}(A :: SparseMatrixCSC{T,Int}; kwargs...)
+function ma57_factorize{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}; kwargs...)
   ma57 = Ma57(A; kwargs...)
   ma57_factorize(ma57)
   return ma57
@@ -355,7 +356,7 @@ end
 """Convenience method that combines the symbolic analysis, numerical
 factorization and solution phases.
 """
-function ma57_solve{T <: Ma57Data}(A :: SparseMatrixCSC{T,Int}, b :: Array{T})
+function ma57_solve{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}, b :: Array{T})
   (m, n) = size(A)
   m < n && (return ma57_min_norm(A, b))
   m > n && (return ma57_least_squares(A, b))
@@ -374,7 +375,7 @@ by solving the saddle-point system
     [ I  A' ] [ x ]   [ 0 ]
     [ A     ] [ y ] = [ b ].
 """
-function ma57_min_norm{T <: Ma57Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
+function ma57_min_norm{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T})
   (m, n) = size(A)
   K = [ speye(T, n)  spzeros(T, n, m) ; A  0.0 * speye(T, m) ]
   rhs = [ zeros(T, n) ; b ]
@@ -397,7 +398,7 @@ by solving the saddle-point system
     [ I   A ] [ r ]   [ b ]
     [ A'    ] [ x ] = [ 0 ].
 """
-function ma57_least_squares{T <: Ma57Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
+function ma57_least_squares{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T})
   (m, n) = size(A)
   K = [ speye(T, m)  spzeros(T, m,n) ; A'  0.0 * speye(T, n) ]
   rhs = [ b ; zeros(T, n) ]
