@@ -565,7 +565,7 @@ by solving the saddle-point system
 """
 function ma97_min_norm{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
   (m, n) = size(A)
-  K = [ speye(T, n)  spzeros(T, n, m) ; A  0.0 * speye(T, m) ]
+  K = [ speye(T, n)  spzeros(T, n, m) ; A  T(0) * speye(T, m) ]
   rhs = [ zeros(T, n) ; b ]
   xy97 = ma97_solve(K, rhs, matrix_type=T in (Complex64, Complex128) ? :herm_indef : :real_indef)
   x97 = xy97[1:n]
@@ -588,7 +588,7 @@ by solving the saddle-point system
 """
 function ma97_least_squares{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
   (m, n) = size(A)
-  K = [ speye(T, m)  spzeros(T, m,n) ; A'  0.0 * speye(T, n) ]
+  K = [ speye(T, m)  spzeros(T, m,n) ; A'  T(0) * speye(T, n) ]
   rhs = [ b ; zeros(T, n) ]
   rx97 = ma97_solve(K, rhs, matrix_type=T in (Complex64, Complex128) ? :herm_indef : :real_indef)
   r97 = rx97[1:m]
