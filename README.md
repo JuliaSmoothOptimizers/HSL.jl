@@ -37,7 +37,7 @@ Note that a C and Fortran compilers are required.
 
 ### HSL_MA97
 
-[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html) version 2.3.0: an
+[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html) version 2.4.0: an
 OpenMP-based direct solver for symmetric linear systems. Example:
 
 ```JULIA
@@ -54,17 +54,15 @@ x = ma97_solve(LBL, rhs)  # or x = LBL \ rhs
 
 #### Rectangular Systems
 
-There is a convenience interface to solve rectangular systems that somewhat
-does away with the missing sparse QR factorization in Julia 0.3 and provides an
-alternative in Julia 0.4.
+There is a convenience interface to solve rectangular systems that complements
+the sparse QR factorization in Julia.
 
 When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
 ```JULIA
 (x, y) = ma97_solve(A, b)
 ```
 solves for the minimum-norm solution, i.e., *x* such that *Ax = b* and *x +
-Aᵀ y = 0*. This is equivalent to `A \ b` when `A` is a dense array in Julia 0.3,
-and also when `A` is a sparse matrix in Julia 0.4. The call
+Aᵀ y = 0*. The call
 ```JULIA
 (x, y) = ma97_min_norm(A, b)
 ```
@@ -75,9 +73,7 @@ When *m* > *n* and has full column rank,
 (r, x) = ma97_solve(A, b)
 ```
 solves for the least-squares solution, i.e., *x* such that *r = b - Ax*
-satisfies *Aᵀ r = 0*. This is again equivalent to `A \ b` when `A` is a dense
-array in Julia 0.3, and also when `A` is a sparse matrix in Julia 0.4. The
-call
+satisfies *Aᵀ r = 0*. The call
 ```JULIA
 (r, x) = ma97_least_squares(A, b)
 ```

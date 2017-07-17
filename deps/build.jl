@@ -21,8 +21,8 @@ here = dirname(@__FILE__)
 include(joinpath(here, "build_blas.jl"))
 include(joinpath(here, "build_metis4.jl"))
 
-const hsl_ma97_version = "2.3.0"
-const hsl_ma97_sha256 = "e3133eba520abcabaf1700106f8a1310d4286c61721f707e94fb7d45a220abf2"
+const hsl_ma97_version = "2.4.0"
+const hsl_ma97_sha256 = "b91552164311add95f7228d1397a747611f08ffdc86a100df58ddfcedfdc7ca7"
 const hsl_ma97_archive = joinpath(here, "downloads", "hsl_ma97-$hsl_ma97_version.tar.gz")
 
 info("looking for $hsl_ma97_archive")
