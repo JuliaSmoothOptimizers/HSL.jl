@@ -22,14 +22,15 @@ for T in (Float32, Float64, Complex64, Complex128)
   b = rand(T, n)
   x = ma97_solve(ma97, b)
   @test ma97.info.flag == 0
-  x_exact = A \ b
+  LU = lufact(A)
+  x_exact = LU \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   # Solve with multiple rhs.
   b = rand(T, n, 3)
   x = ma97_solve(ma97, b)
   @test ma97.info.flag == 0
-  x_exact = A \ b
+  x_exact = LU \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   piv_order, d = ma97_inquire(ma97, matrix_type=matrix_type)
@@ -58,14 +59,15 @@ for T in (Float32, Float64, Complex64, Complex128)
   b = rand(T, n)
   x = ma97_solve(ma97, b)
   @test ma97.info.flag == 0
-  x_exact = A \ b
+  LU = lufact(A)
+  x_exact = LU \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   # Solve with multiple rhs.
   b = rand(T, n, 3)
   x = ma97_solve(ma97, b)
   @test ma97.info.flag == 0
-  x_exact = A \ b
+  x_exact = LU \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   d = ma97_inquire(ma97, matrix_type=matrix_type)
