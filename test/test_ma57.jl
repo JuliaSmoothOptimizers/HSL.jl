@@ -28,7 +28,7 @@ function test_ma57(A, M, b, xexact)
   @test norm(x3 - b3) ≤ ϵ * norm(b3)
 
   # alter the D factor
-  d1 = abs(diag(D))
+  d1 = abs.(diag(D))
   d2 = [diag(D, 1) ; 0]
   ma57_alter_d(M, [full(d1)' ; full(d2)'])
 end
