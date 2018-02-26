@@ -49,13 +49,8 @@ for T in (Float32, Float64)
   test_ma57(A, M, b, xexact)
 
   n = 5
-  if VERSION >= v"0.5"
-    A = convert(T, 3) * sprand(T, n, n, .5)
-  else
-    A = convert(T, 3) * convert(SparseMatrixCSC{T,Int}, sprand(n, n, .5))
-  end
-
-  A = A + A' + speye(T, n)
+  A = convert(T, 3) * convert(SparseMatrixCSC{T,Int32}, sprand(T, n, n, .5))
+  A = A + A' + convert(SparseMatrixCSC{T,Int32}, speye(T, n))
   M = Ma57(A)
   b = rand(T, n)
   xexact = A \ b
