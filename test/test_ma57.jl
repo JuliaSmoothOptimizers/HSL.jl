@@ -53,6 +53,6 @@ for T in (Float32, Float64)
   A = A + A' + convert(SparseMatrixCSC{T,Int32}, speye(T, n))
   M = Ma57(A)
   b = rand(T, n)
-  xexact = A \ b
+  xexact = lufact(A) \ b
   test_ma57(A, M, b, xexact)
 end
