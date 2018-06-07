@@ -7,8 +7,8 @@ export ma97_csc, ma97_coord,
        ma97_min_norm, ma97_least_squares
 export Ma97Exception
 
-typealias Ma97Data Union{Float32, Float64, Complex64, Complex128}
-typealias Ma97Real Union{Cfloat, Cdouble}
+const Ma97Data = Union{Float32, Float64, Complex64, Complex128}
+const Ma97Real = Union{Cfloat, Cdouble}
 
 
 """Main control type for MA97.
@@ -73,7 +73,7 @@ type Ma97_Control{T <: Ma97Real}
   "spare real storage currently unused"
   rspare :: Vector{T}
 
-  function Ma97_Control(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6)
+  function Ma97_Control{T}(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6) where {T}
     control = new(0, 0, 0, 0.0, 0, 0, 0, 0.0,
                   0.0, 0, 0, 0, 0, 0, 0, 0, 0.0,
                   zeros(Cint, 5), zeros(T, 10))
@@ -206,7 +206,7 @@ type Ma97_Info{T <: Ma97Real}
   "spare real storage currently unused"
   rspare :: Vector{T}
 
-  function Ma97_Info()
+  function Ma97_Info{T}() where {T}
     return new(0, 0, 0, 0, 0, 0, 0, 0,
                0, 0, 0, 0, 0, 0, 0, 0, 0,
                zeros(Cint, 5), zeros(T, 10))
@@ -231,7 +231,7 @@ type Ma97{T <: Ma97Data, S <: Ma97Real}
   function Ma97{T, S}(
     a :: Array{Ptr{Void}}, f :: Array{Ptr{Void}}, n :: Int,
     colptr :: Vector{Cint}, rowval :: Vector{Cint}, nzval :: Vector{T},
-    control :: Ma97_Control{S}, info :: Ma97_Info{S})
+    control :: Ma97_Control{S}, info :: Ma97_Info{S}) where {T, S}
 
     t = eltype(nzval)
     S == data_map[t] || throw(TypeError(:Ma97, "Ma97{$T, $S}\n", data_map[t], t))
