@@ -12,18 +12,20 @@ const Ma97Data = Union{Float32, Float64, Complex64, Complex128}
 const Ma97Real = Union{Cfloat, Cdouble}
 
 
-"""Main control type for MA97.
+"""# Main control type for MA97.
 
-Optional arguments:
+    Ma97_Control(; kwargs...)
 
-* print_level: integer controling the verbosit level. Accepted values are:
+## Keyword arguments:
+
+* `print_level::Int`: integer controling the verbosit level. Accepted values are:
     * <0: no printing
     * 0: errors and warnings only (default)
     * 1: errors, warnings and basic diagnostics
     * 2: errors, warning and full diagnostics
-* unit_diagnostics: Fortran file unit for diagnostics (default: 6)
-* unit_error: Fortran file unit for errors (default: 6)
-* unit_warning: Fortran file unit for warnings (default: 6)
+* `unit_diagnostics::Int`: Fortran file unit for diagnostics (default: 6)
+* `unit_error::Int`: Fortran file unit for errors (default: 6)
+* `unit_warning::Int`: Fortran file unit for warnings (default: 6)
 """
 type Ma97_Control{T <: Ma97Real}
 
@@ -148,8 +150,11 @@ type Ma97Exception <: Exception
 end
 
 
-"""Main info type for MA97. An `info` variable is used to collect
-statistics on the analysis, factorization and solve.
+"""# Main info type for MA97
+
+    info = Ma97_Info{T <: Ma97Real}()
+
+An `info` variable is used to collect statistics on the analysis, factorization and solve.
 """
 type Ma97_Info{T <: Ma97Real}
   "exit status"
@@ -265,9 +270,6 @@ for (fname, freename, typ) in ((:ma97_analyse_s, :ma97_free_akeep_s, Float32),
 
   @eval begin
 
-    """Instantiate an object of type `Ma97` and perform the
-    symbolic analysis on a matrix described in sparse CSC format.
-    """
     function ma97_csc{Ti <: Integer}(n :: Int, colptr :: Vector{Ti}, rowval :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
       control = Ma97_Control{$(data_map[typ])}(; kwargs...)
       info = Ma97_Info{$(data_map[typ])}()
@@ -291,8 +293,20 @@ for (fname, freename, typ) in ((:ma97_analyse_s, :ma97_free_akeep_s, Float32),
 end
 
 
-"""Instantiate an object of type `Ma97` and perform the
-symbolic analysis on a sparse Julia matrix.
+"""# Instantiate and perform symbolic analysis on a sparse Julia matrix
+
+    M = Ma97(A; kwargs...)
+
+
+Instantiate an object of type `Ma97` and perform the symbolic analysis on a sparse Julia matrix.
+
+## Input arguments
+
+* `A::SparseMatrixCSC{T<:Ma97Data,Int}`: input matrix. The lower triangle will be extracted.
+
+## Keyword arguments
+
+All keyword arguments are passed directly to `ma97_csc()`.
 """
 function Ma97{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}; kwargs...)
   m, n = size(A)
@@ -311,9 +325,6 @@ for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float
 
   @eval begin
 
-    """Instantiate an object of type `Ma97` and perform the
-    symbolic analysis on a matrix described in sparse coordinate format.
-    """
     function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
       control = Ma97_Control{$(data_map[typ])}(; kwargs...)
       info = Ma97_Info{$(data_map[typ])}()
@@ -345,13 +356,6 @@ for (fname, typ) in ((:ma97_factor_s, Float32),
 
   @eval begin
 
-    """Perform numerical factorization. The symbolic analysis must have
-    been performed and must have succeeded. Indicate the matrix type by
-    way of the `matrix_type` named argument. Accepted values are
-
-    * `:real_spd` for a real symmetric and positive definite matrix
-    * `:real_indef` for a real symmetric and indefinite matrix.
-    """
     function ma97_factorize!(ma97 :: Ma97{$typ, $(data_map[typ])}; matrix_type :: Symbol=:real_indef)
       t = matrix_types97[matrix_type]
 
@@ -369,10 +373,6 @@ for (fname, typ) in ((:ma97_factor_s, Float32),
 end
 
 
-"""Convenience method that combines the symbolic analysis and numerical
-factorization phases. An MA97 instance is returned, that can subsequently
-be passed to other functions, e.g., `ma97_solve()`.
-"""
 function ma97_factorize{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}; matrix_type :: Symbol=:real_indef)
   ma97 = Ma97(A)
   ma97_factorize!(ma97, matrix_type=matrix_type)
@@ -384,9 +384,6 @@ ma97_factorise! = ma97_factorize!
 ma97_factorise = ma97_factorize
 
 
-"""Solve a linear system with right-hand side `b`. Multiple right-hand
-sides can be represented with an array `b` of size `n` by `nrhs`.
-"""
 function ma97_solve{T <: Ma97Data, S <: Ma97Real}(ma97 :: Ma97{T, S}, b :: Array{T})
   x = copy(b)
   ma97_solve!(ma97, x)
@@ -401,10 +398,6 @@ for (fname, typ) in ((:ma97_solve_s, Float32),
 
   @eval begin
 
-    """Solve a linear system in place with right-hand side `b`. Note that
-    `b` will be overwritten. To solve a system with multiple right-hand sides,
-    `b` should have size `n` by `nrhs`.
-    """
     function ma97_solve!(ma97 :: Ma97{$typ, $(data_map[typ])}, b :: Array{$typ}; job :: Symbol=:A)
       size(b, 1) == ma97.n || throw(Ma97Exception("Ma97: rhs size mismatch", 0))
       nrhs = size(b, 2)
@@ -431,9 +424,6 @@ end
 \{T <: Ma97Data, S <: Ma97Real}(ma97 :: Ma97{T,S}, b :: Array{T}) = ma97_solve(ma97, b)
 
 
-"""Convenience method that combines the symbolic analysis, numerical
-factorization and solution phases.
-"""
 function ma97_solve{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Array{T}; matrix_type :: Symbol=:real_indef)
   (m, n) = size(A)
   m < n && (return ma97_min_norm(A, b))
@@ -451,11 +441,6 @@ for (fname, typ) in ((:ma97_factor_solve_s, Float32),
 
   @eval begin
 
-    """Convenience method that combines the symbolic analysis, numerical
-    factorization and solution phases. The solution is performed in place,
-    i.e., `b` will be overwritten. To solve a system with multiple right-hand
-    sides, `b` should have size `n` by `nrhs`.
-    """
     function ma97_solve!(A :: SparseMatrixCSC{$typ,Int}, b :: Array{$typ}; matrix_type :: Symbol=:real_indef)
       t = matrix_types97[matrix_type]
       M = Ma97(A)
@@ -485,16 +470,6 @@ for (indef, posdef, typ) in ((:ma97_enquire_indef_s, :ma97_enquire_posdef_s, Flo
 
   @eval begin
 
-    """Obtain information on the pivots after a successful factorization or solve.
-    An inquiry on a real or complex indefinite matrix returns two vectors:
-
-    * `piv_order`: contains the pivot sequence; a negative value indicates that the
-      corresponding variable is part of a 2x2 pivot,
-    * `d`: a `2` by `n` array whose first row contains the diagonal of D⁻¹ in the
-      factorization, and whose nonzeros in the second row contain the off-diagonals.
-
-    An inquiry on a positive definite matrix returns one vector with the pivot values.
-    """
     function ma97_inquire(ma97 :: Ma97{$typ, $(data_map[typ])}; matrix_type :: Symbol=:real_indef)
       if matrix_type in [:real_indef, :herm_indef, :cmpl_indef]
         piv_order = zeros(Cint, ma97.n)
@@ -555,15 +530,27 @@ end
 # least_squares because the user would have to provide a storage array
 # of length n+m, which is not the size of the solution x alone.
 
-"""Solve the minimum-norm problem
+"""# Solve a minimum-norm problem
 
-    minimize ‖x‖  subject to Ax=b,
+    ma97_min_norm(A, b)
 
-where A has shape m-by-n with m < n,
-by solving the saddle-point system
+solves
+
+    minimize ‖x‖₂  subject to Ax=b,
+
+where A has shape m-by-n with m < n, by solving the saddle-point system
 
     [ I  A' ] [ x ]   [ 0 ]
     [ A     ] [ y ] = [ b ].
+
+## Input arguments
+
+* `A::SparseMatrixCSC{T<:Ma97Data,Int}`: input matrix of shape m-by-n with m < n. A full matrix will be converted to sparse.
+* `b::Vector{T}`: right-hand side vector
+
+## Return value
+
+* `x::Vector{T}`: solution vector.
 """
 function ma97_min_norm{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
   (m, n) = size(A)
@@ -578,15 +565,27 @@ end
 ma97_min_norm{T <: Ma97Data}(A :: Array{T,2}, b :: Vector{T}) = ma97_min_norm(sparse(A), b)
 
 
-"""Solve the least-squares problem
+"""# Solve least-squares problem
 
-    minimize ‖Ax - b‖,
+    ma97_least_squares(A, b)
 
-where A has shape m-by-n with m > n,
-by solving the saddle-point system
+Solve the least-squares problem
+
+    minimize ‖Ax - b‖₂
+
+where A has shape m-by-n with m > n, by solving the saddle-point system
 
     [ I   A ] [ r ]   [ b ]
     [ A'    ] [ x ] = [ 0 ].
+
+## Input arguments
+
+* `A::SparseMatrixCSC{T<:Ma97Data,Int}`: input matrix of shape m-by-n with m > n. A full matrix will be converted to sparse.
+* `b::Vector{T}`: right-hand side vector
+
+## Return value
+
+* `x::Vector{T}`: solution vector.
 """
 function ma97_least_squares{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
   (m, n) = size(A)
@@ -599,3 +598,168 @@ function ma97_least_squares{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vec
 end
 
 ma97_least_squares{T <: Ma97Data}(A :: Array{T,2}, b :: Vector{T}) = ma97_least_squares(sparse(A), b)
+
+
+# docstrings
+
+"""# Instantiate and perform symbolic analysis using CSC arrays
+
+    M = ma97_csc(n, colptr, rowval, nzval; kwargs...)
+
+Instantiate an object of type `Ma97` and perform the symbolic analysis on a matrix described in sparse CSC format.
+
+## Input arguments
+
+* `n::Int`: the matrix size
+* `colptr::Vector{T<:Integer}`: CSC colptr array for the lower triangle
+* `rowval::Vector{T<:Integer}`: CSC rowval array for the lower triangle
+* `nzval::Vector{T<:Ma97Data}`: CSC nzval array for the lower triangle
+
+## Keyword arguments
+
+All keyword arguments are passed directly to the `Ma97_Control` constructor.
+"""
+ma97_csc
+
+
+"""# Instantiate and perform symbolic analysis using coordinate arrays
+
+    M = ma97_coord(n, cols, rows, nzval; kwargs...)
+
+Instantiate an object of type `Ma97` and perform the symbolic analysis on a matrix described in sparse coordinate format.
+
+## Input arguments
+
+* `n::Int`: the matrix size
+* `cols::Vector{T<:Integer}`: array of column indices for the lower triangle
+* `rows::Vector{T<:Integer}`: array of row indices for the lower triangle
+* `nzval::Vector{T<:Ma97Data}`: array of values for the lower triangle
+
+## Keyword arguments
+
+All keyword arguments are passed directly to the `Ma97_Control` constructor.
+"""
+ma97_coord
+
+
+"""# Perform numerical factorization.
+
+    ma97_factorize!(ma97; kwargs...)
+
+The symbolic analysis must have been performed and must have succeeded.
+
+## Input Arguments
+
+* `ma97::Ma97{T<:Ma97Data}`:: an `Ma97` structure for which the analysis has been performed
+
+## Keyword Arguments
+
+* `matrix_type::Symbol=:real_indef`: indicates the matrix type. Accepted values are
+  * `:real_spd` for a real symmetric and positive definite matrix
+  * `:real_indef` for a real symmetric and indefinite matrix.
+"""
+ma97_factorize!, ma97_factorise!
+
+
+"""# Combined Analysis and factorization
+
+  M = ma97_factorize(A; kwargs...)
+
+Convenience method that combines the symbolic analysis and numerical
+factorization phases. An MA97 instance is returned, that can subsequently
+be passed to other functions, e.g., `ma97_solve()`.
+
+## Input Arguments
+
+* `A::SparseMatrixCSC{T<:Ma97Data,Int}`: Julia sparse matrix
+
+## Keyword Arguments
+
+* `matrix_type::Symbol=:real_indef`: indicates the matrix type. Accepted values are
+  * `:real_spd` for a real symmetric and positive definite matrix
+  * `:real_indef` for a real symmetric and indefinite matrix.
+"""
+ma97_factorize, ma97_factorise
+
+
+"""# In-place system solve
+
+See the documentation for `ma97_solve()`. The only difference is that the right-hand side `b` is overwritten with the solution.
+"""
+ma97_solve!
+
+
+"""# System solve
+
+## Solve after factorization
+
+    ma97_solve(ma97, b; kwargs...)
+
+### Input arguments
+
+* `ma97::Ma97{T<:Ma97Data}`: an `Ma97` structure for which the analysis and factorization have been performed
+* `b::Array{T}`: vector of array of right-hand sides. Note that `b` will be overwritten. To solve a system with multiple right-hand sides, `b` should have size `n` by `nrhs`.
+
+### Keyword arguments
+
+* `job::Symbol=:A`: task to perform. Accepted values are
+  * `:A`: solve Ax = b
+  * `:PL`: solve PLx = Sb
+  * `:D`: solve Dx = b
+  * `:LPS`: solve L'P'S⁻¹x = b
+  * `:DLPS`: solve DL'P'S⁻¹x = b.
+
+### Return values
+
+* `x::Array{T}`: an array of the same size as `b` containing the solutions.
+
+## Combined analysis, factorization and solve
+
+    ma97_solve(A, b; kwargs...)
+
+### Input arguments
+
+* `A::SparseMatrixCSC{T<:Ma97Data,Int}`: input matrix. A full matrix will be converted to sparse.
+* `b::Array{T}`: vector of array of right-hand sides. Note that `b` will be overwritten. To solve a system with multiple right-hand sides, `b` should have size `n` by `nrhs`.
+
+### Keyword arguments
+
+* `matrix_type::Symbol=:real_indef`: indicates the matrix type. Accepted values are
+  * `:real_spd` for a real symmetric and positive definite matrix
+  * `:real_indef` for a real symmetric and indefinite matrix.
+
+### Return values
+
+* `x::Array{T}`: an array of the same size as `b` containing the solutions.
+"""
+ma97_solve
+
+
+"""# Inquire about a factorization or solve
+
+    ma97_inquire(ma97; kwargs...)
+
+Obtain information on the pivots after a successful factorization or solve.
+
+## Input Arguments
+
+* `ma97::Ma97{T<:Ma97Data}`: an `Ma97` structure for which the analysis and factorization have been performed
+
+## Keyword arguments
+
+* `matrix_type::Symbol=:real_indef`: indicates the matrix type. Accepted values are
+  * `:real_spd` for a real symmetric and positive definite matrix
+  * `:real_indef` for a real symmetric and indefinite matrix.
+
+## Return values
+
+An inquiry on a real or complex indefinite matrix returns two vectors:
+
+* `piv_order`: contains the pivot sequence; a negative value indicates that the
+  corresponding variable is part of a 2x2 pivot,
+* `d`: a `2` by `n` array whose first row contains the diagonal of D⁻¹ in the
+  factorization, and whose nonzeros in the second row contain the off-diagonals.
+
+An inquiry on a positive definite matrix returns one vector with the pivot values.
+"""
+ma97_inquire, ma97_enquire
