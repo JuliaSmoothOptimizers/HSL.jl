@@ -1,5 +1,6 @@
 export Ma97_Control, Ma97_Info, Ma97
 export ma97_csc, ma97_coord,
+       ma97_factorize!, ma97_factorise!,
        ma97_factorize, ma97_factorise,
        ma97_solve, ma97_solve!,
        ma97_inquire, ma97_enquire,
@@ -351,7 +352,7 @@ for (fname, typ) in ((:ma97_factor_s, Float32),
     * `:real_spd` for a real symmetric and positive definite matrix
     * `:real_indef` for a real symmetric and indefinite matrix.
     """
-    function ma97_factorize(ma97 :: Ma97{$typ, $(data_map[typ])}; matrix_type :: Symbol=:real_indef)
+    function ma97_factorize!(ma97 :: Ma97{$typ, $(data_map[typ])}; matrix_type :: Symbol=:real_indef)
       t = matrix_types97[matrix_type]
 
       ccall(($(string(fname)), libhsl_ma97), Void,
@@ -374,11 +375,12 @@ be passed to other functions, e.g., `ma97_solve()`.
 """
 function ma97_factorize{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}; matrix_type :: Symbol=:real_indef)
   ma97 = Ma97(A)
-  ma97_factorize(ma97, matrix_type=matrix_type)
+  ma97_factorize!(ma97, matrix_type=matrix_type)
   return ma97
 end
 
 # Z's not dead.
+ma97_factorise! = ma97_factorize!
 ma97_factorise = ma97_factorize
 
 

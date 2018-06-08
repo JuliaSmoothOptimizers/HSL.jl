@@ -15,7 +15,7 @@ for T in (Float32, Float64, Complex64, Complex128)
 
   # Test symmetric indefinite A.
   ma97 = Ma97(A)
-  ma97_factorize(ma97, matrix_type=matrix_type)
+  ma97_factorize!(ma97, matrix_type=matrix_type)
   @test ma97.info.flag == 0
 
   # Solve with one rhs.
@@ -53,7 +53,7 @@ for T in (Float32, Float64, Complex64, Complex128)
   matrix_type = T in (Complex64, Complex128) ? :herm_pd : :real_spd
 
   ma97 = Ma97(A)
-  ma97_factorize(ma97, matrix_type=matrix_type)
+  ma97_factorize!(ma97, matrix_type=matrix_type)
   @test ma97.info.flag == 0
 
   b = rand(T, n)
