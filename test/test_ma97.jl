@@ -42,7 +42,7 @@ for T in (Float32, Float64, Complex64, Complex128)
 
   # Alter d.
   d[1,1] *= 2
-  ma97_alter(ma97, d)
+  ma97_alter!(ma97, d)
 
   # Test convenience interface.
   x = ma97_solve(A, b, matrix_type=matrix_type)

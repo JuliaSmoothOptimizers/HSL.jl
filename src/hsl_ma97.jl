@@ -4,7 +4,7 @@ export ma97_csc, ma97_coord,
        ma97_factorize, ma97_factorise,
        ma97_solve, ma97_solve!,
        ma97_inquire, ma97_enquire,
-       ma97_alter,
+       ma97_alter!,
        ma97_min_norm, ma97_least_squares
 export Ma97Exception
 
@@ -535,7 +535,7 @@ for (fname, typ) in ((:ma97_alter_s, Float32),
 
   @eval begin
 
-    function ma97_alter(ma97 :: Ma97{$typ, $(data_map[typ])}, d :: Array{$typ, 2})
+    function ma97_alter!(ma97 :: Ma97{$typ, $(data_map[typ])}, d :: Array{$typ, 2})
       n, m = size(d)
       (m == ma97.n && n == 2) || throw(Ma97Exception("Ma97: input array d must be n x 2", 0))
       ccall(($(string(fname)), libhsl_ma97), Void,
