@@ -656,7 +656,12 @@ The symbolic analysis must have been performed and must have succeeded.
   * `:real_spd` for a real symmetric and positive definite matrix
   * `:real_indef` for a real symmetric and indefinite matrix.
 """
-ma97_factorize!, ma97_factorise!
+ma97_factorize!
+
+
+"""ma97_factorise!: see the documentation for `ma97_factorize!`.
+"""
+ma97_factorise!
 
 
 """# Combined Analysis and factorization
@@ -677,7 +682,12 @@ be passed to other functions, e.g., `ma97_solve()`.
   * `:real_spd` for a real symmetric and positive definite matrix
   * `:real_indef` for a real symmetric and indefinite matrix.
 """
-ma97_factorize, ma97_factorise
+ma97_factorize
+
+
+"""ma97_factorise: see the documentation for `ma97_factorize`.
+"""
+ma97_factorise
 
 
 """# In-place system solve
@@ -760,4 +770,9 @@ An inquiry on a real or complex indefinite matrix returns two vectors:
 
 An inquiry on a positive definite matrix returns one vector with the pivot values.
 """
-ma97_inquire, ma97_enquire
+ma97_inquire
+
+
+"""ma97_enquire: see the documentation for `ma97_inquire`.
+"""
+ma97_enquire
