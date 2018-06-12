@@ -8,7 +8,7 @@ export ma57_coord,
 
 export Ma57Exception
 
-typealias Ma57Data Union{Float32, Float64}
+const Ma57Data = Union{Float32, Float64}
 
 "Exception type raised in case of error."
 type Ma57Exception <: Exception
@@ -22,7 +22,7 @@ type Ma57_Control{T <: Ma57Data}
   icntl :: Vector{Int32}
   cntl :: Vector{T}
 
-  function Ma57_Control(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6)
+  function Ma57_Control{T}(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6) where {T}
     icntl = zeros(Int32, 20)
     cntl = zeros(T, 5)
     if T == Float32
@@ -61,7 +61,7 @@ type Ma57_Info{T <: Ma57Data}
   cond2 :: T
   error_inf_norm :: T
 
-  function Ma57_Info()
+  function Ma57_Info{T}() where {T}
     new(zeros(Int, 40), zeros(T, 20),
         0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0)
@@ -120,9 +120,9 @@ type Ma57{T <: Ma57Data}
   __lifact :: Int32
   __ifact :: Vector{Int32}
 
-  function Ma57(n :: Int32, nz :: Int32,
+  function Ma57{T}(n :: Int32, nz :: Int32,
                 rows :: Vector{Int32}, cols :: Vector{Int32}, vals :: Vector{T},
-                control :: Ma57_Control{T}, info :: Ma57_Info{T})
+                control :: Ma57_Control{T}, info :: Ma57_Info{T}) where {T}
 
     lkeep = 5 * n + nz + max(n, nz) + 42
     keep = zeros(Int32, lkeep)
