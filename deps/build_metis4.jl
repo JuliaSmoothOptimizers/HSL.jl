@@ -2,7 +2,7 @@
 
 libmetis4 = library_dependency("libmetis")  # METIS 5 not ok!
 
-metis4_tap = "dpo/openblas/metis4"
+metis4_tap = "dpo/openblas/metis@4"
 @static if is_apple()
   provides(Homebrew.HB, metis4_tap, libmetis4, os=:Darwin)
 end
