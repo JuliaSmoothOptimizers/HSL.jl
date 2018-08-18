@@ -11,13 +11,13 @@ export Ma57Exception
 const Ma57Data = Union{Float32, Float64}
 
 "Exception type raised in case of error."
-type Ma57Exception <: Exception
+mutable struct Ma57Exception <: Exception
   msg  :: AbstractString
   flag :: Int
 end
 
 "Main control type for MA57."
-type Ma57_Control{T <: Ma57Data}
+mutable struct Ma57_Control{T <: Ma57Data}
 
   icntl :: Vector{Int32}
   cntl :: Vector{T}
@@ -41,7 +41,7 @@ type Ma57_Control{T <: Ma57Data}
 end
 
 "Main info type for MA57."
-type Ma57_Info{T <: Ma57Data}
+mutable struct Ma57_Info{T <: Ma57Data}
   info :: Vector{Int32}
   rinfo :: Vector{T}
 
@@ -101,7 +101,7 @@ end
                        )
 
 
-type Ma57{T <: Ma57Data}
+mutable struct Ma57{T <: Ma57Data}
   n :: Int32
   nz :: Int32
   rows :: Vector{Int32}
@@ -135,14 +135,14 @@ end
 """Instantiate an object of type `Ma57` and perform the
 symbolic analysis on a sparse Julia matrix.
 """
-function Ma57{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}; kwargs...)
+function Ma57(A :: SparseMatrixCSC{T,Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   m, n = size(A)
   m == n || throw(Ma57Exception("Ma57: input matrix must be square", 0))
   L = tril(convert(SparseMatrixCSC{data_map[T],Int32}, A))
   return ma57_coord(L.n, findnz(L)...; kwargs...)
 end
 
-Ma57{T <: Ma57Data}(A :: Array{T,2}; kwargs...) = Ma57(sparse(A); kwargs...)
+Ma57(A :: Array{T,2}; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A); kwargs...)
 
 
 for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
@@ -152,7 +152,7 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
     """Instantiate an object of type `Ma57` and perform the
     symbolic analysis on a matrix described in sparse coordinate format.
     """
-    function ma57_coord{Ti <: Integer}(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
+    function ma57_coord(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...) where {Ti <: Integer}
       control = Ma57_Control{$(data_map[typ])}(; kwargs...)
       info = Ma57_Info{$(data_map[typ])}()
       nz = length(cols)
@@ -164,8 +164,8 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 
       # Perform symbolic analysis.
       ccall(($(string(fname)), libhsl_ma57), Void,
-            (Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32},    Ptr{Int32}, Ptr{Int32}, Ptr{Int32},       Ptr{Int32},   Ptr{Int32},    Ptr{$typ}),
-                &(M.n),     &(M.nz),     M.rows,     M.cols,  &(M.__lkeep),   M.__keep,      iwork,  M.control.icntl,  M.info.info, M.info.rinfo)
+            (Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32},    Ref{Int32}, Ptr{Int32}, Ptr{Int32},       Ptr{Int32},   Ptr{Int32},    Ptr{$typ}),
+                   M.n,        M.nz,     M.rows,     M.cols,     M.__lkeep,   M.__keep,      iwork,  M.control.icntl,  M.info.info, M.info.rinfo)
 
       status = M.info.info[1]
       status > 0 && warn("Ma57: analyze returns with code $status")
@@ -203,8 +203,8 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
       factorized = false
       while !factorized
         ccall(($(string(fname)), libhsl_ma57), Void,
-              (Ptr{Int32},  Ptr{Int32}, Ptr{$typ},  Ptr{$typ},      Ptr{Int32},   Ptr{Int32},       Ptr{Int32},      Ptr{Int32},  Ptr{Int32},  Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
-               &(ma57.n),   &(ma57.nz), ma57.vals, ma57.__fact, &(ma57.__lfact), ma57.__ifact, &(ma57.__lifact), &(ma57.__lkeep), ma57.__keep,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
+              (Ref{Int32},  Ref{Int32}, Ptr{$typ},  Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32},      Ref{Int32},  Ptr{Int32},  Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
+                   ma57.n,     ma57.nz, ma57.vals, ma57.__fact,   ma57.__lfact, ma57.__ifact,   ma57.__lifact,    ma57.__lkeep, ma57.__keep,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
         status = ma57.info.info[1]
         status > 0 && warn("Ma57: factorize returns with code $status")
@@ -238,7 +238,7 @@ end
 factorization phases. An MA57 instance is returned, that can subsequently
 be passed to other functions, e.g., `ma57_solve()`.
 """
-function ma57_factorize{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}; kwargs...)
+function ma57_factorize(A :: SparseMatrixCSC{T,Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   ma57 = Ma57(A; kwargs...)
   ma57_factorize(ma57)
   return ma57
@@ -251,7 +251,7 @@ ma57_factorise = ma57_factorize
 """Solve a linear system with right-hand side `b`. Multiple right-hand
 sides can be represented with an array `b` of size `n` by `nrhs`.
 """
-function ma57_solve{T <: Ma57Data}(ma57 :: Ma57{T}, b :: Array{T}; kwargs...)
+function ma57_solve(ma57 :: Ma57{T}, b :: Array{T}; kwargs...) where {T <: Ma57Data}
   x = copy(b)
   ma57_solve!(ma57, x; kwargs...)
   return x
@@ -273,8 +273,8 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
       lwork = ma57.n * nrhs
       work = Vector{$typ}(lwork)
       ccall(($(string(fname)), libhsl_ma57), Void,
-            (Ptr{Int32}, Ptr{Int32},   Ptr{$typ},      Ptr{Int32},   Ptr{Int32},       Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},         Ptr{Int32},     Ptr{Int32}),
-                    &j,   &(ma57.n), ma57.__fact, &(ma57.__lfact), ma57.__ifact, &(ma57.__lifact),      &nrhs,         b,  &(ma57.n),      work,     &lwork,      iwork, ma57.control.icntl, ma57.info.info)
+            (Ref{Int32}, Ref{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ref{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{Int32},         Ptr{Int32},     Ptr{Int32}),
+                      j,     ma57.n, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,       nrhs,         b,     ma57.n,      work,      lwork,      iwork, ma57.control.icntl, ma57.info.info)
 
       status = ma57.info.info[1]
       status > 0 && warn("Ma57: solve returns with code $status")
@@ -287,7 +287,7 @@ end
 
 """Solve a linear system with right-hand side `b` with iterative refinement.
 """
-function ma57_solve{T <: Ma57Data}(ma57 :: Ma57{T}, b :: Vector{T}, nitref :: Int)
+function ma57_solve(ma57 :: Ma57{T}, b :: Vector{T}, nitref :: Int) where {T <: Ma57Data}
   x = Vector{T}(ma57.n)
   ma57_solve!(ma57, b, x, nitref)
   return x
@@ -317,8 +317,8 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
       work = Vector{$typ}(lwork)
       ccall(($(string(fname)), libhsl_ma57), Void,
-            (Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},   Ptr{$typ},      Ptr{Int32},   Ptr{Int32},       Ptr{Int32}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
-                   &job,  &(ma57.n), &(ma57.nz), ma57.vals,  ma57.rows,  ma57.cols, ma57.__fact, &(ma57.__lfact), ma57.__ifact, &(ma57.__lifact),         b,         x,     resid,      work,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
+            (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
+                    job,     ma57.n,    ma57.nz, ma57.vals,  ma57.rows,  ma57.cols, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,         b,         x,     resid,      work,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
       status = ma57.info.info[1]
       status > 0 && warn("Ma57: solve returns with code $status")
@@ -347,16 +347,14 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
 end
 
 # Overload backslash to solve with MA57.
-if VERSION ≥ v"0.4.0"
-  import Base.\
-end
-\{T <: Ma57Data}(ma57 :: Ma57{T}, b :: Array{T}) = ma57_solve(ma57, b)
+import Base.\
+\(ma57 :: Ma57{T}, b :: Array{T}) where {T <: Ma57Data} = ma57_solve(ma57, b)
 
 
 """Convenience method that combines the symbolic analysis, numerical
 factorization and solution phases.
 """
-function ma57_solve{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}, b :: Array{T})
+function ma57_solve(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
   m < n && (return ma57_min_norm(A, b))
   m > n && (return ma57_least_squares(A, b))
@@ -375,7 +373,7 @@ by solving the saddle-point system
     [ I  A' ] [ x ]   [ 0 ]
     [ A     ] [ y ] = [ b ].
 """
-function ma57_min_norm{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T})
+function ma57_min_norm(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
   K = [ speye(T, n)  spzeros(T, n, m) ; A  0.0 * speye(T, m) ]
   rhs = [ zeros(T, n) ; b ]
@@ -385,7 +383,7 @@ function ma57_min_norm{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti},
   return (x57, y57)
 end
 
-ma57_min_norm{T <: Ma57Data}(A :: Array{T,2}, b :: Vector{T}) = ma57_min_norm(sparse(A), b)
+ma57_min_norm(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
 
 
 """Solve the least-squares problem
@@ -398,7 +396,7 @@ by solving the saddle-point system
     [ I   A ] [ r ]   [ b ]
     [ A'    ] [ x ] = [ 0 ].
 """
-function ma57_least_squares{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T})
+function ma57_least_squares(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
   K = [ speye(T, m)  spzeros(T, m,n) ; A'  0.0 * speye(T, n) ]
   rhs = [ b ; zeros(T, n) ]
@@ -408,7 +406,7 @@ function ma57_least_squares{T <: Ma57Data, Ti <: Integer}(A :: SparseMatrixCSC{T
   return (r57, x57)
 end
 
-ma57_least_squares{T <: Ma57Data}(A :: Array{T,2}, b :: Vector{T}) = ma57_least_squares(sparse(A), b)
+ma57_least_squares(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma57Data} = ma57_least_squares(sparse(A), b)
 
 
 for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
@@ -446,8 +444,8 @@ for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
       status = 0
 
       ccall(($(string(fname)), libhsl_ma57), Void,
-            (Ptr{Int32},   Ptr{$typ},      Ptr{Int32},   Ptr{Int32},       Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},        Ptr{Int32}, Ptr{Int32}),
-              &(ma57.n), ma57.__fact, &(ma57.__lfact), ma57.__ifact, &(ma57.__lifact),     &nebdu,       &nzl,        ipl,        irn,        fl,       &nzd,        ipd,         id,         d,        ivp,      iperm, &(ma57.info.rank),    &status)
+            (Ref{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},        Ref{Int32}, Ref{Int32}),
+                 ma57.n, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,      nebdu,        nzl,        ipl,        irn,        fl,        nzd,         ipd,         id,         d,        ivp,      iperm,    ma57.info.rank,    status)
 
       status < 0 && throw(Ma57Exception("Ma57: Error while retrieving factors", status))
       s = ma57.control.icntl[15] == 1 ? ma57.__fact[end-ma57.n:end-1] : ones($typ, ma57.n)
@@ -460,7 +458,7 @@ for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
   end
 end
 
-function ma57_alter_d{T <: Ma57Data}(ma57 :: Ma57{T}, d :: Array{T,2})
+function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
 
   ka = 1
   k2 = ma57.__ifact[1]
