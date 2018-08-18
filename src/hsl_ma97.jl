@@ -1,3 +1,9 @@
+if VERSION < v"0.7.0-DEV.3389"
+   const SparseArrays = Base.SparseArrays
+ else
+   using SparseArrays
+ end
+
 export Ma97_Control, Ma97_Info, Ma97
 export ma97_csc, ma97_coord,
        ma97_factorize!, ma97_factorise!,
@@ -27,7 +33,7 @@ const Ma97Real = Union{Cfloat, Cdouble}
 * `unit_error::Int`: Fortran file unit for errors (default: 6)
 * `unit_warning::Int`: Fortran file unit for warnings (default: 6)
 """
-type Ma97_Control{T <: Ma97Real}
+mutable struct Ma97_Control{T <: Ma97Real}
 
   "`f_arrays`=1 indicates that arrays are 1-based"
   f_arrays :: Cint
@@ -82,13 +88,13 @@ type Ma97_Control{T <: Ma97Real}
                   zeros(Cint, 5), zeros(T, 10))
 
     if T == Float32
-      ccall((:ma97_default_control_s, libhsl_ma97), Void, (Ptr{Ma97_Control},), &control)
+      ccall((:ma97_default_control_s, libhsl_ma97), Void, (Ref{Ma97_Control},), control)
     elseif T == Float64
-      ccall((:ma97_default_control_d, libhsl_ma97), Void, (Ptr{Ma97_Control},), &control)
+      ccall((:ma97_default_control_d, libhsl_ma97), Void, (Ref{Ma97_Control},), control)
     elseif T == Complex64
-      ccall((:ma97_default_control_c, libhsl_ma97), Void, (Ptr{Ma97_Control},), &control)
+      ccall((:ma97_default_control_c, libhsl_ma97), Void, (Ref{Ma97_Control},), control)
     elseif T == Complex128
-      ccall((:ma97_default_control_z, libhsl_ma97), Void, (Ptr{Ma97_Control},), &control)
+      ccall((:ma97_default_control_z, libhsl_ma97), Void, (Ref{Ma97_Control},), control)
     end
     control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
     control.print_level = print_level
@@ -144,7 +150,7 @@ end
 
 
 "Exception type raised in case of error."
-type Ma97Exception <: Exception
+mutable struct Ma97Exception <: Exception
   msg  :: AbstractString
   flag :: Int
 end
@@ -156,7 +162,7 @@ end
 
 An `info` variable is used to collect statistics on the analysis, factorization and solve.
 """
-type Ma97_Info{T <: Ma97Real}
+mutable struct Ma97_Info{T <: Ma97Real}
   "exit status"
   flag :: Cint
 
@@ -224,7 +230,7 @@ end
 # the following is inspired by
 # https://groups.google.com/d/msg/julia-users/JNQ3eBUL3QU/gqAfij6bAgAJ
 
-type Ma97{T <: Ma97Data, S <: Ma97Real}
+mutable struct Ma97{T <: Ma97Data, S <: Ma97Real}
   __akeep :: Array{Ptr{Void}}
   __fkeep :: Array{Ptr{Void}}
   n :: Int
@@ -270,15 +276,15 @@ for (fname, freename, typ) in ((:ma97_analyse_s, :ma97_free_akeep_s, Float32),
 
   @eval begin
 
-    function ma97_csc{Ti <: Integer}(n :: Int, colptr :: Vector{Ti}, rowval :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
+    function ma97_csc(n :: Int, colptr :: Vector{Ti}, rowval :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...) where {Ti <: Integer}
       control = Ma97_Control{$(data_map[typ])}(; kwargs...)
       info = Ma97_Info{$(data_map[typ])}()
       M = Ma97{$typ, $(data_map[typ])}([convert(Ptr{Void}, C_NULL)], [convert(Ptr{Void}, C_NULL)], n, colptr, rowval, nzval, control, info)
 
       # Perform symbolic analysis.
       ccall(($(string(fname)), libhsl_ma97), Void,
-            (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cint}),
-             1,    M.n,  M.colptr,  M.rowval,  C_NULL,    M.__akeep,      &(M.control),      &(M.info),      C_NULL)
+            (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}, Ptr{Cint}),
+             1,    M.n,  M.colptr,  M.rowval,  C_NULL,    M.__akeep,      M.control,         M.info,         C_NULL)
 
       if M.info.flag < 0
         ccall(($(string(freename)), libhsl_ma97), Void, (Ptr{Ptr{Void}},), M.__akeep)
@@ -308,14 +314,14 @@ Instantiate an object of type `Ma97` and perform the symbolic analysis on a spar
 
 All keyword arguments are passed directly to `ma97_csc()`.
 """
-function Ma97{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}; kwargs...)
+function Ma97(A :: SparseMatrixCSC{T,Int}; kwargs...) where {T <: Ma97Data}
   m, n = size(A)
   m == n || throw(Ma97Exception("Ma97: input matrix must be square", 0))
   L = tril(convert(SparseMatrixCSC{T,Cint}, A))
   return ma97_csc(L.n, L.colptr, L.rowval, L.nzval; kwargs...)
 end
 
-Ma97{T <: Ma97Data}(A :: Array{T,2}; kwargs...) = Ma97(sparse(A); kwargs...)
+Ma97(A :: Array{T,2}; kwargs...) where {T <: Ma97Data} = Ma97(sparse(A); kwargs...)
 
 
 for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float32),
@@ -325,7 +331,7 @@ for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float
 
   @eval begin
 
-    function ma97_coord{Ti <: Integer}(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...)
+    function ma97_coord(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...) where {Ti <: Integer}
       control = Ma97_Control{$(data_map[typ])}(; kwargs...)
       info = Ma97_Info{$(data_map[typ])}()
       M = Ma97{$typ, $(data_map[typ])}([convert(Ptr{Void}, C_NULL)], [convert(Ptr{Void}, C_NULL)], n, cols, rows, nzval, control, info)
@@ -333,8 +339,8 @@ for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float
 
       # Perform symbolic analysis.
       ccall(($(string(fname)), libhsl_ma97), Void,
-            (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cint}),
-             M.n,  nz,   M.rowval,  M.colptr,  C_NULL,    M.__akeep,      &(M.control),      &(M.info),      C_NULL)
+            (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}, Ptr{Cint}),
+             M.n,  nz,   M.rowval,  M.colptr,  C_NULL,    M.__akeep,      M.control,         M.info,         C_NULL)
 
       if M.info.flag < 0
         ccall(($(string(freename)), libhsl_ma97), Void, (Ptr{Ptr{Void}},), M.__akeep)
@@ -360,8 +366,8 @@ for (fname, typ) in ((:ma97_factor_s, Float32),
       t = matrix_types97[matrix_type]
 
       ccall(($(string(fname)), libhsl_ma97), Void,
-            (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ},  Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{$(data_map[typ])}),
-             t,    C_NULL,    C_NULL,    ma97.nzval, ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info),   C_NULL)
+            (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ},  Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}, Ptr{$(data_map[typ])}),
+             t,    C_NULL,    C_NULL,    ma97.nzval, ma97.__akeep,   ma97.__fkeep,   ma97.control,      ma97.info,   C_NULL)
 
       if ma97.info.flag < 0
         ma97_finalize(ma97)
@@ -373,7 +379,7 @@ for (fname, typ) in ((:ma97_factor_s, Float32),
 end
 
 
-function ma97_factorize{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}; matrix_type :: Symbol=:real_indef)
+function ma97_factorize(A :: SparseMatrixCSC{T,Int}; matrix_type :: Symbol=:real_indef) where {T <: Ma97Data}
   ma97 = Ma97(A)
   ma97_factorize!(ma97, matrix_type=matrix_type)
   return ma97
@@ -384,7 +390,7 @@ ma97_factorise! = ma97_factorize!
 ma97_factorise = ma97_factorize
 
 
-function ma97_solve{T <: Ma97Data, S <: Ma97Real}(ma97 :: Ma97{T, S}, b :: Array{T})
+function ma97_solve(ma97 :: Ma97{T, S}, b :: Array{T}) where {T <: Ma97Data, S <: Ma97Real}
   x = copy(b)
   ma97_solve!(ma97, x)
   return x
@@ -404,8 +410,8 @@ for (fname, typ) in ((:ma97_solve_s, Float32),
 
       j = jobs97[job]
       ccall(($(string(fname)), libhsl_ma97), Void,
-            (Cint, Cint, Ptr{$typ}, Cint,   Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}),
-             j,    nrhs, b,         ma97.n, ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info))
+            (Cint, Cint, Ptr{$typ}, Cint,   Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}),
+             j,    nrhs, b,         ma97.n, ma97.__akeep,   ma97.__fkeep,   ma97.control,      ma97.info)
 
       if ma97.info.flag < 0
         ma97_finalize(ma97)
@@ -421,10 +427,10 @@ end
 if VERSION ≥ v"0.4.0"
   import Base.\
 end
-\{T <: Ma97Data, S <: Ma97Real}(ma97 :: Ma97{T,S}, b :: Array{T}) = ma97_solve(ma97, b)
+\(ma97 :: Ma97{T,S}, b :: Array{T}) where {T <: Ma97Data, S <: Ma97Real} = ma97_solve(ma97, b)
 
 
-function ma97_solve{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Array{T}; matrix_type :: Symbol=:real_indef)
+function ma97_solve(A :: SparseMatrixCSC{T,Int}, b :: Array{T}; matrix_type :: Symbol=:real_indef) where {T <: Ma97Data}
   (m, n) = size(A)
   m < n && (return ma97_min_norm(A, b))
   m > n && (return ma97_least_squares(A, b))
@@ -447,8 +453,8 @@ for (fname, typ) in ((:ma97_factor_solve_s, Float32),
       size(b, 1) == M.n || throw(Ma97Exception("Ma97: rhs size mismatch", 0))
       nrhs = size(b, 2)
       ccall(($(string(fname)), libhsl_ma97), Void,
-            (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Cint, Ptr{$typ}, Cint, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{$(data_map[typ])}),
-             t,    M.colptr,  M.rowval,  M.nzval,   nrhs, b,         M.n,  M.__akeep,      M.__fkeep,      &(M.control),      &(M.info),      C_NULL)
+            (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Cint, Ptr{$typ}, Cint, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}, Ptr{$(data_map[typ])}),
+             t,    M.colptr,  M.rowval,  M.nzval,   nrhs, b,         M.n,  M.__akeep,      M.__fkeep,      M.control,      M.info,      C_NULL)
 
       if M.info.flag < 0
         ma97_finalize(M)
@@ -460,7 +466,7 @@ for (fname, typ) in ((:ma97_factor_solve_s, Float32),
 end
 
 
-ma97_solve{T <: Ma97Data}(A :: Array{T,2}, b :: Array{T}; matrix_type :: Symbol=:real_indef) = ma97_solve(sparse(A), b, matrix_type=matrix_type)
+ma97_solve(A :: Array{T,2}, b :: Array{T}; matrix_type :: Symbol=:real_indef) where {T <: Ma97Data} = ma97_solve(sparse(A), b, matrix_type=matrix_type)
 
 
 for (indef, posdef, typ) in ((:ma97_enquire_indef_s, :ma97_enquire_posdef_s, Float32),
@@ -478,14 +484,14 @@ for (indef, posdef, typ) in ((:ma97_enquire_indef_s, :ma97_enquire_posdef_s, Flo
         # documentation says d should be n x 2, we must declare 2 x n.
         d = zeros($typ, 2, ma97.n)
         ccall(($(string(indef)), libhsl_ma97), Void,
-              (Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{Cint}, Ptr{$typ}),
-               ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info),   piv_order, d)
+              (Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}, Ptr{Cint}, Ptr{$typ}),
+               ma97.__akeep,   ma97.__fkeep,   ma97.control,      ma97.info,      piv_order, d)
         ret = (piv_order, d)
       else
         d = zeros($typ, ma97.n)
         ccall(($(string(posdef)), libhsl_ma97), Void,
-              (Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}, Ptr{$typ}),
-               ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info),   d)
+              (Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}, Ptr{$typ}),
+               ma97.__akeep,   ma97.__fkeep,   ma97.control,      ma97.info,      d)
         ret = d
       end
 
@@ -514,8 +520,8 @@ for (fname, typ) in ((:ma97_alter_s, Float32),
       n, m = size(d)
       (m == ma97.n && n == 2) || throw(Ma97Exception("Ma97: input array d must be n x 2", 0))
       ccall(($(string(fname)), libhsl_ma97), Void,
-            (Ptr{$typ}, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ptr{Ma97_Control}, Ptr{Ma97_Info}),
-             d,         ma97.__akeep,   ma97.__fkeep,   &(ma97.control),   &(ma97.info))
+            (Ptr{$typ}, Ptr{Ptr{Void}}, Ptr{Ptr{Void}}, Ref{Ma97_Control}, Ref{Ma97_Info}),
+             d,         ma97.__akeep,   ma97.__fkeep,   ma97.control,      ma97.info)
 
       if ma97.info.flag < 0
         ma97_finalize(ma97)
@@ -552,7 +558,7 @@ where A has shape m-by-n with m < n, by solving the saddle-point system
 
 * `x::Vector{T}`: solution vector.
 """
-function ma97_min_norm{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
+function ma97_min_norm(A :: SparseMatrixCSC{T,Int}, b :: Vector{T}) where {T <: Ma97Data}
   (m, n) = size(A)
   K = [ speye(T, n)  spzeros(T, n, m) ; A  T(0) * speye(T, m) ]
   rhs = [ zeros(T, n) ; b ]
@@ -562,7 +568,7 @@ function ma97_min_norm{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T
   return (x97, y97)
 end
 
-ma97_min_norm{T <: Ma97Data}(A :: Array{T,2}, b :: Vector{T}) = ma97_min_norm(sparse(A), b)
+ma97_min_norm(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma97Data} = ma97_min_norm(sparse(A), b)
 
 
 """# Solve least-squares problem
@@ -587,7 +593,7 @@ where A has shape m-by-n with m > n, by solving the saddle-point system
 
 * `x::Vector{T}`: solution vector.
 """
-function ma97_least_squares{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vector{T})
+function ma97_least_squares(A :: SparseMatrixCSC{T,Int}, b :: Vector{T}) where {T <: Ma97Data}
   (m, n) = size(A)
   K = [ speye(T, m)  spzeros(T, m,n) ; A'  T(0) * speye(T, n) ]
   rhs = [ b ; zeros(T, n) ]
@@ -597,7 +603,7 @@ function ma97_least_squares{T <: Ma97Data}(A :: SparseMatrixCSC{T,Int}, b :: Vec
   return (r97, x97)
 end
 
-ma97_least_squares{T <: Ma97Data}(A :: Array{T,2}, b :: Vector{T}) = ma97_least_squares(sparse(A), b)
+ma97_least_squares(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma97Data} = ma97_least_squares(sparse(A), b)
 
 
 # docstrings
