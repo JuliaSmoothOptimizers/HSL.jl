@@ -13,9 +13,18 @@ matrix:
   allow_failures:
     - nightly
 
+branches:
+  only:
+    - master
+
 notifications:
   email: false
 
 script:
  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
  - julia --check-bounds=yes -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("HSL"); Pkg.test("HSL"; coverage=true)'
+
+after_success:
+  - julia -e 'using Pkg; Pkg.add("Documenter")'
+  - julia -e 'using Pkg; Pkg.clone("https://github.com/JuliaSmoothOptimizers/HSL.jl.git")'
+  - julia -e 'using Pkg; cd(Pkg.dir("HSL")); include(joinpath("docs", "make.jl"))'
