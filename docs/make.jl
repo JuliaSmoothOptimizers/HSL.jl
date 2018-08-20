@@ -11,7 +11,6 @@ makedocs(
 
 deploydocs(deps = nothing, make = nothing,
   repo = "github.com/JuliaSmoothOptimizers/HSL.jl.git",
-  deps = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
   target = "build",
   julia = "0.6",
   latest = "master"
