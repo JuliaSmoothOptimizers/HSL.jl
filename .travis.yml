@@ -26,5 +26,4 @@ script:
 
 after_success:
   - julia -e 'using Pkg; Pkg.add("Documenter")'
-  - julia -e 'using Pkg; Pkg.clone("https://github.com/JuliaSmoothOptimizers/HSL.jl.git")'
   - julia -e 'using Pkg; cd(Pkg.dir("HSL")); include(joinpath("docs", "make.jl"))'
