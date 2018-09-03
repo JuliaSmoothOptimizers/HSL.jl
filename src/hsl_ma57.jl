@@ -437,17 +437,19 @@ by solving the saddle-point system
     [ I  A' ] [ x ]   [ 0 ]
     [ A     ] [ y ] = [ b ].
 """
-function ma57_min_norm(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T}) where {T <: Ma57Data, Ti <: Integer}
+function ma57_min_norm(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
   K = [ speye(T, n)  spzeros(T, n, m) ; A  0.0 * speye(T, m) ]
+  M = Ma57(K)
+  ma57_factorize(M)
   rhs = [ zeros(T, n) ; b ]
-  xy57 = ma57_solve(K, rhs)
+  xy57 = ma57_solve(M, rhs)
   x57 = xy57[1:n]
   y57 = xy57[n+1:n+m]
   return (x57, y57)
 end
 
-ma57_min_norm(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
+ma57_min_norm(A :: Array{T,2}, b :: Array{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
 
 
 """
@@ -458,17 +460,19 @@ by solving the saddle-point system
     [ I   A ] [ r ]   [ b ]
     [ A'    ] [ x ] = [ 0 ].
 """
-function ma57_least_squares(A :: SparseMatrixCSC{T,Ti}, b :: Vector{T}) where {T <: Ma57Data, Ti <: Integer}
+function ma57_least_squares(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
   K = [ speye(T, m)  spzeros(T, m,n) ; A'  0.0 * speye(T, n) ]
+  M = Ma57(K)
+  ma57_factorize(M)
   rhs = [ b ; zeros(T, n) ]
-  rx57 = ma57_solve(K, rhs)
+  rx57 = ma57_solve(M, rhs)
   r57 = rx57[1:m]
   x57 = rx57[m+1:m+n]
   return (r57, x57)
 end
 
-ma57_least_squares(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma57Data} = ma57_least_squares(sparse(A), b)
+ma57_least_squares(A :: Array{T,2}, b :: Array{T}) where {T <: Ma57Data} = ma57_least_squares(sparse(A), b)
 
 
 ## get factors -----------------------------------------------------------------
