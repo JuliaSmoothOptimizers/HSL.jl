@@ -10,13 +10,39 @@ export Ma57Exception
 
 const Ma57Data = Union{Float32, Float64}
 
-"Exception type raised in case of error."
+"""
+# Exception type raised in case of error.
+"""
 mutable struct Ma57Exception <: Exception
   msg  :: AbstractString
   flag :: Int
 end
 
-"Main control type for MA57."
+## diagnostics (1) -------------------------------------------------------------
+"""
+# Main control type for MA57.
+
+    Ma57_Control(; kwargs...)
+
+## Keyword arguments:
+
+* `print_level::Int`: integer controling the verbosit level. Accepted values are:
+    * <0: no printing
+    * 0: errors and warnings only (default)
+    * 1: errors, warnings and basic diagnostics
+    * 2: errors, warning and full diagnostics
+* `unit_diagnostics::Int`: Fortran file unit for diagnostics (default: 6)
+* `unit_error::Int`: Fortran file unit for errors (default: 6)
+* `unit_warning::Int`: Fortran file unit for warnings (default: 6)
+
+## Example:
+
+```JULIA
+julia> using HSL
+julia> Ma57_Control{Float64}(print_level=1)
+HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 1, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0])
+```
+"""
 mutable struct Ma57_Control{T <: Ma57Data}
 
   icntl :: Vector{Int32}
@@ -40,7 +66,28 @@ mutable struct Ma57_Control{T <: Ma57Data}
   end
 end
 
-"Main info type for MA57."
+## diagnostics (2) -------------------------------------------------------------
+"""
+# Main info type for MA57
+
+    info = Ma57_Info{T <: Ma97Real}()
+
+An `info` variable is used to collect statistics on the analysis, factorization,
+and solve.
+
+## Example:
+
+```JULIA
+julia> using HSL
+julia> T = Float64;
+julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+julia> M = Ma57(A);
+julia> M.info
+HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+```
+"""
 mutable struct Ma57_Info{T <: Ma57Data}
   info :: Vector{Int32}
   rinfo :: Vector{T}
@@ -68,13 +115,14 @@ mutable struct Ma57_Info{T <: Ma57Data}
   end
 end
 
+
+## option dictionaries ---------------------------------------------------------
 @compat const orderings57 = Dict{Symbol,Int}(
                               :mc47   => 0,
                               :user   => 1,
                               :mc50   => 2,
                               :mindeg => 3,
                               :metis  => 4)
-
 
 @compat const ordering_names57 = Dict{Int,AbstractString}(
                                    0 => "AMD with MC47",
@@ -101,6 +149,37 @@ end
                        )
 
 
+## instantiate -----------------------------------------------------------------
+"""
+# Instantiate an object of type `Ma57` and perform the symbolic analysis on a sparse Julia matrix.
+
+ M = Ma57(A; kwargs...)
+
+## Input arguments
+
+* `A::SparseMatrixCSC{T<:Ma57Data,Int}`: input matrix. The lower triangle will be extracted.
+
+## Keyword arguments
+
+All keyword arguments are passed directly to `ma57_coord()`.
+
+## Example:
+
+```JULIA
+
+julia> T = Float64;
+
+julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+
+julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+
+julia> M = Ma57(A)
+
+HSL.Ma57{Float64}(5, 7, Int32[1, 1, 2, 2, 3, 3, 5], Int32[1, 2, 3, 5, 3, 4, 5], [2.0, 3.0, 4.0, 6.0, 1.0, 5.0, 1.0], HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 0, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0]), HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 1.1, 81, Int32[5, 4, 3, 2, 1, 2, 9, 0, 0, 0  …  4, 3, 3, 2, 2, 1, 1, 0, 0, 0], 48, Float64[], 53, Int32[])
+```
+"""
 mutable struct Ma57{T <: Ma57Data}
   n :: Int32
   nz :: Int32
@@ -131,10 +210,7 @@ mutable struct Ma57{T <: Ma57Data}
   end
 end
 
-
-"""Instantiate an object of type `Ma57` and perform the
-symbolic analysis on a sparse Julia matrix.
-"""
+## helper function to create `Ma57` object
 function Ma57(A :: SparseMatrixCSC{T,Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   m, n = size(A)
   m == n || throw(Ma57Exception("Ma57: input matrix must be square", 0))
@@ -144,14 +220,12 @@ end
 
 Ma57(A :: Array{T,2}; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A); kwargs...)
 
-
 for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 
   @eval begin
 
-    """Instantiate an object of type `Ma57` and perform the
-    symbolic analysis on a matrix described in sparse coordinate format.
-    """
+    ## helper function to instantiate an object of type `Ma57` and perform the
+    ## symbolic analysis on a matrix described in sparse coordinate format.
     function ma57_coord(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...) where {Ti <: Integer}
       control = Ma57_Control{$(data_map[typ])}(; kwargs...)
       info = Ma57_Info{$(data_map[typ])}()
@@ -162,7 +236,7 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 
       iwork = Vector{Int32}(5 * n)
 
-      # Perform symbolic analysis.
+      ## perform symbolic analysis.
       ccall(($(string(fname)), libhsl_ma57), Void,
             (Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32},    Ref{Int32}, Ptr{Int32}, Ptr{Int32},       Ptr{Int32},   Ptr{Int32},    Ptr{$typ}),
                    M.n,        M.nz,     M.rows,     M.cols,     M.__lkeep,   M.__keep,      iwork,  M.control.icntl,  M.info.info, M.info.rinfo)
@@ -180,13 +254,11 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 end
 
 
+## factorize -------------------------------------------------------------------
 for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
 
   @eval begin
 
-    """Perform numerical factorization. The symbolic analysis must have
-    been performed and must have succeeded.
-    """
     function ma57_factorize(ma57 :: Ma57{$typ})
 
       if ma57.__lfact <= 0 || ma57.__lifact <= 0
@@ -234,23 +306,20 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
   end
 end
 
-"""Convenience method that combines the symbolic analysis and numerical
-factorization phases. An MA57 instance is returned, that can subsequently
-be passed to other functions, e.g., `ma57_solve()`.
-"""
+## convenience method that combines the symbolic analysis and numerical
+## factorization phases. An MA57 instance is returned, that can subsequently
+## be passed to other functions, e.g., `ma57_solve()`.
 function ma57_factorize(A :: SparseMatrixCSC{T,Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   ma57 = Ma57(A; kwargs...)
   ma57_factorize(ma57)
   return ma57
 end
 
-# Z's not dead.
+## Z's not dead.
 ma57_factorise = ma57_factorize
 
 
-"""Solve a linear system with right-hand side `b`. Multiple right-hand
-sides can be represented with an array `b` of size `n` by `nrhs`.
-"""
+## solve -----------------------------------------------------------------------
 function ma57_solve(ma57 :: Ma57{T}, b :: Array{T}; kwargs...) where {T <: Ma57Data}
   x = copy(b)
   ma57_solve!(ma57, x; kwargs...)
@@ -285,8 +354,7 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
   end
 end
 
-"""Solve a linear system with right-hand side `b` with iterative refinement.
-"""
+## iterative refinement
 function ma57_solve(ma57 :: Ma57{T}, b :: Vector{T}, nitref :: Int) where {T <: Ma57Data}
   x = Vector{T}(ma57.n)
   ma57_solve!(ma57, b, x, nitref)
@@ -297,10 +365,9 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
 
   @eval begin
 
-    """Solve a symmetric linear system with iterative refinement.
-    The symbolic analysis and numerical factorization must have been performed
-    and must have succeeded.
-    """
+    ## Solve a symmetric linear system with iterative refinement.
+    ## The symbolic analysis and numerical factorization must have been performed
+    ## and must have succeeded.
     function ma57_solve!(ma57 :: Ma57{$typ}, b :: Vector{$typ}, x :: Vector{$typ}, nitref :: Int)
       if nitref == 0
         warn("Ma57: calling this version of `solve()` with `nitref=0` is wasteful")
@@ -346,14 +413,12 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
   end
 end
 
-# Overload backslash to solve with MA57.
+## overload backslash to solve with MA57.
 import Base.\
 \(ma57 :: Ma57{T}, b :: Array{T}) where {T <: Ma57Data} = ma57_solve(ma57, b)
 
-
-"""Convenience method that combines the symbolic analysis, numerical
-factorization and solution phases.
-"""
+## convenience method that combines the symbolic analysis, numerical
+## factorization and solution phases.
 function ma57_solve(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
   m < n && (return ma57_min_norm(A, b))
@@ -363,13 +428,11 @@ function ma57_solve(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57D
   return x
 end
 
-"""Solve the minimum-norm problem
-
+"""
+Solve the minimum-norm problem
     minimize ‖x‖  subject to Ax=b,
-
 where A has shape m-by-n with m < n,
 by solving the saddle-point system
-
     [ I  A' ] [ x ]   [ 0 ]
     [ A     ] [ y ] = [ b ].
 """
@@ -386,13 +449,11 @@ end
 ma57_min_norm(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
 
 
-"""Solve the least-squares problem
-
+"""
+Solve the least-squares problem
     minimize ‖Ax - b‖,
-
 where A has shape m-by-n with m > n,
 by solving the saddle-point system
-
     [ I   A ] [ r ]   [ b ]
     [ A'    ] [ x ] = [ 0 ].
 """
@@ -409,20 +470,11 @@ end
 ma57_least_squares(A :: Array{T,2}, b :: Vector{T}) where {T <: Ma57Data} = ma57_least_squares(sparse(A), b)
 
 
+## get factors -----------------------------------------------------------------
 for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
 
   @eval begin
 
-    """Retrieve factors, scaling and permutation.
-
-    Retrieve a unit triangular matrix L, a block-diagonal matrix D a scaling
-    vector s and a permutation vector p such that
-
-      P * S * A * S * P' = L * D * L'
-
-    where S = spdiagm(s) and P = speye(n)[p,:].
-    The numerical factorization must have been performed and have succeeded.
-    """
     function ma57_get_factors(ma57 :: Ma57{$typ})
 
       # make room for L factor
@@ -458,6 +510,7 @@ for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
   end
 end
 
+## alter D ---------------------------------------------------------------------
 function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
 
   ka = 1
@@ -486,3 +539,275 @@ function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
     kw = kw + ncols + 2
   end
 end
+
+
+## additional docstrings -------------------------------------------------------
+"""
+# Factorize `Ma57` object.
+
+  ma57_factorize(M)
+
+## Input arguments:
+
+* `M::Ma57`: `Ma57` object
+
+## Return values:
+
+* (none)
+
+## Stored information:
+
+* `M.info.largest_front::Int`: order of largest frontal matrix
+* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
+* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
+* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `M`
+* `M.info.rank::Int`: rank of factorization of `M`
+* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
+
+# Factorize a sparse matrix.
+
+## Input arguments:
+
+* `A::SparseMatrixCSC{T<:Ma57Data,Int}`: sparse matrix
+
+## Return values:
+
+* `M::Ma57`: factorized `Ma57` object
+
+## Stored information:
+
+* `M.info.largest_front::Int`: order of largest frontal matrix
+* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
+* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
+* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `A`
+* `M.info.rank::Int`: rank of factorization of `A`
+* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
+
+## Example:
+
+```JULIA
+
+julia> using HSL
+
+julia> T = Float64;
+
+julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+
+julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+
+julia> M = Ma57(A)
+
+julia> ma57_factorize(M)      ## factorize `Ma57` object in place
+
+julia> F = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
+
+julia> M.info.largest_front
+
+4
+
+julia> A.info.largest_front   ## same result
+
+4
+```
+"""
+ma57_factorize, ma57_factorise
+
+
+"""
+# System solve.
+
+## Solve after factorization without iterative refinement
+
+    ma57_solve(ma57, b; kwargs...)
+
+### Input arguments:
+
+* `ma57::Ma57{T<:Ma57Data}`: an `Ma57` structure for which the analysis and factorization have been performed
+* `b::Array{T}`: vector of array of right-hand sides. Note that `b` will be overwritten. To solve a system with multiple right-hand sides, `b` should have size `n` by `nrhs`.
+
+### Keyword arguments:
+
+* `job::Symbol=:A`: task to perform. Accepted values are
+  * `:A`: solve Ax = b
+  * `:LS`: solve LPSx = PSb
+  * `:DS`: solve DPS⁻¹x = PSb
+  * `:LPS`: solve L'PS⁻¹x = PS⁻¹b
+
+### Return values:
+
+* `x::Array{T}`: an array of the same size as `b` containing the solutions.
+
+## Solve after factorization with iterative refinement
+
+    ma57_solve(A, b, nitref; kwargs...)
+
+### Input arguments:
+
+* `A::SparseMatrixCSC{T<:Ma57Data,Int}`: input matrix. A full matrix will be converted to sparse.
+* `b::Array{T}`: vector of array of right-hand sides. Note that `b` will be overwritten. To solve a system with multiple right-hand sides, `b` should have size `n` by `nrhs`.
+* `nitref::Int`: number of iterative refinement steps
+
+### Return values:
+
+* `x::Array{T}`: an array of the same size as `b` containing the solutions.
+
+### Stored information:
+
+    Accessible through the Ma57 matrix object's `info` attribute
+
+* `ma57.info.backward_error1::T`: \max_{i} \frac{|b - Ax|_i}{(|b| + |A| |x|)_i}
+* `ma57.info.backward_error2::T`: \max_{i} \frac{|b - Ax|_i}{((|A| |x|)_i + ||A_i||_{∞} ||x||_{∞}}
+* `ma57.info.matrix_inf_norm::T`: ||A||_{∞}
+* `ma57.info.solution_inf_norm::T`: ||x||_{∞}
+* `ma57.info.scaled_residuals::T`: norm of scaled residuals = max_{i} \frac{|\sum_j a_{ij} x_j - b_i|}{||A||_{∞} ||x||_{∞}}
+* `ma57.info.cond1::T`: condition number as defined in [Arioli, M. Demmel, J. W., and Duff, I. S. (1989)](https://doi.org/10.1137/0610013). Solving sparse linear systems with sparse backward error. SIAM J.Matrix Anal. and Applics. 10, 165-190.
+* `ma57.info.cond2::T`: condition number as defined in [Arioli, M. Demmel, J. W., and Duff, I. S. (1989)](https://doi.org/10.1137/0610013). Solving sparse linear systems with sparse backward error. SIAM J.Matrix Anal. and Applics. 10, 165-190.
+* `ma57.info.error_inf_norm::T`: upper bound for the infinity norm of the error in the solution
+
+## Example:
+
+```JULIA
+
+julia> using HSL
+
+julia> T = Float64;
+
+julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+
+julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+
+julia> b = T[8, 45, 31, 15, 17]
+
+julia> ϵ = sqrt(eps(eltype(A)))
+
+julia> xexact = T[1, 2, 3, 4, 5]
+
+julia> M = Ma57(A)
+
+julia> ma57_factorize(M)
+
+julia> x = ma57_solve(M, b)      ## solve without iterative refinement
+
+julia> norm(x - xexact) ≤ ϵ * norm(xexact)
+
+true
+
+julia> xx = ma57_solve(M, b, 2)  ## solve with iterative refinement
+
+julia> norm(xx - xexact) ≤ ϵ * norm(xexact)
+
+true
+```
+"""
+ma57_solve
+
+"""
+# Retrieve factors, scaling, and permutation.
+
+  L, D, s, iperm = ma57_get_factors(M)
+
+  Function will retrieve a unit triangular matrix L, a block-diagonal matrix D a scaling
+  vector s and a permutation vector p such that
+
+  P * S * A * S * P' = L * D * L'
+
+  where S = spdiagm(s) and P = speye(n)[p,:].
+
+  Note that the numerical factorization must have been performed and have succeeded.
+
+## Input arguments
+
+* `M::Ma57`: factorized `Ma57` object
+
+## Return values
+
+* `L::SparseMatrixCSC{T<:Ma57Data,Int}`: L factor
+* `D::SparseMatrixCSC{T<:Ma57Data,Int}`: D factor
+* `s::Array{T,1}`: diagonal components of scaling matrix S
+* `iperm::Array{Int,1}`: array representin permutation matrix P
+
+## Example:
+
+```JULIA
+
+julia> using HSL
+
+julia> T = Float64;
+
+julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+
+julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+
+julia> b = T[8, 45, 31, 15, 17]
+
+julia> ϵ = sqrt(eps(eltype(A)))
+
+julia> xexact = T[1, 2, 3, 4, 5]
+
+julia> M = Ma57(A)
+
+julia> ma57_factorize(M)
+
+julia> (L, D, s, p) = ma57_get_factors(M)
+
+julia> S = spdiagm(s)
+
+julia> P = speye(M.n)[p, :]
+
+julia> vecnorm(P * S * A * S * P' - L * D * L') ≤ ϵ * vecnorm(A)
+
+true
+```
+"""
+ma57_get_factors
+
+"""
+# Alter block diagonal matrix `D`
+
+## Input arguments:
+
+* `M::Ma57`: `Ma57` object
+* `F::Array{Float64,2}`: diagonal adjustment
+
+
+## Example:
+
+```JULIA
+julia> using HSL
+
+julia> T = Float64;
+
+julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+
+julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+
+julia> b = T[8, 45, 31, 15, 17]
+
+julia> ϵ = sqrt(eps(eltype(A)))
+
+julia> xexact = T[1, 2, 3, 4, 5]
+
+julia> M = Ma57(A)
+
+julia> ma57_factorize(M)
+
+julia> (L, D, s, p) = ma57_get_factors(M)
+
+julia> d1 = abs.(diag(D))
+
+julia> d2 = [diag(D, 1) ; 0]
+
+julia> F = [full(d1)' ; full(d2)']
+
+julia> ma57_alter_d(M, F)
+```
+"""
+ma57_alter_d
