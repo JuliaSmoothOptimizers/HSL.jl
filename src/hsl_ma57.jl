@@ -262,7 +262,8 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
     function ma57_factorize(ma57 :: Ma57{$typ})
 
       if ma57.__lfact <= 0 || ma57.__lifact <= 0
-        throw(Ma57Exception("Ma57: Symbolic analysis must be performed first"))
+        status = ma57.info.info[1]
+        throw(Ma57Exception("Ma57: Symbolic analysis must be performed first", status))
       end
       if length(ma57.__fact) < ma57.__lfact
         ma57.__fact = Vector{$typ}(ma57.__lfact)
@@ -531,7 +532,8 @@ function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
         ma57.__fact[k2] = d[2, kd]
         k2 = k2 + 1
       else
-        d[2, kd] == 0.0 || throw(Ma57Exception("Ma57: Erroneous 2x2 block specified in d[2,$kd]"))
+        status = ma57.info.info[1]
+        d[2, kd] == 0.0 || throw(Ma57Exception("Ma57: Erroneous 2x2 block specified in d[2,$kd]", status))
       end
       ka = ka + nrows + 1 - i
     end
