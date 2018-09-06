@@ -439,7 +439,7 @@ by solving the saddle-point system
 """
 function ma57_min_norm(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
-  K = [ speye(T, n)  spzeros(T, n, m) ; A  0.0 * speye(T, m) ]
+  K = [ speye(T, n)  spzeros(T, n, m) ; A  T[0.0] .* speye(T, m) ]
   M = Ma57(K)
   ma57_factorize(M)
   rhs = [ zeros(T, n) ; b ]
@@ -462,7 +462,7 @@ by solving the saddle-point system
 """
 function ma57_least_squares(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
-  K = [ speye(T, m)  spzeros(T, m,n) ; A'  0.0 * speye(T, n) ]
+  K = [ speye(T, m)  spzeros(T, m,n) ; A'  T[0.0] .* speye(T, n) ]
   M = Ma57(K)
   ma57_factorize(M)
   rhs = [ b ; zeros(T, n) ]
