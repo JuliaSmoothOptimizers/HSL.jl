@@ -31,6 +31,19 @@ function test_ma57(A, M, b, xexact)
   d1 = abs.(diag(D))
   d2 = [diag(D, 1) ; 0]
   ma57_alter_d(M, [full(d1)' ; full(d2)'])
+
+  # test min norm
+  A_mn = A[1:2,:]
+  x_mn, y_mn = ma57_min_norm(A_mn, b[1:2]) # == ma57_solve(A_mn, b[1:2])
+  x_mn_star = A_mn' * (inv(full(A_mn * A_mn')) * b[1:2])
+  @test norm(x_mn - x_mn_star) ≤ ϵ * norm(x_mn_star)
+
+  ## solve least squares
+  A_ls = A[:,1:2]
+  r_ls, x_ls = ma57_least_squares(A_ls, b)   # == ma57_solve(A_ls, b)
+  Q,R = qr(full(A_ls))
+  x_ls_star = R \ (Q' * b)
+  @test norm(x_ls - x_ls_star) ≤ ϵ * norm(x_ls_star)
 end
 
 
