@@ -1,6 +1,7 @@
 module HSL
 
-using Compat
+using LinearAlgebra
+using SparseArrays
 
 if isfile(joinpath(dirname(@__FILE__), "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
@@ -11,10 +12,12 @@ end
 # definitions applicable to all packages
 const data_map = Dict{Type, Type}(Float32 => Cfloat,
                                   Float64 => Cdouble,
-                                  Complex64 => Cfloat,
-                                  Complex128 => Cdouble)
+                                  ComplexF32 => Cfloat,
+                                  ComplexF64 => Cdouble)
 
 # package-specific definitions
-isdefined(:libhsl_ma97) && include("hsl_ma97.jl")
+if @isdefined libhsl_ma97
+  include("hsl_ma97.jl")
+end
 
 end

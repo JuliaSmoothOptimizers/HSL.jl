@@ -2,8 +2,8 @@
 
 libmetis4 = library_dependency("libmetis")  # METIS 5 not ok!
 
-metis4_tap = "dpo/openblas/metis@4"
-@static if is_apple()
+metis4_tap = "brewsci/num/brewsci-metis@4"
+@static if Sys.isapple()
   provides(Homebrew.HB, metis4_tap, libmetis4, os=:Darwin)
 end
 
@@ -34,11 +34,11 @@ provides(SimpleBuild,
              end)
           end), [libmetis4], os=:Unix)
 
-@static if is_unix()
+@static if Sys.isunix()
   # Set metis_libpath for all Unix platforms.
   # TODO: update this when there are more providers.
   metis_libpath = joinpath(metis_prefix, "lib")
-  @static if is_apple()
+  @static if Sys.isapple()
     # It's different on OSX because we used Homebrew.
     metis_libpath = joinpath(Homebrew.prefix(metis4_tap), "lib")
   end
