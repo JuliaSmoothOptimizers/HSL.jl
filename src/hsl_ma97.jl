@@ -328,7 +328,7 @@ for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float
     function ma97_coord(n :: Int, cols :: Vector{Ti}, rows :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...) where {Ti <: Integer}
       control = Ma97_Control{$(data_map[typ])}(; kwargs...)
       info = Ma97_Info{$(data_map[typ])}()
-      M = Ma97{$typ, $(data_map[typ])}([convert(Ptr{Nothing}, C_NULL)], [convert(Ptr{Nothing}, C_NULL)], n, cols, rows, nzval, control, info)
+      M = Ma97{$typ, $(data_map[typ])}([convert(Ptr{Nothing}, C_NULL)], [convert(Ptr{Nothing}, C_NULL)], n, convert(Vector{Cint}, cols), convert(Vector{Cint}, rows), nzval, control, info)
       nz = length(cols)
 
       # Perform symbolic analysis.
