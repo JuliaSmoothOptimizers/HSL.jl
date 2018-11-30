@@ -341,7 +341,7 @@ for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float
         throw(Ma97Exception("Ma97: Error during symbolic analysis", M.info.flag))
       end
 
-      finalizer(M, ma97_finalize)
+      finalizer(ma97_finalize, M)
       return M
     end
 
