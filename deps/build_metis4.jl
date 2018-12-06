@@ -29,17 +29,18 @@ provides(SimpleBuild,
                (@build_steps begin
                   `make COPTIONS=-fPIC`
                   `cc -fPIC -shared -Wl,$all_load $metis_srcdir/libmetis.a -Wl,$noall_load -o $metis_prefix/lib/libmetis.$so`
-                  # `cp $metis_srcdir/Lib/*.h $metis_prefix/include`  # broken
                 end)
              end)
           end), [libmetis4], os=:Unix)
 
+# try to guess what BinDeps installed
 @static if Sys.isunix()
   # Set metis_libpath for all Unix platforms.
   # TODO: update this when there are more providers.
-  metis_libpath = joinpath(metis_prefix, "lib")
+  metis_libdir = joinpath(metis_prefix, "lib")
   @static if Sys.isapple()
     # It's different on OSX because we used Homebrew.
-    metis_libpath = joinpath(Homebrew.prefix(metis4_tap), "lib")
+    metis_libdir = joinpath(Homebrew.prefix(metis4_tap), "lib")
   end
+  metis_libpath = isdir(metis_libdir) ? "-L$metis_libdir -lmetis" : "-lmetis"
 end
