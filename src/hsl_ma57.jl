@@ -52,9 +52,9 @@ mutable struct Ma57_Control{T <: Ma57Data}
     icntl = zeros(Int32, 20)
     cntl = zeros(T, 5)
     if T == Float32
-      ccall((:ma57i_, libhsl_ma57), Void, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+      ccall((:ma57i_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
     elseif T == Float64
-      ccall((:ma57id_, libhsl_ma57), Void, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+      ccall((:ma57id_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
     end
     icntl[1] = unit_error
     icntl[2] = unit_warning
@@ -117,36 +117,36 @@ end
 
 
 ## option dictionaries ---------------------------------------------------------
-@compat const orderings57 = Dict{Symbol,Int}(
-                              :mc47   => 0,
-                              :user   => 1,
-                              :mc50   => 2,
-                              :mindeg => 3,
-                              :metis  => 4)
+const orderings57 = Dict{Symbol,Int}(
+                         :mc47   => 0,
+                         :user   => 1,
+                         :mc50   => 2,
+                         :mindeg => 3,
+                         :metis  => 4)
 
-@compat const ordering_names57 = Dict{Int,AbstractString}(
-                                   0 => "AMD with MC47",
-                                   1 => "user supplied or none",
-                                   2 => "AMD with MC50",
-                                   3 => "Minimum degree",
-                                   4 => "METIS")
+const ordering_names57 = Dict{Int,AbstractString}(
+                              0 => "AMD with MC47",
+                              1 => "user supplied or none",
+                              2 => "AMD with MC50",
+                              3 => "Minimum degree",
+                              4 => "METIS")
 
-@compat const matrix_types57 = Dict{Symbol,Int}(
-                                 :real_spd   =>  3,  # real symmetric positive definite
-                                 :real_indef =>  4   # real symmetric indefinite
-                               )
+const matrix_types57 = Dict{Symbol,Int}(
+                            :real_spd   =>  3,  # real symmetric positive definite
+                            :real_indef =>  4   # real symmetric indefinite
+                          )
 
 # MA57 computes the factorization PSASP' = LDL', i.e.,
 # Ax=b becomes S⁻¹P'LDL'PS⁻¹x = b.
 # The computations are arranged so the system is rewritten equivalently
 # (S⁻¹P'LPS) (S⁻¹P'DPS⁻¹) (SP'L'PS⁻¹)x = b.
 
-@compat const jobs57 = Dict{Symbol,Int}(
-                         :A    => 1,  # solve Ax = b
-                         :LS   => 2,  # solve LPSx = PSb
-                         :DS   => 3,  # solve DPS⁻¹x = PSb
-                         :LPS  => 4,  # solve L'PS⁻¹x = PS⁻¹b
-                       )
+const jobs57 = Dict{Symbol,Int}(
+                    :A    => 1,  # solve Ax = b
+                    :LS   => 2,  # solve LPSx = PSb
+                    :DS   => 3,  # solve DPS⁻¹x = PSb
+                    :LPS  => 4,  # solve L'PS⁻¹x = PS⁻¹b
+                  )
 
 
 ## instantiate -----------------------------------------------------------------
@@ -234,15 +234,15 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
                      convert(Vector{Int32}, rows), convert(Vector{Int32}, cols),
                      nzval, control, info)
 
-      iwork = Vector{Int32}(5 * n)
+      iwork = Vector{Int32}(undef, 5 * n)
 
       ## perform symbolic analysis.
-      ccall(($(string(fname)), libhsl_ma57), Void,
+      ccall(($(string(fname)), libhsl_ma57), Nothing,
             (Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32},    Ref{Int32}, Ptr{Int32}, Ptr{Int32},       Ptr{Int32},   Ptr{Int32},    Ptr{$typ}),
                    M.n,        M.nz,     M.rows,     M.cols,     M.__lkeep,   M.__keep,      iwork,  M.control.icntl,  M.info.info, M.info.rinfo)
 
       status = M.info.info[1]
-      status > 0 && warn("Ma57: analyze returns with code $status")
+      status > 0 && @warn "Ma57: analyze returns with code $status"
       status < 0 && throw(Ma57Exception("Ma57: Error during symbolic analysis", status))
 
       M.__lfact = M.info.info[9]
@@ -266,21 +266,21 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
         throw(Ma57Exception("Ma57: Symbolic analysis must be performed first", status))
       end
       if length(ma57.__fact) < ma57.__lfact
-        ma57.__fact = Vector{$typ}(ma57.__lfact)
+        ma57.__fact = Vector{$typ}(undef, ma57.__lfact)
       end
       if length(ma57.__ifact) < ma57.__lifact
-        ma57.__ifact = Vector{Int32}(ma57.__lifact)
+        ma57.__ifact = Vector{Int32}(undef, ma57.__lifact)
       end
-      iwork = Vector{Int32}(ma57.n)
+      iwork = Vector{Int32}(undef, ma57.n)
 
       factorized = false
       while !factorized
-        ccall(($(string(fname)), libhsl_ma57), Void,
+        ccall(($(string(fname)), libhsl_ma57), Nothing,
               (Ref{Int32},  Ref{Int32}, Ptr{$typ},  Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32},      Ref{Int32},  Ptr{Int32},  Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
                    ma57.n,     ma57.nz, ma57.vals, ma57.__fact,   ma57.__lfact, ma57.__ifact,   ma57.__lifact,    ma57.__lkeep, ma57.__keep,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
         status = ma57.info.info[1]
-        status > 0 && warn("Ma57: factorize returns with code $status")
+        status > 0 && @warn "Ma57: factorize returns with code $status"
         if status == -3 || status == 10
           ma57.__lfact = ceil(ma57.multiplier * ma57.info.info[17])
           resize!(ma57.__fact, ma57.__lfact)
@@ -339,15 +339,15 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
       nrhs = size(b, 2)
 
       j = jobs57[job]
-      iwork = Vector{Int32}(ma57.n)
+      iwork = Vector{Int32}(undef, ma57.n)
       lwork = ma57.n * nrhs
-      work = Vector{$typ}(lwork)
-      ccall(($(string(fname)), libhsl_ma57), Void,
+      work = Vector{$typ}(undef, lwork)
+      ccall(($(string(fname)), libhsl_ma57), Nothing,
             (Ref{Int32}, Ref{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ref{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{Int32},         Ptr{Int32},     Ptr{Int32}),
                       j,     ma57.n, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,       nrhs,         b,     ma57.n,      work,      lwork,      iwork, ma57.control.icntl, ma57.info.info)
 
       status = ma57.info.info[1]
-      status > 0 && warn("Ma57: solve returns with code $status")
+      status > 0 && @warn "Ma57: solve returns with code $status"
       status < 0 && throw(Ma57Exception("Ma57: Error during solution", status))
       return b
     end
@@ -357,7 +357,7 @@ end
 
 ## iterative refinement
 function ma57_solve(ma57 :: Ma57{T}, b :: Vector{T}, nitref :: Int) where {T <: Ma57Data}
-  x = Vector{T}(ma57.n)
+  x = Vector{T}(undef, ma57.n)
   ma57_solve!(ma57, b, x, nitref)
   return x
 end
@@ -371,7 +371,7 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
     ## and must have succeeded.
     function ma57_solve!(ma57 :: Ma57{$typ}, b :: Vector{$typ}, x :: Vector{$typ}, nitref :: Int)
       if nitref == 0
-        warn("Ma57: calling this version of `solve()` with `nitref=0` is wasteful")
+        @warn "Ma57: calling this version of `solve()` with `nitref=0` is wasteful"
         return ma57_solve!(ma57, b)
       end
       size(b, 1) == ma57.n || throw(Ma57Exception("Ma57: rhs size mismatch", 0))
@@ -379,17 +379,17 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
       current_nitref = ma57.control.icntl[9]
       ma57.control.icntl[9] = max(0, nitref)
       job = ma57.control.icntl[9] == 1 ? 1 : 0
-      resid = Vector{$typ}(ma57.n)
+      resid = Vector{$typ}(undef, ma57.n)
 
-      iwork = ma57.control.icntl[9] > 1 ? Vector{Int32}(ma57.n) : Int32[]
+      iwork = ma57.control.icntl[9] > 1 ? Vector{Int32}(undef, ma57.n) : Int32[]
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
-      work = Vector{$typ}(lwork)
-      ccall(($(string(fname)), libhsl_ma57), Void,
+      work = Vector{$typ}(undef, lwork)
+      ccall(($(string(fname)), libhsl_ma57), Nothing,
             (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
                     job,     ma57.n,    ma57.nz, ma57.vals,  ma57.rows,  ma57.cols, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,         b,         x,     resid,      work,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
       status = ma57.info.info[1]
-      status > 0 && warn("Ma57: solve returns with code $status")
+      status > 0 && @warn "Ma57: solve returns with code $status"
       if status < 0
         ma57.control.icntl[9] = current_nitref
         throw(Ma57Exception("Ma57: Error during solution", status))
@@ -439,7 +439,7 @@ by solving the saddle-point system
 """
 function ma57_min_norm(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
-  K = [ speye(T, n)  spzeros(T, n, m) ; A  T[0.0] .* speye(T, m) ]
+  K = [ sparse(T(1)*I, n, n)  spzeros(T, n, m) ; A  T[0.0] .* sparse(T(1)*I, m, m) ]
   M = Ma57(K)
   ma57_factorize(M)
   rhs = [ zeros(T, n) ; b ]
@@ -462,7 +462,7 @@ by solving the saddle-point system
 """
 function ma57_least_squares(A :: SparseMatrixCSC{T,Ti}, b :: Array{T}) where {T <: Ma57Data, Ti <: Integer}
   (m, n) = size(A)
-  K = [ speye(T, m)  spzeros(T, m,n) ; A'  T[0.0] .* speye(T, n) ]
+  K = [ sparse(T(1)*I, m, m)  spzeros(T, m,n) ; A'  T[0.0] .* sparse(T(1)*I, n, n) ]
   M = Ma57(K)
   ma57_factorize(M)
   rhs = [ b ; zeros(T, n) ]
@@ -485,22 +485,22 @@ for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
       # make room for L factor
       nebdu = ma57.info.info[14]
       nzl = nebdu
-      ipl = Vector{Int32}(ma57.n + 1)
-      irn = Vector{Int32}(nzl)
-      fl = Vector{$typ}(nzl)
+      ipl = Vector{Int32}(undef, ma57.n + 1)
+      irn = Vector{Int32}(undef, nzl)
+      fl = Vector{$typ}(undef, nzl)
 
       # make room for D; note that entire 2x2 blocks are stored
       nzd = 2 * ma57.info.num_2x2_pivots + ma57.n
-      ipd = Vector{Int32}(ma57.n + 1)
-      id = Vector{Int32}(nzd)
-      d = Vector{$typ}(nzd)
+      ipd = Vector{Int32}(undef, ma57.n + 1)
+      id = Vector{Int32}(undef, nzd)
+      d = Vector{$typ}(undef, nzd)
 
-      ivp = Vector{Int32}(ma57.n)
-      iperm = Vector{Int32}(ma57.n)
+      ivp = Vector{Int32}(undef, ma57.n)
+      iperm = Vector{Int32}(undef, ma57.n)
 
       status = 0
 
-      ccall(($(string(fname)), libhsl_ma57), Void,
+      ccall(($(string(fname)), libhsl_ma57), Nothing,
             (Ref{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},        Ref{Int32}, Ref{Int32}),
                  ma57.n, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,      nebdu,        nzl,        ipl,        irn,        fl,        nzd,         ipd,         id,         d,        ivp,      iperm,    ma57.info.rank,    status)
 
@@ -663,11 +663,11 @@ ma57_factorize, ma57_factorise
 
     Accessible through the Ma57 matrix object's `info` attribute
 
-* `ma57.info.backward_error1::T`: \max_{i} \frac{|b - Ax|_i}{(|b| + |A| |x|)_i}
-* `ma57.info.backward_error2::T`: \max_{i} \frac{|b - Ax|_i}{((|A| |x|)_i + ||A_i||_{∞} ||x||_{∞}}
+* `ma57.info.backward_error1::T`: max_{i} |b - Ax|_i / (|b| + |A| |x|)_i
+* `ma57.info.backward_error2::T`: max_{i} |b - Ax|_i / ((|A| |x|)_i + ||A_i||_{∞} ||x||_{∞})
 * `ma57.info.matrix_inf_norm::T`: ||A||_{∞}
 * `ma57.info.solution_inf_norm::T`: ||x||_{∞}
-* `ma57.info.scaled_residuals::T`: norm of scaled residuals = max_{i} \frac{|\sum_j a_{ij} x_j - b_i|}{||A||_{∞} ||x||_{∞}}
+* `ma57.info.scaled_residuals::T`: norm of scaled residuals = max_{i} |sum_j a_{ij} x_j - b_i| / ||A||_{∞} ||x||_{∞})
 * `ma57.info.cond1::T`: condition number as defined in [Arioli, M. Demmel, J. W., and Duff, I. S. (1989)](https://doi.org/10.1137/0610013). Solving sparse linear systems with sparse backward error. SIAM J.Matrix Anal. and Applics. 10, 165-190.
 * `ma57.info.cond2::T`: condition number as defined in [Arioli, M. Demmel, J. W., and Duff, I. S. (1989)](https://doi.org/10.1137/0610013). Solving sparse linear systems with sparse backward error. SIAM J.Matrix Anal. and Applics. 10, 165-190.
 * `ma57.info.error_inf_norm::T`: upper bound for the infinity norm of the error in the solution
