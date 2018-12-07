@@ -17,9 +17,9 @@ provides(SimpleBuild,
             (@build_steps begin
               ChangeDirectory(hsl_ma57_src)
               `patch -p1 -i $hsl_ma57_depsdir/downloads/get_factors.patch`
-              `./configure F77=gfortran CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --prefix=$hsl_ma57_prefix --with-blas=-lblas --with-metis="-L$metis_libpath -lmetis"`
+              `./configure F77=gfortran CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --prefix=$hsl_ma57_prefix --with-blas="$blas_lib" --with-metis="$metis_libpath"`
               `make install`
-              `gfortran -fPIC -shared -Wl,$all_load $hsl_ma57_libdir/libhsl_ma57.a -lblas -llapack -L$metis_libpath -lmetis -lgomp -Wl,$noall_load -o $hsl_ma57_libdir/libhsl_ma57.$so`
+              `gfortran -fPIC -shared -Wl,$all_load $hsl_ma57_libdir/libhsl_ma57.a $(split(blas_lib)) $(split(lapack_lib)) $(split(metis_libpath)) -lgomp -Wl,$noall_load -o $hsl_ma57_libdir/libhsl_ma57.$so`
             end)
           end), libhsl_ma57, os=:Unix)
 
