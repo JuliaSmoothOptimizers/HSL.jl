@@ -1,6 +1,6 @@
 for T in (Float32, Float64, ComplexF32, ComplexF64)
 
-  @info "Testing hsl_ma97 with $T data"
+  Compat.@info "Testing hsl_ma97 with $T data"
   matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
 
   ϵ = sqrt(eps(real(T)))
@@ -76,14 +76,14 @@ for T in (Float32, Float64, ComplexF32, ComplexF64)
   # Test rectangular A.
   A = rand(T, 10, 6)
   b = rand(T, 10)
-  @info "Warning below is expected and normal"
+  Compat.@info "Warning below is expected and normal"
   (r, x) = ma97_least_squares(A, b)
   x_exact = A \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   A = rand(T, 6, 10)
   b = rand(T, 6)
-  @info "Warning below is expected and normal"
+  Compat.@info "Warning below is expected and normal"
   (x, y) = ma97_min_norm(A, b)
   x_exact = A \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)

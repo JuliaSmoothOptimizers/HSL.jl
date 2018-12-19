@@ -1,8 +1,7 @@
 using HSL
-
+using Compat
 if VERSION < v"0.7.0-DEV.2005"
    using Base.Test
-   lu(A) = lufact(A)
  else
    using Test
    using SparseArrays

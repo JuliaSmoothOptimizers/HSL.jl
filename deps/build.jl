@@ -8,15 +8,7 @@ so = "so"
 all_load = "--whole-archive"
 noall_load = "--no-whole-archive"
 
-if VERSION <v"0.7.0-DEV.3389"
-   const isapple = is_apple()
-   const isunix = is_unix()
- else
-   const isapple = Sys.isapple()
-   const isunix = Sys.isunix()
- end
-
-@static if isapple
+@static if Compat.Sys.isapple()
   so = "dylib"
   all_load = "-all_load"
   noall_load = "-noall_load"
@@ -33,12 +25,12 @@ const hsl_ma97_version = "2.4.0"
 const hsl_ma97_sha256 = "b91552164311add95f7228d1397a747611f08ffdc86a100df58ddfcedfdc7ca7"
 const hsl_ma97_archive = joinpath(here, "downloads", "hsl_ma97-$hsl_ma97_version.tar.gz")
 
-@info "looking for $hsl_ma97_archive"
+Compat.@info "looking for $hsl_ma97_archive"
 if isfile(hsl_ma97_archive)
-  @info "hsl_ma97 found"
+  Compat.@info "hsl_ma97 found"
   include("build_hsl_ma97.jl")
 else
-  @info "hsl_ma97 not found"
+  Compat.@info "hsl_ma97 not found"
 end
 
 @eval @BinDeps.install $hsl_modules
