@@ -342,6 +342,7 @@ for (fname, freename, typ) in ((:ma97_analyse_coord_s, :ma97_free_akeep_s, Float
       end
 
       finalizer(ma97_finalize, M)
+
       return M
     end
 

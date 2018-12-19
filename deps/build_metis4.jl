@@ -3,7 +3,7 @@
 libmetis4 = library_dependency("libmetis")  # METIS 5 not ok!
 
 metis4_tap = "brewsci/num/brewsci-metis@4"
-@static if Sys.isapple()
+@static if Compat.Sys.isapple()
   provides(Homebrew.HB, metis4_tap, libmetis4, os=:Darwin)
 end
 
@@ -34,11 +34,11 @@ provides(SimpleBuild,
           end), [libmetis4], os=:Unix)
 
 # try to guess what BinDeps installed
-@static if Sys.isunix()
+@static if Compat.Sys.isunix()
   # Set metis_libpath for all Unix platforms.
   # TODO: update this when there are more providers.
-  metis_libdir = joinpath(metis_prefix, "lib")
-  @static if Sys.isapple()
+  metis_libpath = joinpath(metis_prefix, "lib")
+  @static if Compat.Sys.isapple()
     # It's different on OSX because we used Homebrew.
     metis_libdir = joinpath(Homebrew.prefix(metis4_tap), "lib")
   end

@@ -3,7 +3,7 @@
 libblas = library_dependency("libblas")
 liblapack = library_dependency("liblapack")
 
-@static if Sys.isapple()
+@static if Compat.Sys.isapple()
   provides(Homebrew.HB, "homebrew/core/openblas", libblas, os=:Darwin)
   provides(Homebrew.HB, "homebrew/core/openblas", liblapack, os=:Darwin)
 end
