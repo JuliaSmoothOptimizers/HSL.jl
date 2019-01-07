@@ -18,8 +18,18 @@ end
 hsl_modules = @compat Dict()
 
 here = dirname(@__FILE__)
-include(joinpath(here, "build_blas.jl"))
-include(joinpath(here, "build_metis4.jl"))
+
+
+function build_blas_and_metis()
+  global blas_and_metis_built = false
+  if !blas_and_metis_built
+    @info "building blas"
+    include(joinpath(here, "build_blas.jl"))
+    @info "building metis"
+    include(joinpath(here, "build_metis4.jl"))
+    blas_and_metis_built = true
+  end
+end
 
 const hsl_ma57_version = "5.2.0"
 const hsl_ma57_sha256 = "a7ebde9ab8665b03a8dd6681bbac67b98323975be1e807e894cff1f8349fbc1c"
@@ -28,6 +38,7 @@ const hsl_ma57_archive = joinpath(here, "downloads", "hsl_ma57-$hsl_ma57_version
 @info "looking for $hsl_ma57_archive"
 if isfile(hsl_ma57_archive)
   @info "hsl_ma57 found"
+  build_blas_and_metis()
   include("build_hsl_ma57.jl")
 else
   @info "hsl_ma57 not found"
@@ -40,6 +51,7 @@ const hsl_ma97_archive = joinpath(here, "downloads", "hsl_ma97-$hsl_ma97_version
 @info "looking for $hsl_ma97_archive"
 if isfile(hsl_ma97_archive)
   @info "hsl_ma97 found"
+  build_blas_and_metis()
   include("build_hsl_ma97.jl")
 else
   @info "hsl_ma97 not found"
