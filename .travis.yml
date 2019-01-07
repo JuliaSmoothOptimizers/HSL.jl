@@ -19,4 +19,3 @@ notifications:
 script:
  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
  - julia --check-bounds=yes -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("HSL"); Pkg.test("HSL"; coverage=true)'
- - julia --check-bounds=yes -e 'using Pkg; Pkg.add("BinDeps"); Pkg.add("Compat"); Pkg.build("BinDeps"); using BinDeps; BinDeps.debug("HSL")'
