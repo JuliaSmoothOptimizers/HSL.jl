@@ -19,9 +19,10 @@ hsl_modules = @compat Dict()
 
 here = dirname(@__FILE__)
 
+blas_and_metis_built = false
 
 function build_blas_and_metis()
-  global blas_and_metis_built = false
+  global blas_and_metis_built
   if !blas_and_metis_built
     @info "building blas"
     include(joinpath(here, "build_blas.jl"))

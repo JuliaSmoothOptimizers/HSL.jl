@@ -42,5 +42,6 @@ provides(SimpleBuild,
     # It's different on OSX because we used Homebrew.
     metis_libdir = joinpath(Homebrew.prefix(metis4_tap), "lib")
   end
-  metis_libpath = isdir(metis_libdir) ? "-L$metis_libdir -lmetis" : "-lmetis"
+  # This is run before metis_libdir is created, so checking if isdir fails
+  metis_libpath = "-L$metis_libdir -lmetis"
 end
