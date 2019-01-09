@@ -16,6 +16,7 @@ matrix:
 branches:
   only:
     - master
+    - documenter
 
 notifications:
   email: false
