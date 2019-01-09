@@ -12,6 +12,6 @@ makedocs(
 deploydocs(deps = nothing, make = nothing,
   repo = "github.com/JuliaSmoothOptimizers/HSL.jl.git",
   target = "build",
-  julia = "0.6",
-  latest = "master"
+  julia = "1.0",
+  latest = "documenter"
 )
