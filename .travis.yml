@@ -16,14 +16,18 @@ matrix:
 branches:
   only:
     - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/ # tags
 
 notifications:
   email: false
 
-script:
- - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
- - julia --check-bounds=yes -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("HSL"); Pkg.test("HSL"; coverage=true)'
+jobs:
+  include:
+    - stage: Documentation
+      julia: 1.0
+      os: linux
+      script:
+        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd()))'
+        - julia --project=docs docs/make.jl
+      after_success: skip
 
-after_success:
-  - julia -e 'using Pkg; Pkg.add("Documenter")'
-  - julia -e 'using Pkg; cd(Pkg.dir("HSL")); include(joinpath("docs", "make.jl"))'
