@@ -1,7 +1,7 @@
 var documenterSearchIndex = {"docs": [
 
 {
-    "location": "reference/#",
+    "location": "#",
     "page": "Reference",
     "title": "Reference",
     "category": "page",
@@ -9,7 +9,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "reference/#Reference-1",
+    "location": "#Reference-1",
     "page": "Reference",
     "title": "Reference",
     "category": "section",
