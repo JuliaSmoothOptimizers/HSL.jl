@@ -3,15 +3,16 @@ using HSL
 
 makedocs(
   modules = [HSL],
+  doctest = false,
+  strict = false,
   assets = ["assets/style.css"],
-  format = :html,
+  format = Documenter.HTML(),
   sitename = "HSL.jl",
-  pages = Any["Reference" => "reference.md"]
+  pages = ["Reference" => "reference.md"]
 )
 
 deploydocs(deps = nothing, make = nothing,
   repo = "github.com/JuliaSmoothOptimizers/HSL.jl.git",
   target = "build",
-  julia = "0.6",
-  latest = "master"
+  devbranch = "master"
 )
