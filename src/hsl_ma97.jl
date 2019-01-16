@@ -76,7 +76,7 @@ mutable struct Ma97_Control{T <: Ma97Real}
   "spare real storage currently unused"
   rspare :: Vector{T}
 
-  function Ma97_Control{T}(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6) where {T}
+  function Ma97_Control{T}(; print_level :: Int=-1, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6) where {T}
     control = new(0, 0, 0, 0.0, 0, 0, 0, 0.0,
                   0.0, 0, 0, 0, 0, 0, 0, 0, 0.0,
                   zeros(Cint, 5), zeros(T, 10))
