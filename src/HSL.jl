@@ -3,10 +3,16 @@ module HSL
 using LinearAlgebra
 using SparseArrays
 
-if isfile(joinpath(dirname(@__FILE__), "..", "deps", "deps.jl"))
+if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
 else
   error("HSL library not properly installed. Please run Pkg.build(\"HSL\")")
+end
+
+function __init__()
+  if @isdefined libhsl_ma97
+    check_deps()
+  end
 end
 
 # definitions applicable to all packages
