@@ -21,13 +21,17 @@ branches:
 notifications:
   email: false
 
+script:
+  - git fetch --unshallow
+  - julia --color=yes -e 'using Pkg; Pkg.add(PackageSpec(path=pwd())); if VERSION >= v"1.1.0-rc1"; Pkg.build("HSL"; verbose=true); else Pkg.build("HSL"); end'
+
 jobs:
   include:
     - stage: Documentation
       julia: 1.0
       os: linux
       script:
-        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd()))'
+        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd())); Pkg.build("HSL")'
         - julia --project=docs docs/make.jl
       after_success: skip
 
