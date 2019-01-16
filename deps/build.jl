@@ -57,7 +57,7 @@ if any(isfile.(hsl_archives))
     libs = filter(lib -> endswith(lib, ".dylib"), readdir(libdir))
     for lib in libs
       libfull = joinpath(libdir, lib)
-      run()
+      run(`install_name_tool -id $libfull $libfull`)
     end
   end
 
