@@ -6,7 +6,9 @@ using Test
 
 include("../deps/deps.jl")
 
-if @isdefined libhsl_ma97
-    include("test_ma97.jl")
+if @isdefined libhsl_ma57
+  include("test_ma57.jl")
 end
-isdefined(HSL, :libhsl_ma57) && include("test_ma57.jl")
+if @isdefined libhsl_ma97
+  include("test_ma97.jl")
+end
