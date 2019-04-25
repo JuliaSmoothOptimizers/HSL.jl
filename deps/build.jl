@@ -6,7 +6,7 @@ const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__
 
 const hsl_ma57_version = "5.2.0"
 const hsl_ma57_sha256 = "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347e326cf584"
-const hsl_ma57_archive = joinpath(here, "downloads", "hsl_ma57-$hsl_ma57_version.tar.gz")
+const hsl_ma57_archive = joinpath(@__DIR__, "downloads", "hsl_ma57-$hsl_ma57_version.tar.gz")
 
 const hsl_ma97_version = "2.4.0"
 const hsl_ma97_sha256 = "b91552164311add95f7228d1397a747611f08ffdc86a100df58ddfcedfdc7ca7"
@@ -16,7 +16,7 @@ const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 
-hsl_archives = [hsl_ma97_archive]
+hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
 
 if any(isfile.(hsl_archives))
   products = Product[
@@ -32,14 +32,6 @@ if any(isfile.(hsl_archives))
   # Asserting every product has a download_info
   for p in products
     @assert haskey(download_info, p.variable_name)
-  end
-
-  info("looking for $hsl_ma57_archive")
-  if isfile(hsl_ma57_archive)
-    info("hsl_ma57 found")
-    include("build_hsl_ma57.jl")
-  else
-    info("hsl_ma57 not found")
   end
 
   # Install unsatisfied or updated dependencies:
@@ -76,6 +68,12 @@ if any(isfile.(hsl_archives))
   # Dependencies are supposedly installed, so we turn to HSL
   builddir = joinpath(usrdir, "src")
   mkpath(builddir)
+  if isfile(hsl_ma57_archive)
+    @info "building ma57"
+    push!(products, FileProduct(prefix, "lib/libhsl_ma57.$so", :libhsl_ma57))
+    include("build_hsl_ma57.jl")
+  end
+
   if isfile(hsl_ma97_archive)
     @info "building ma97"
     push!(products, FileProduct(prefix, "lib/libhsl_ma97.$so", :libhsl_ma97))
