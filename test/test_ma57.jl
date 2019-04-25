@@ -16,7 +16,8 @@ function test_ma57(A, M, b, xexact)
   # extract factors
   (L, D, s, p) = ma57_get_factors(M)
   S = spdiagm(0 => s)
-  P = sparse(eltype(A)(1)*I, M.n, M.n)[p, :]
+  P = sparse(1.0I, M.n, M.n)[p, :]
+  L = convert(SparseMatrixCSC{Float64,Int}, L) # Convert to 64 bits because \ is not defined for 32 bits.
   @test norm(P * S * A * S * P' - L * D * L') ≤ ϵ * norm(A)
 
   # test partial solves

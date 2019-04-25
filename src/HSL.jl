@@ -10,7 +10,7 @@ else
 end
 
 function __init__()
-  if @isdefined libhsl_ma97
+  if (@isdefined libhsl_ma57) || (@isdefined libhsl_ma97)
     check_deps()
   end
 end
@@ -22,6 +22,9 @@ const data_map = Dict{Type, Type}(Float32 => Cfloat,
                                   ComplexF64 => Cdouble)
 
 # package-specific definitions
+if (@isdefined libhsl_ma57) || haskey(ENV, "DOCUMENTER_KEY")
+  include("hsl_ma57.jl")
+end
 if (@isdefined libhsl_ma97) || haskey(ENV, "DOCUMENTER_KEY")
   include("hsl_ma97.jl")
 end
