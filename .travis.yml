@@ -5,8 +5,8 @@ os:
   - osx
 
 julia:
-  - 0.7
   - 1.0
+  - 1.1
   - nightly
 
 matrix:
@@ -21,14 +21,10 @@ branches:
 notifications:
   email: false
 
-script:
-  - git fetch --unshallow
-  - julia --color=yes -e 'using Pkg; Pkg.add(PackageSpec(path=pwd())); if VERSION >= v"1.1.0-rc1"; Pkg.build("HSL"; verbose=true); else Pkg.build("HSL"); end'
-
 jobs:
   include:
     - stage: Documentation
-      julia: 1.0
+      julia: 1.1
       os: linux
       script:
         - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd())); Pkg.build("HSL")'
