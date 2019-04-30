@@ -7,6 +7,7 @@ const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__
 const hsl_ma57_version = "5.2.0"
 const hsl_ma57_sha256 = "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347e326cf584"
 const hsl_ma57_archive = joinpath(@__DIR__, "downloads", "hsl_ma57-$hsl_ma57_version.tar.gz")
+const hsl_ma57_patch = joinpath(@__DIR__, "downloads", "get_factors.patch")
 
 const hsl_ma97_version = "2.4.0"
 const hsl_ma97_sha256 = "b91552164311add95f7228d1397a747611f08ffdc86a100df58ddfcedfdc7ca7"
@@ -71,6 +72,9 @@ if any(isfile.(hsl_archives))
   if isfile(hsl_ma57_archive)
     @info "building ma57"
     push!(products, FileProduct(prefix, "lib/libhsl_ma57.$so", :libhsl_ma57))
+    if isfile(hsl_ma57_patch)
+      push!(products, FileProduct(prefix, "../downloads/get_factors.patch", :libhsl_ma57_patch))
+    end
     include("build_hsl_ma57.jl")
   end
 
