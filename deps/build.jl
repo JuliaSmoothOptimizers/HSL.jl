@@ -9,8 +9,8 @@ const hsl_ma57_sha256 = "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347
 const hsl_ma57_archive = joinpath(@__DIR__, "downloads", "hsl_ma57-$hsl_ma57_version.tar.gz")
 const hsl_ma57_patch = joinpath(@__DIR__, "downloads", "get_factors.patch")
 
-const hsl_ma97_version = "2.4.0"
-const hsl_ma97_sha256 = "b91552164311add95f7228d1397a747611f08ffdc86a100df58ddfcedfdc7ca7"
+const hsl_ma97_version = "2.5.0"
+const hsl_ma97_sha256 = "9ceb858f09045d406c3cf399dcc07b4c7f716f29a5e5f55a77dc8b09d55e0c4e"
 const hsl_ma97_archive = joinpath(@__DIR__, "downloads", "hsl_ma97-$hsl_ma97_version.tar.gz")
 
 const so         = Sys.isapple() ? "dylib" : "so"
@@ -92,3 +92,4 @@ else
   @info "No archive found. Put the .tar.gz for at least one of the following:", basename.(hsl_archives)
   write_deps_file(joinpath(@__DIR__, "deps.jl"), Product[], verbose=verbose)
 end
+
