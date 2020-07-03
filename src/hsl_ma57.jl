@@ -229,6 +229,10 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
     function ma57_coord(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}; kwargs...) where {Ti <: Integer}
       control = Ma57_Control{$(data_map[typ])}(; kwargs...)
       info = Ma57_Info{$(data_map[typ])}()
+      ma57_coord(n, rows, cols, nzval, control, info)
+    end
+
+    function ma57_coord(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}, control :: Ma57_Control{$(data_map[typ])},  info :: Ma57_Info{$(data_map[typ])}) where {Ti <: Integer}
       nz = length(cols)
       M = Ma57{$typ}(convert(Int32, n), convert(Int32, nz),
                      convert(Vector{Int32}, rows), convert(Vector{Int32}, cols),
