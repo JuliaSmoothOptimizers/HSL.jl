@@ -71,14 +71,12 @@ for T in (Float32, Float64, ComplexF32, ComplexF64)
   # Test rectangular A.
   A = rand(T, 10, 6)
   b = rand(T, 10)
-  @info "Warning below is expected and normal"
   (r, x) = ma97_least_squares(A, b)
   x_exact = A \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   A = rand(T, 6, 10)
   b = rand(T, 6)
-  @info "Warning below is expected and normal"
   (x, y) = ma97_min_norm(A, b)
   x_exact = A \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
