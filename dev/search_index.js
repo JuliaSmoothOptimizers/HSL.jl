@@ -41,7 +41,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#HSL.Ma97-Union{Tuple{SparseMatrixCSC{T,Int64}}, Tuple{T}} where T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}",
+    "location": "#HSL.Ma97-Union{Tuple{SparseArrays.SparseMatrixCSC{T,Int64}}, Tuple{T}} where T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}",
     "page": "Reference",
     "title": "HSL.Ma97",
     "category": "method",
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#HSL.ma57_least_squares-Union{Tuple{Ti}, Tuple{T}, Tuple{SparseMatrixCSC{T,Ti},Array{T,N} where N}} where Ti<:Integer where T<:Union{Float32, Float64}",
+    "location": "#HSL.ma57_least_squares-Union{Tuple{Ti}, Tuple{T}, Tuple{SparseArrays.SparseMatrixCSC{T,Ti},Array{T,N} where N}} where Ti<:Integer where T<:Union{Float32, Float64}",
     "page": "Reference",
     "title": "HSL.ma57_least_squares",
     "category": "method",
@@ -105,7 +105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#HSL.ma57_min_norm-Union{Tuple{Ti}, Tuple{T}, Tuple{SparseMatrixCSC{T,Ti},Array{T,N} where N}} where Ti<:Integer where T<:Union{Float32, Float64}",
+    "location": "#HSL.ma57_min_norm-Union{Tuple{Ti}, Tuple{T}, Tuple{SparseArrays.SparseMatrixCSC{T,Ti},Array{T,N} where N}} where Ti<:Integer where T<:Union{Float32, Float64}",
     "page": "Reference",
     "title": "HSL.ma57_min_norm",
     "category": "method",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#HSL.ma97_least_squares-Union{Tuple{T}, Tuple{SparseMatrixCSC{T,Int64},Array{T,1}}} where T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}",
+    "location": "#HSL.ma97_least_squares-Union{Tuple{T}, Tuple{SparseArrays.SparseMatrixCSC{T,Int64},Array{T,1}}} where T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}",
     "page": "Reference",
     "title": "HSL.ma97_least_squares",
     "category": "method",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#HSL.ma97_min_norm-Union{Tuple{T}, Tuple{SparseMatrixCSC{T,Int64},Array{T,1}}} where T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}",
+    "location": "#HSL.ma97_min_norm-Union{Tuple{T}, Tuple{SparseArrays.SparseMatrixCSC{T,Int64},Array{T,1}}} where T<:Union{Complex{Float32}, Complex{Float64}, Float32, Float64}",
     "page": "Reference",
     "title": "HSL.ma97_min_norm",
     "category": "method",
