@@ -211,14 +211,14 @@ mutable struct Ma57{T <: Ma57Data}
 end
 
 ## helper function to create `Ma57` object
-function Ma57(A :: SparseMatrixCSC{T,Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
+function Ma57(A :: SparseMatrixCSC{T,Ti}, args...) where {T <: Ma57Data, Ti <: Integer}
   m, n = size(A)
   m == n || throw(Ma57Exception("Ma57: input matrix must be square", 0))
   L = tril(convert(SparseMatrixCSC{data_map[T],Int32}, A))
-  return ma57_coord(L.n, findnz(L)...; kwargs...)
+  return ma57_coord(L.n, findnz(L)..., args...)
 end
 
-Ma57(A :: Array{T,2}; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A); kwargs...)
+Ma57(A :: Array{T,2}, args...) where {T <: Ma57Data} = Ma57(sparse(A), args...)
 
 for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 
