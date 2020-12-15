@@ -1,5 +1,6 @@
 # HSL
 
+[![Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaSmoothOptimizers.github.io/HSL.jl/dev)
 [![DOI](https://zenodo.org/badge/44119477.svg)](https://zenodo.org/badge/latestdoi/44119477)
 
 These are the beginnings of a set of interfaces to
