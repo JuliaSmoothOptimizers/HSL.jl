@@ -50,7 +50,7 @@ K = MatrixMarket.mmread("K.mtx")  # only the lower triangle
 rhs = readdlm("rhs.rhs")
 
 LBL = Ma97(K)
-ma97_factorize(LBL)
+ma97_factorize!(LBL)
 x = ma97_solve(LBL, rhs)  # or x = LBL \ rhs
 ```
 
