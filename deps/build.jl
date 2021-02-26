@@ -12,8 +12,8 @@ const hsl_ma57_sha256 = "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347
 const hsl_ma57_archive = joinpath(@__DIR__, "downloads", "hsl_ma57-$hsl_ma57_version.tar.gz")
 const hsl_ma57_patch = joinpath(@__DIR__, "downloads", "get_factors.patch")
 
-const hsl_ma97_version = "2.5.0"
-const hsl_ma97_sha256 = "9ceb858f09045d406c3cf399dcc07b4c7f716f29a5e5f55a77dc8b09d55e0c4e"
+const hsl_ma97_version = "2.6.0"
+const hsl_ma97_sha256 = "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66"
 const hsl_ma97_archive = joinpath(@__DIR__, "downloads", "hsl_ma97-$hsl_ma97_version.tar.gz")
 
 const so         = Sys.isapple() ? "dylib" : "so"
