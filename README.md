@@ -25,11 +25,9 @@ least temporarily. For example, if you are on OSX and are using Homebrew, you
 can hide METIS 5 with `brew unlink metis`. After the install procedure is
 complete, it is fine to link `metis` again with `brew link metis`.
 
-The source archive `tar.gz`, as obtained from the HSL download process, should be placed as is in `Pkg.dir("HSL", "deps", "downloads")`.
-You can also set the environment variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to store the source archives elsewhere.
-It's the recommended solution if you use `HSL.jl` with multiple environments.
+Set the environment variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to specify where the source archives `tar.gz` are stored.
 The `HSL` Julia module will take care of compilation.
-Once the source archives have been placed in the location indicated, run
+Once the source archives have been placed in the locations indicated by the environment variables, run
 
 ```JULIA
 julia> ]
