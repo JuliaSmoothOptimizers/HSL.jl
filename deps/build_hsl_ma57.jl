@@ -1,5 +1,3 @@
-# Users should place hsl_ma57-x.y.z.tar.gz in ~/.julia/v0.j/HSL/deps/downloads
-
 open(hsl_ma57_archive) do f
   if bytes2hex(sha256(f)) != hsl_ma57_sha256
     error("SHA256 of HSL MA57 doesn't match")
