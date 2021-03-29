@@ -9,12 +9,16 @@ const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__
 
 const hsl_ma57_version = "5.2.0"
 const hsl_ma57_sha256 = "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347e326cf584"
-const hsl_ma57_archive = joinpath(@__DIR__, "downloads", "hsl_ma57-$hsl_ma57_version.tar.gz")
-const hsl_ma57_patch = joinpath(@__DIR__, "downloads", "get_factors.patch")
+
+const hsl_ma57_path = haskey(ENV, "HSL_MA57_PATH") ? ENV["HSL_MA57_PATH"] : joinpath(@__DIR__, "downloads")
+const hsl_ma57_archive = joinpath(hsl_ma57_path, "hsl_ma57-$hsl_ma57_version.tar.gz")
+const hsl_ma57_patch = joinpath(hsl_ma57_path, "get_factors.patch")
 
 const hsl_ma97_version = "2.6.0"
 const hsl_ma97_sha256 = "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66"
-const hsl_ma97_archive = joinpath(@__DIR__, "downloads", "hsl_ma97-$hsl_ma97_version.tar.gz")
+
+const hsl_ma97_path = haskey(ENV, "HSL_MA97_PATH") ? ENV["HSL_MA97_PATH"] : joinpath(@__DIR__, "downloads")
+const hsl_ma97_archive = joinpath(hsl_ma97_path, "hsl_ma97-$hsl_ma97_version.tar.gz")
 
 const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
@@ -36,7 +40,7 @@ if any(isfile.(hsl_archives))
     @info "building ma57"
     push!(products, FileProduct(prefix, "lib/libhsl_ma57.$so", :libhsl_ma57))
     if isfile(hsl_ma57_patch)
-      push!(products, FileProduct(prefix, "../downloads/get_factors.patch", :libhsl_ma57_patch))
+      push!(products, FileProduct(prefix, hsl_ma57_patch, :libhsl_ma57_patch))
     end
     include("build_hsl_ma57.jl")
   end
@@ -52,7 +56,6 @@ if any(isfile.(hsl_archives))
   # Write out a deps.jl file that will contain mappings for our products
   write_deps_file(joinpath(@__DIR__, "deps.jl"), products, verbose=verbose)
 else
-  @info "No archive found. Put the .tar.gz for at least one of the following in $(joinpath(@__DIR__, "downloads")):", basename.(hsl_archives)
+  @info "No archive found."
   write_deps_file(joinpath(@__DIR__, "deps.jl"), Product[], verbose=verbose)
 end
-

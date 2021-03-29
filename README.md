@@ -13,7 +13,8 @@ In all cases, users are responsible for obtaining HSL packages.
 ## Installing
 
 ```JULIA
-julia> Pkg.clone("https://github.com/JuliaSmoothOptimizers/HSL.jl.git")
+julia> ]
+pkg> add HSL
 ```
 
 At this point, make sure that there isn't a stray METIS library on your library
@@ -24,14 +25,16 @@ least temporarily. For example, if you are on OSX and are using Homebrew, you
 can hide METIS 5 with `brew unlink metis`. After the install procedure is
 complete, it is fine to link `metis` again with `brew link metis`.
 
-The source archive, as obtained from the HSL download process, should be placed
-as is in `Pkg.dir("HSL", "deps", "downloads")`. The `HSL` Julia module will
-take care of compilation. Once the source archives have been placed in the
-location indicated, run
+The source archive `tar.gz`, as obtained from the HSL download process, should be placed as is in `Pkg.dir("HSL", "deps", "downloads")`.
+You can also set the environmental variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to store the source archives elsewhere.
+It's the recommended solution if you use `HSL.jl` with multiple environments.
+The `HSL` Julia module will take care of compilation.
+Once the source archives have been placed in the location indicated, run
 
 ```JULIA
-julia> Pkg.build("HSL")
-julia> Pkg.test("HSL")
+julia> ]
+pkg> build HSL
+pkg> test HSL
 ```
 
 Note that a C and Fortran compilers are required.
@@ -40,7 +43,7 @@ Note that a C and Fortran compilers are required.
 
 ### HSL_MA97
 
-[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html) version 2.4.0: an
+[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html) version 2.6.0: an
 OpenMP-based direct solver for symmetric linear systems. Example:
 
 ```JULIA
