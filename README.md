@@ -26,7 +26,7 @@ can hide METIS 5 with `brew unlink metis`. After the install procedure is
 complete, it is fine to link `metis` again with `brew link metis`.
 
 The source archive `tar.gz`, as obtained from the HSL download process, should be placed as is in `Pkg.dir("HSL", "deps", "downloads")`.
-You can also set the environmental variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to store the source archives elsewhere.
+You can also set the environment variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to store the source archives elsewhere.
 It's the recommended solution if you use `HSL.jl` with multiple environments.
 The `HSL` Julia module will take care of compilation.
 Once the source archives have been placed in the location indicated, run
