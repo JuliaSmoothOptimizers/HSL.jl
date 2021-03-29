@@ -31,7 +31,7 @@ end
 
 for T in (Float32, Float64)
 
-  @info "Testing hsl_ma57 with $T data"
+  @info "Testing hsl_ma57_patch with $T data"
   rows = Int32[1, 1, 2, 2, 3, 3, 5]
   cols = Int32[1, 2, 3, 5, 3, 4, 5]
   vals = T[2, 3, 4, 6, 1, 5, 1]
