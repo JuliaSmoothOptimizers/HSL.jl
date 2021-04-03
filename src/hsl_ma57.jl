@@ -26,6 +26,7 @@ end
 
 ## Keyword arguments:
 
+* `sqd::Bool`: Flag indicating symmetric quasi-definite matrix (default: false)
 * `print_level::Int`: integer controling the verbosit level. Accepted values are:
     * <0: no printing
     * 0: errors and warnings only (default)
@@ -48,7 +49,7 @@ mutable struct Ma57_Control{T <: Ma57Data}
   icntl :: Vector{Int32}
   cntl :: Vector{T}
 
-  function Ma57_Control{T}(; print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6) where {T}
+  function Ma57_Control{T}(; sqd :: Bool=false, print_level :: Int=0, unit_diagnostics :: Int=6, unit_error :: Int=6, unit_warning :: Int=6) where {T}
     icntl = zeros(Int32, 20)
     cntl = zeros(T, 5)
     if T == Float32
@@ -61,6 +62,10 @@ mutable struct Ma57_Control{T <: Ma57Data}
     icntl[3] = unit_diagnostics
     icntl[5] = print_level
     icntl[10] = 1  # want condition number estimates if performing iterative refinement
+    if sqd
+      cntl[1] = eps(T)
+      icntl[7] = 1
+    end
     control = new(icntl, cntl)
     return control
   end
@@ -211,14 +216,14 @@ mutable struct Ma57{T <: Ma57Data}
 end
 
 ## helper function to create `Ma57` object
-function Ma57(A :: SparseMatrixCSC{T,Ti}, args...) where {T <: Ma57Data, Ti <: Integer}
+function Ma57(A :: SparseMatrixCSC{T,Ti}, args...; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   m, n = size(A)
   m == n || throw(Ma57Exception("Ma57: input matrix must be square", 0))
   L = tril(convert(SparseMatrixCSC{data_map[T],Int32}, A))
-  return ma57_coord(L.n, findnz(L)..., args...)
+  return ma57_coord(L.n, findnz(L)..., args...; kwargs...)
 end
 
-Ma57(A :: Array{T,2}, args...) where {T <: Ma57Data} = Ma57(sparse(A), args...)
+Ma57(A :: Array{T,2}, args...; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A), args...; kwargs...)
 
 for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 
@@ -232,7 +237,7 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
       ma57_coord(n, rows, cols, nzval, control, info)
     end
 
-    function ma57_coord(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}, control :: Ma57_Control{$(data_map[typ])},  info :: Ma57_Info{$(data_map[typ])}) where {Ti <: Integer}
+    function ma57_coord(n :: Int, rows :: Vector{Ti}, cols :: Vector{Ti}, nzval :: Vector{$typ}, control :: Ma57_Control{$(data_map[typ])}, info :: Ma57_Info{$(data_map[typ])}) where {Ti <: Integer}
       nz = length(cols)
       M = Ma57{$typ}(convert(Int32, n), convert(Int32, nz),
                      convert(Vector{Int32}, rows), convert(Vector{Int32}, cols),
