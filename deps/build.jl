@@ -1,6 +1,6 @@
 using BinaryProvider, SHA # requires BinaryProvider 0.3.0 or later
 
-using METIS_jll
+using METIS4_jll
 using OpenBLAS32_jll
 
 # Parse some basic command-line arguments
@@ -30,7 +30,7 @@ if any(isfile.(hsl_archives))
   products = Product[]
 
   libopenblas_dir=joinpath(OpenBLAS32_jll.artifact_dir, "lib")
-  libmetis_dir=joinpath(METIS_jll.artifact_dir, "lib")
+  libmetis_dir=joinpath(METIS4_jll.artifact_dir, "lib")
 
   usrdir = joinpath(@__DIR__, "usr")
   libdir = joinpath(usrdir, "lib")
