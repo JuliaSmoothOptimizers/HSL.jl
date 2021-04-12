@@ -1,6 +1,6 @@
 name = "HSL"
 uuid = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
-version = "0.2.1"
+version = "0.2.2"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
