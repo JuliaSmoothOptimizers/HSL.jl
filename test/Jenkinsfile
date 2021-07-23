@@ -45,7 +45,7 @@ pipeline {
 
      causeString: 'Triggered on comment',
 
-     token: "",
+     token: "HSL_test",
 
      printContributedVariables: true,
      printPostContent: true,
