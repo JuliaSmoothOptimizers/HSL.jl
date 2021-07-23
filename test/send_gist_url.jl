@@ -55,7 +55,9 @@ function get_comment_from_test_results()
     open(TEST_RESULTS_FILE, "r") do file
         text_to_match = "tests passed"
         for line in readlines(file)
-            occursin(line, text_to_match) && return line
+            if occursin(line, text_to_match)
+                return line
+            end
         end
     end
     return "Tests failed: "
