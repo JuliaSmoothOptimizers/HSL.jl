@@ -60,5 +60,6 @@ function get_comment_from_test_results()
     end
     return "Tests failed: "
 end
+
 comment = get_comment_from_test_results()
-post_gist_url_to_pr(comment * create_gist(myauth).html_url; auth = myauth)
+post_gist_url_to_pr("$comment $(create_gist(myauth).html_url)"; auth = myauth)
