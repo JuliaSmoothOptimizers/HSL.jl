@@ -53,12 +53,15 @@ end
 
 function get_comment_from_test_results()
     open(TEST_RESULTS_FILE, "r") do file
-        text_to_match = "tests passed"
+        text_to_match = r"tests passed"
         for line in readlines(file)
-            occursin(line, text_to_match) && return line
+            if occursin(text_to_match, line)
+                return "$(strip(line)): "
+            end
         end
+        return "Tests failed: "
     end
-    return "Tests failed: "
 end
+
 comment = get_comment_from_test_results()
-post_gist_url_to_pr(comment * create_gist(myauth).html_url; auth = myauth)
+post_gist_url_to_pr("$comment $(create_gist(myauth).html_url)"; auth = myauth)
