@@ -1,0 +1,79 @@
+pipeline {
+  agent any
+  options {
+    skipDefaultCheckout false
+  }
+  triggers {
+    GenericTrigger(
+     genericVariables: [
+        [
+            key: 'action', 
+            value: '$.action',
+            expressionType: 'JSONPath', //Optional, defaults to JSONPath
+            regexpFilter: '[^(created)]', //Optional, defaults to empty string
+            defaultValue: '' //Optional, defaults to empty string
+        ],
+        [
+            key: 'comment',
+            value: '$.comment.body',
+            expressionType: 'JSONPath', //Optional, defaults to JSONPath
+            regexpFilter: '', //Optional, defaults to empty string
+            defaultValue: '' //Optional, defaults to empty string
+        ],
+        [
+            key: 'org',
+            value: '$.organization.login',
+            expressionType: 'JSONPath', //Optional, defaults to JSONPath
+            regexpFilter: '', //Optional, defaults to empty string
+            defaultValue: 'JuliaSmoothOptimizers' //Optional, defaults to empty string
+        ],
+        [
+            key: 'pullrequest',
+            value: '$.issue.number',
+            expressionType: 'JSONPath', //Optional, defaults to JSONPath
+            regexpFilter: '[^0-9]', //Optional, defaults to empty string
+            defaultValue: '' //Optional, defaults to empty string
+        ],
+        [
+            key: 'repo',
+            value: '$.repository.name',
+            expressionType: 'JSONPath', //Optional, defaults to JSONPath
+            regexpFilter: '', //Optional, defaults to empty string
+            defaultValue: '' //Optional, defaults to empty string
+        ]
+     ],
+
+     causeString: 'Triggered on comment',
+
+     token: "",
+
+     printContributedVariables: true,
+     printPostContent: true,
+
+     silentResponse: false,
+
+     regexpFilterText: '$comment',
+     regexpFilterExpression: '@JSOBot runtests'
+    )
+  }
+  stages {
+    stage('run tests') {
+      steps {
+        sh "chmod +x run_tests.sh"
+        sh "./run_tests.sh"  
+      }
+    }
+  }
+  post {
+    success {
+      echo "SUCCESS!"  
+    }
+    cleanup {
+      sh 'printenv'
+      sh '''
+      git clean -fd
+      git reset --hard
+      '''
+    }
+  }
+}
