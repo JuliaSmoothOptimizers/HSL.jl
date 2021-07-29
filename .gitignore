@@ -5,3 +5,5 @@ deps/downloads
 deps/usr
 deps/src
 deps/build.log
+Manifest.toml
+docs/Manifest.toml
