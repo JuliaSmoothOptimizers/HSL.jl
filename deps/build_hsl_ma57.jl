@@ -1,10 +1,10 @@
-open(hsl_ma57_archive) do f
-  if bytes2hex(sha256(f)) != hsl_ma57_sha256
-    error("SHA256 of HSL MA57 doesn't match")
-  end
+if hsl_ma97_version.ext == ".tar.gz"
+    run(`tar -zxf $hsl_ma57_archive -C $builddir`)
+elseif hsl_ma97_version.ext == ".zip"
+    run(`unzip $hsl_ma57_archive -d $builddir`)
 end
-run(`tar -zxf $hsl_ma57_archive -C $builddir`)
-cd("$builddir/hsl_ma57-$hsl_ma57_version")
+
+cd("$builddir/hsl_ma57-$(hsl_ma57_version.version)")
 if isfile(hsl_ma57_patch)
   run(`patch -p1 -i $hsl_ma57_patch`)
 end
