@@ -1,4 +1,15 @@
-for T in (Float32, Float64, ComplexF32, ComplexF64)
+function getallocs(A)
+    T = eltype(A)
+    n = size(A,1)
+    ma97 = Ma97(A)
+    matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
+    allocs = @allocated ma97_factorize!(ma97, matrix_type=matrix_type)
+    b = rand(T, n)
+    x = copy(b)
+    allocs += @allocated ma97_solve!(ma97, x)
+end
+
+for T in (Float32, Float64, ComplexF32, ComplexF64 )
 
   @info "Testing hsl_ma97 with $T data"
   matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
@@ -42,6 +53,9 @@ for T in (Float32, Float64, ComplexF32, ComplexF64)
   # Test convenience interface.
   x = ma97_solve(A, b, matrix_type=matrix_type)
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
+
+  # Test allocations
+  @test getallocs(A) == 0
 
   # Test symmetric positive definite A.
   A = A * A';
