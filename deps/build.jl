@@ -10,7 +10,7 @@ struct HSLVersion
     ext::String
 end
 
-getname(ver::HSLVersion) = ver.algname * "-" * ver.version * ver.ext 
+getname(ver::HSLVersion, extension::Bool=true) = ver.algname * "-" * ver.version * (extension ? ver.ext : "")
 
 function checksha(version::HSLVersion, filepath)
     if isfile(filepath)
@@ -56,14 +56,26 @@ const hsl_ma57_patch = joinpath(hsl_ma57_path, "get_factors.patch")
 ##############################
 # MA97
 ##############################
-const hsl_ma97_verions = [
-    HSLVersion("hsl_ma97", "2.6.0", "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66", ".tar.gz"),
+const hsl_ma97_versions = [
     HSLVersion("hsl_ma97", "2.7.0", "ac3a081d3a28e9ecb8871ce769f4ced2a5ffa5a9c36defbd2c844ae3493ccb37", ".tar.gz"),
-    HSLVersion("hsl_ma97", "2.7.0", "8221b607d96554d7a57cc60483c7305ef43a8785dc4171ac2e8da087900a1100", ".zip")
+    HSLVersion("hsl_ma97", "2.7.0", "8221b607d96554d7a57cc60483c7305ef43a8785dc4171ac2e8da087900a1100", ".zip"),
+    HSLVersion("hsl_ma97", "2.6.0", "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66", ".tar.gz")
 ]
 const hsl_ma97_path = haskey(ENV, "HSL_MA97_PATH") ? ENV["HSL_MA97_PATH"] : joinpath(@__DIR__, "downloads")
-hsl_ma97_version = findversion(hsl_ma97_verions, hsl_ma97_path)
+hsl_ma97_version = findversion(hsl_ma97_versions, hsl_ma97_path)
 const hsl_ma97_archive = isnothing(hsl_ma97_version) ? "" : joinpath(hsl_ma97_path, getname(hsl_ma97_version))
+
+##############################
+# COINHSL
+##############################
+const hsl_coin_versions = [
+    # HSLVersion("coinhsl", "2021.05.05", "f77ad752a37de8695c02c81bcc503674af76689d40a9864b6f2a7a790c3efc95", ".tar.gz"),  # this has a problem with the install-sh script
+    HSLVersion("coinhsl", "2021.05.05", "62c7e18ff22b977afa442db97d791f31359ab4a4f5a027f315cace211a24fbe9", ".zip")
+]
+ENV["HSL_COIN_PATH"] = ENV["HSL_MA97_PATH"]
+const hsl_coin_path = haskey(ENV, "HSL_COIN_PATH") ? ENV["HSL_COIN_PATH"] : joinpath(@__DIR__, "downloads")
+hsl_coin_version = findversion(hsl_coin_versions, hsl_coin_path)
+const hsl_coin_archive = isnothing(hsl_coin_version) ? "" : joinpath(hsl_coin_path, getname(hsl_coin_version))
 
 ##############################
 # Build
@@ -97,6 +109,12 @@ if any(isfile.(hsl_archives))
     @info "building ma97"
     push!(products, FileProduct(prefix, "lib/libhsl_ma97.$so", :libhsl_ma97))
     include("build_hsl_ma97.jl")
+  end
+
+  if isfile(hsl_coin_archive)
+    @info "build coinhsl"
+    push!(products, FileProduct(prefix, "lib/libcoinhsl.$so", :libcoinshl))
+    include("build_coinhsl.jl")
   end
 
   @assert(all(satisfied.(products)))
