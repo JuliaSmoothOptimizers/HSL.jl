@@ -72,7 +72,6 @@ const hsl_coin_versions = [
     # HSLVersion("coinhsl", "2021.05.05", "f77ad752a37de8695c02c81bcc503674af76689d40a9864b6f2a7a790c3efc95", ".tar.gz"),  # this has a problem with the install-sh script
     HSLVersion("coinhsl", "2021.05.05", "62c7e18ff22b977afa442db97d791f31359ab4a4f5a027f315cace211a24fbe9", ".zip")
 ]
-ENV["HSL_COIN_PATH"] = ENV["HSL_MA97_PATH"]
 const hsl_coin_path = haskey(ENV, "HSL_COIN_PATH") ? ENV["HSL_COIN_PATH"] : joinpath(@__DIR__, "downloads")
 hsl_coin_version = findversion(hsl_coin_versions, hsl_coin_path)
 const hsl_coin_archive = isnothing(hsl_coin_version) ? "" : joinpath(hsl_coin_path, getname(hsl_coin_version))
@@ -80,7 +79,7 @@ const hsl_coin_archive = isnothing(hsl_coin_version) ? "" : joinpath(hsl_coin_pa
 ##############################
 # Build
 ##############################
-const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
+const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_coin_archive]
 
 const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
@@ -113,7 +112,7 @@ if any(isfile.(hsl_archives))
 
   if isfile(hsl_coin_archive)
     @info "build coinhsl"
-    push!(products, FileProduct(prefix, "lib/libcoinhsl.$so", :libcoinshl))
+    push!(products, FileProduct(prefix, "lib/libcoinhsl.$so", :libcoinhsl))
     include("build_coinhsl.jl")
   end
 

@@ -1,4 +1,4 @@
-for T in (Float32, Float64, ComplexF32, ComplexF64)
+for T in HSL.ma97types 
 
   @info "Testing hsl_ma97 with $T data"
   matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef

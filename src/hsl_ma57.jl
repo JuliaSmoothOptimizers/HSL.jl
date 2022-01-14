@@ -10,6 +10,10 @@ export Ma57Exception
 
 const Ma57Data = Union{Float32, Float64}
 
+const ma57alg = getalg(:hsl_ma57)
+const ma57types = getdatatypes(ma57alg)
+const libma57 = getlib(ma57alg)
+
 """
 # Exception type raised in case of error.
 """
@@ -53,9 +57,9 @@ mutable struct Ma57_Control{T <: Ma57Data}
     icntl = zeros(Int32, 20)
     cntl = zeros(T, 5)
     if T == Float32
-      ccall((:ma57i_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+      ccall((:ma57i_, libma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
     elseif T == Float64
-      ccall((:ma57id_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+      ccall((:ma57id_, libma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
     end
     icntl[1] = unit_error
     icntl[2] = unit_warning
@@ -246,7 +250,7 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
       iwork = Vector{Int32}(undef, 5 * n)
 
       ## perform symbolic analysis.
-      ccall(($(string(fname)), libhsl_ma57), Nothing,
+      ccall(($(string(fname)), libma57), Nothing,
             (Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32},    Ref{Int32}, Ptr{Int32}, Ptr{Int32},       Ptr{Int32},   Ptr{Int32},    Ptr{$typ}),
                    M.n,        M.nz,     M.rows,     M.cols,     M.__lkeep,   M.__keep,      iwork,  M.control.icntl,  M.info.info, M.info.rinfo)
 
@@ -284,7 +288,7 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
 
       factorized = false
       while !factorized
-        ccall(($(string(fname)), libhsl_ma57), Nothing,
+        ccall(($(string(fname)), libma57), Nothing,
               (Ref{Int32},  Ref{Int32}, Ptr{$typ},  Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32},      Ref{Int32},  Ptr{Int32},  Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
                    ma57.n,     ma57.nz, ma57.vals, ma57.__fact,   ma57.__lfact, ma57.__ifact,   ma57.__lifact,    ma57.__lkeep, ma57.__keep,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
@@ -351,7 +355,7 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
       iwork = Vector{Int32}(undef, ma57.n)
       lwork = ma57.n * nrhs
       work = Vector{$typ}(undef, lwork)
-      ccall(($(string(fname)), libhsl_ma57), Nothing,
+      ccall(($(string(fname)), libma57), Nothing,
             (Ref{Int32}, Ref{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ref{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{Int32},         Ptr{Int32},     Ptr{Int32}),
                       j,     ma57.n, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,       nrhs,         b,     ma57.n,      work,      lwork,      iwork, ma57.control.icntl, ma57.info.info)
 
@@ -393,7 +397,7 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
       iwork = ma57.control.icntl[9] > 1 ? Vector{Int32}(undef, ma57.n) : Int32[]
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
       work = Vector{$typ}(undef, lwork)
-      ccall(($(string(fname)), libhsl_ma57), Nothing,
+      ccall(($(string(fname)), libma57), Nothing,
             (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Int32},         Ptr{Int32},         Ptr{$typ},     Ptr{Int32},       Ptr{$typ}),
                     job,     ma57.n,    ma57.nz, ma57.vals,  ma57.rows,  ma57.cols, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,         b,         x,     resid,      work,      iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
