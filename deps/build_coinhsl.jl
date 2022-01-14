@@ -3,7 +3,7 @@ archive = hsl_coin_archive
 if ver.ext == ".tar.gz"
     run(`tar -zxf $archive -C $builddir`)
 elseif ver.ext == ".zip"
-    run(`unzip $archive -d $builddir`)
+    run(`unzip -o $archive -d $builddir`)
 end
 
 name = getname(ver, false) 

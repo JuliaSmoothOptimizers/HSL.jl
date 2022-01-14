@@ -1,7 +1,7 @@
 if hsl_ma97_version.ext == ".tar.gz"
     run(`tar -zxf $hsl_ma97_archive -C $builddir`)
 elseif hsl_ma97_version.ext == ".zip"
-    run(`unzip $hsl_ma97_archive -d $builddir`)
+    run(`unzip -o $hsl_ma97_archive -d $builddir`)
 end
 
 cd("$builddir/hsl_ma97-$(hsl_ma97_version.version)")
