@@ -16,15 +16,19 @@ const hsl_ma57_patch = joinpath(hsl_ma57_path, "get_factors.patch")
 
 const hsl_ma97_version = "2.6.0"
 const hsl_ma97_sha256 = "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66"
-
 const hsl_ma97_path = haskey(ENV, "HSL_MA97_PATH") ? ENV["HSL_MA97_PATH"] : joinpath(@__DIR__, "downloads")
 const hsl_ma97_archive = joinpath(hsl_ma97_path, "hsl_ma97-$hsl_ma97_version.tar.gz")
+
+const hsl_ma86_version = "1.7.0"
+const hsl_ma86_sha256 = "845c65bee0bf31507d7b99c87773997012b7b16434da349ad5c361ceb257191e"
+const hsl_ma86_path = haskey(ENV, "HSL_MA86_PATH") ? ENV["HSL_MA86_PATH"] : joinpath(@__DIR__, "downloads")
+const hsl_ma86_archive = joinpath(hsl_ma86_path, "hsl_ma86-$hsl_ma86_version.tar.gz")
 
 const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 
-hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
+hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_ma86_archive]
 
 if any(isfile.(hsl_archives))
   products = Product[]
@@ -43,6 +47,12 @@ if any(isfile.(hsl_archives))
       push!(products, FileProduct(prefix, hsl_ma57_patch, :libhsl_ma57_patch))
     end
     include("build_hsl_ma57.jl")
+  end
+
+  if isfile(hsl_ma86_archive)
+    @info "building ma86"
+    push!(products, FileProduct(prefix, "lib/libhsl_ma86.$so", :libhsl_ma86))
+    include("build_hsl_ma86.jl")
   end
 
   if isfile(hsl_ma97_archive)

@@ -21,6 +21,7 @@ const data_map = Dict{Type, Type}(Float32 => Cfloat,
                                   ComplexF32 => Cfloat,
                                   ComplexF64 => Cdouble)
 
+
 # package-specific definitions
 if (@isdefined libhsl_ma57) || haskey(ENV, "DOCUMENTER_KEY")
   include("hsl_ma57.jl")
@@ -30,6 +31,9 @@ if (@isdefined libhsl_ma57) || haskey(ENV, "DOCUMENTER_KEY")
 end
 if (@isdefined libhsl_ma97) || haskey(ENV, "DOCUMENTER_KEY")
   include("hsl_ma97.jl")
+end
+if (@isdefined libhsl_ma86) || haskey(ENV, "DOCUMENTER_KEY")
+  include("hsl_ma86.jl")
 end
 
 end
