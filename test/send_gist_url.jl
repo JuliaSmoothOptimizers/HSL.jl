@@ -7,24 +7,22 @@ using GitHub
 
 ORG, REPO, PR = ENV["org"], ENV["repo"], ENV["pullrequest"]
 TEST_RESULTS_FILE = "$(ORG)_$(REPO)_$(PR).txt"
+LOG_FILE = joinpath("deps", "build.log")
 
 # Need to add GITHUB_AUTH to your .bashrc
 myauth = GitHub.authenticate(ENV["GITHUB_AUTH"])
 
 function create_gist(authentication)
-    
-    file_content = ""
-    file = open(TEST_RESULTS_FILE, "r")
-    for line in readlines(file)
-        file_content *= line*'\n'
-    end
-    close(file)
-    
-    file_dict = Dict(TEST_RESULTS_FILE => Dict("content" => file_content))
+
+    file_content = read(TEST_RESULTS_FILE, String)
+    log_content = read(LOG_FILE, String)
+
+    file_dict = Dict(TEST_RESULTS_FILE => Dict("content" => file_content),
+                     LOG_FILE => Dict("content" => log_content)
     gist = Dict{String,Any}("description" => "Test results",
                              "public" => true,
                              "files" => file_dict)
-    
+
     posted_gist = GitHub.create_gist(params = gist, auth = authentication)
 
     return posted_gist
@@ -47,7 +45,7 @@ function get_pull_request(api::GitHub.GitHubWebAPI, org::String, repo::Repo, pul
     my_params = Dict(:sort => "popularity",
                     :direction => "desc")
     pull_request = PullRequest(GitHub.gh_get_json(api, "/repos/$(org)/$(repo.name)/pulls/$(pullrequest_id)"; params=my_params, kwargs...))
-   
+
     return pull_request
 end
 
