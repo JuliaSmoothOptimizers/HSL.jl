@@ -1,3 +1,4 @@
+def prNumber = BRANCH_NAME.tokenize("PR-")[0]
 pipeline {
   agent any
   options {
@@ -52,15 +53,15 @@ pipeline {
 
      silentResponse: false,
 
-     regexpFilterText: '$comment',
-     regexpFilterExpression: '@JSOBot runtests'
+     regexpFilterText: '$comment $pullrequest',
+     regexpFilterExpression: '@JSOBot runtests ' + prNumber
     )
   }
   stages {
     stage('run tests') {
       steps {
-        sh "chmod +x run_tests.sh"
-        sh "./run_tests.sh"  
+        sh "chmod +x test/run_tests.sh"
+        sh "./test/run_tests.sh"
       }
     }
   }
