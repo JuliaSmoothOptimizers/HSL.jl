@@ -18,7 +18,7 @@ function create_gist(authentication)
     log_content = read(LOG_FILE, String)
 
     file_dict = Dict(TEST_RESULTS_FILE => Dict("content" => file_content),
-                     LOG_FILE => Dict("content" => log_content)
+                     LOG_FILE => Dict("content" => log_content))
     gist = Dict{String,Any}("description" => "Test results",
                              "public" => true,
                              "files" => file_dict)
