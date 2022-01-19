@@ -61,7 +61,8 @@ pipeline {
     stage('run tests') {
       steps {
         sh "chmod +x test/run_tests.sh"
-        sh "./test/run_tests.sh"
+        sh "mkdir -p $HOME/tests/${org}/${repo}"
+        sh "qsub -N ${repo}_${pullrequest}_test -V -cwd -e $HOME/tests/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_error.log test/run_tests.sh"
       }
     }
   }
