@@ -37,6 +37,10 @@ pkg> test HSL
 ```
 
 Note that a C and Fortran compilers are required.
+Should it be necessary, you can set the compilers to use by setting the environment variables
+* `HSL_FC`: the Fortran 90/95 compiler (default: `gfortran`)
+* `HSL_F77`: the Fortran 77 compiler (default: the same as `FC`)
+* `HSL_CC`: the C compiler (default: `gcc`).
 
 ## Supported Packages
 
