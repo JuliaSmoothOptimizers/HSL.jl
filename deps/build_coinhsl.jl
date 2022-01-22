@@ -1,5 +1,5 @@
-ver = hsl_coin_version
-archive = hsl_coin_archive
+ver = coinhsl_version
+archive = coinhsl_archive
 if ver.ext == ".tar.gz"
     run(`tar -zxf $archive -C $builddir`)
 elseif ver.ext == ".zip"
