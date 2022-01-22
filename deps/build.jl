@@ -70,9 +70,17 @@ const hsl_ma97_archive = isnothing(hsl_ma97_version) ? "" : joinpath(hsl_ma97_pa
 ##############################
 const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
 
+const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
+const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
+const HSL_CC = haskey(ENV, "HSL_CC") ? ENV["HSL_CC"] : "gcc"
+
 const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
+
+@info "using compilers" HSL_FC HSL_F77 HSL_CC
+
+hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
 
 if any(isfile.(hsl_archives))
   products = Product[]
