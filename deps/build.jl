@@ -80,8 +80,6 @@ const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 
 @info "using compilers" HSL_FC HSL_F77 HSL_CC
 
-hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
-
 if any(isfile.(hsl_archives))
   products = Product[]
 
