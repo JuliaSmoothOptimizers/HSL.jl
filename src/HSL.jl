@@ -3,6 +3,9 @@ module HSL
 using LinearAlgebra
 using SparseArrays
 
+using METIS4_jll
+using OpenBLAS32_jll
+
 if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
 else

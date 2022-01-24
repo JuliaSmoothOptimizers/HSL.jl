@@ -15,7 +15,7 @@ getname(ver::HSLVersion, extension::Bool=true) = ver.algname * "-" * ver.version
 function checksha(version::HSLVersion, filepath)
     if isfile(filepath)
         open(filepath) do f
-            return bytes2hex(sha256(f)) == version.sha 
+            return bytes2hex(sha256(f)) == version.sha
         end
     else
         return false
@@ -24,7 +24,7 @@ end
 
 function findversion(versions::Vector{HSLVersion}, path::AbstractString)
     for ver in versions
-        archivename = getname(ver) 
+        archivename = getname(ver)
         archivepath = joinpath(path, archivename)
         if isfile(archivepath)
             if checksha(ver, archivepath)
@@ -34,7 +34,7 @@ function findversion(versions::Vector{HSLVersion}, path::AbstractString)
             end
         end
     end
-    return nothing 
+    return nothing
 end
 
 # Parse some basic command-line arguments
@@ -81,9 +81,15 @@ const hsl_coin_archive = isnothing(hsl_coin_version) ? "" : joinpath(hsl_coin_pa
 ##############################
 const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_coin_archive]
 
+const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
+const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
+const HSL_CC = haskey(ENV, "HSL_CC") ? ENV["HSL_CC"] : "gcc"
+
 const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
+
+@info "using compilers" HSL_FC HSL_F77 HSL_CC
 
 if any(isfile.(hsl_archives))
   products = Product[]
