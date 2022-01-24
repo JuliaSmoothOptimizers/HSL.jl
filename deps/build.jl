@@ -68,18 +68,18 @@ const hsl_ma97_archive = isnothing(hsl_ma97_version) ? "" : joinpath(hsl_ma97_pa
 ##############################
 # COINHSL
 ##############################
-const hsl_coin_versions = [
+const coinhsl_versions = [
     # HSLVersion("coinhsl", "2021.05.05", "f77ad752a37de8695c02c81bcc503674af76689d40a9864b6f2a7a790c3efc95", ".tar.gz"),  # this has a problem with the install-sh script
     HSLVersion("coinhsl", "2021.05.05", "62c7e18ff22b977afa442db97d791f31359ab4a4f5a027f315cace211a24fbe9", ".zip")
 ]
-const hsl_coin_path = haskey(ENV, "HSL_COIN_PATH") ? ENV["HSL_COIN_PATH"] : joinpath(@__DIR__, "downloads")
-hsl_coin_version = findversion(hsl_coin_versions, hsl_coin_path)
-const hsl_coin_archive = isnothing(hsl_coin_version) ? "" : joinpath(hsl_coin_path, getname(hsl_coin_version))
+const coinhsl_path = get(ENV, "COINHSL_PATH", joinpath(@__DIR__, "downloads"))
+coinhsl_version = findversion(coinhsl_versions, coinhsl_path)
+const coinhsl_archive = isnothing(coinhsl_version) ? "" : joinpath(coinhsl_path, getname(coinhsl_version))
 
 ##############################
 # Build
 ##############################
-const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_coin_archive]
+const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, coinhsl_archive]
 
 const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
 const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
@@ -116,7 +116,7 @@ if any(isfile.(hsl_archives))
     include("build_hsl_ma97.jl")
   end
 
-  if isfile(hsl_coin_archive)
+  if isfile(coinhsl_archive)
     @info "build coinhsl"
     push!(products, FileProduct(prefix, "lib/libcoinhsl.$so", :libcoinhsl))
     include("build_coinhsl.jl")
