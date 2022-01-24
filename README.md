@@ -27,6 +27,7 @@ can hide METIS 5 with `brew unlink metis`. After the install procedure is
 complete, it is fine to link `metis` again with `brew link metis`.
 
 Set the environment variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to specify where the source archives `tar.gz` are stored.
+Alternatively, you can use the `zip` archive as long as `unzip` is installed on your system.
 The `HSL` Julia module will take care of compilation.
 Once the source archives have been placed in the locations indicated by the environment variables, run
 
@@ -37,13 +38,20 @@ pkg> test HSL
 ```
 
 Note that a C and Fortran compilers are required.
+Should it be necessary, you can set the compilers to use by setting the environment variables
+* `HSL_FC`: the Fortran 90/95 compiler (default: `gfortran`)
+* `HSL_F77`: the Fortran 77 compiler (default: the same as `FC`)
+* `HSL_CC`: the C compiler (default: `gcc`).
 
 ## Supported Packages
 
 ### HSL_MA97
 
-[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html) version 2.6.0: an
-OpenMP-based direct solver for symmetric linear systems. Example:
+Supported versions:
+* 2.6.0
+* 2.7.0
+
+[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html): an OpenMP-based direct solver for symmetric linear systems. Example:
 
 ```JULIA
 using MatrixMarket
