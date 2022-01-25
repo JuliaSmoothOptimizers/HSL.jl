@@ -10,7 +10,7 @@ struct HSLVersion
     ext::String
 end
 
-getname(ver::HSLVersion) = ver.algname * "-" * ver.version * ver.ext
+getname(ver::HSLVersion, ext=true) = ver.algname * "-" * ver.version * (ext ? ver.ext : "")
 
 function checksha(version::HSLVersion, filepath)
     if isfile(filepath)
@@ -66,6 +66,16 @@ hsl_ma97_version = findversion(hsl_ma97_versions, hsl_ma97_path)
 const hsl_ma97_archive = isnothing(hsl_ma97_version) ? "" : joinpath(hsl_ma97_path, getname(hsl_ma97_version))
 
 ##############################
+# MA86
+##############################
+const hsl_ma86_versions = [
+  HSLVersion("hsl_ma86", "1.7.0",  "845c65bee0bf31507d7b99c87773997012b7b16434da349ad5c361ceb257191e", ".tar.gz"),
+]
+const hsl_ma86_path = haskey(ENV, "HSL_MA86_PATH") ? ENV["HSL_MA86_PATH"] : joinpath(@__DIR__, "downloads")
+hsl_ma86_version = findversion(hsl_ma86_versions, hsl_ma86_path)
+const hsl_ma86_archive = isnothing(hsl_ma86_version) ? "" : joinpath(hsl_ma86_path, getname(hsl_ma86_version))
+
+##############################
 # Build
 ##############################
 const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_ma86_archive]
@@ -73,11 +83,6 @@ const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_ma86_archive]
 const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
 const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
 const HSL_CC = haskey(ENV, "HSL_CC") ? ENV["HSL_CC"] : "gcc"
-
-const hsl_ma86_version = "1.7.0"
-const hsl_ma86_sha256 = "845c65bee0bf31507d7b99c87773997012b7b16434da349ad5c361ceb257191e"
-const hsl_ma86_path = haskey(ENV, "HSL_MA86_PATH") ? ENV["HSL_MA86_PATH"] : joinpath(@__DIR__, "downloads")
-const hsl_ma86_archive = joinpath(hsl_ma86_path, "hsl_ma86-$hsl_ma86_version.tar.gz")
 
 const so         = Sys.isapple() ? "dylib" : "so"
 const all_load   = Sys.isapple() ? "-all_load" : "--whole-archive"
