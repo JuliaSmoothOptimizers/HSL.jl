@@ -15,3 +15,6 @@ end
 if isdefined(HSL, :libhsl_ma97)
   include("test_ma97.jl")
 end
+if isdefined(HSL, :libhsl_ma86)
+  include("test_ma86.jl")
+end
