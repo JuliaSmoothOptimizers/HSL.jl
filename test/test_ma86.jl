@@ -165,13 +165,13 @@ HSL.solve!(ma86, b)
             # Prints out annoying warning message from MC78.
             # Not sure how to avoid this.
             # Should we even allow for non-square matrices to be passed to the constructor?
-            B = sprand(T, n, n, 0.1)
-            ma86_hslerr = Ma86(B, doanalyse=false)
-            ma86_hslerr.control.diagnostics_level = -1
-            ma86_hslerr.control.unit_diagnostics = -1
-            ma86_hslerr.control.unit_error = -1
-            ma86_hslerr.control.unit_warning = -1
-            @test_throws HSL.Ma86Exception HSL.analyse!(ma86_hslerr)
+            # B = sprand(T, n, n, 0.1)
+            # ma86_hslerr = Ma86(B, doanalyse=false)
+            # ma86_hslerr.control.diagnostics_level = -1
+            # ma86_hslerr.control.unit_diagnostics = -1
+            # ma86_hslerr.control.unit_error = -1
+            # ma86_hslerr.control.unit_warning = -1
+            # @test_throws HSL.Ma86Exception HSL.analyse!(ma86_hslerr)
         end
     end
 end

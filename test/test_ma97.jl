@@ -1,3 +1,6 @@
+using Random
+Random.seed!(1)
+
 function getallocs(A)
     T = eltype(A)
     n = size(A,1)
