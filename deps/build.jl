@@ -10,7 +10,7 @@ struct HSLVersion
     ext::String
 end
 
-getname(ver::HSLVersion) = ver.algname * "-" * ver.version * ver.ext
+getname(ver::HSLVersion, ext=true) = ver.algname * "-" * ver.version * (ext ? ver.ext : "")
 
 function checksha(version::HSLVersion, filepath)
     if isfile(filepath)
@@ -56,19 +56,29 @@ const hsl_ma57_patch = joinpath(hsl_ma57_path, "get_factors.patch")
 ##############################
 # MA97
 ##############################
-const hsl_ma97_verions = [
+const hsl_ma97_versions = [
     HSLVersion("hsl_ma97", "2.7.0", "ac3a081d3a28e9ecb8871ce769f4ced2a5ffa5a9c36defbd2c844ae3493ccb37", ".tar.gz"),
     HSLVersion("hsl_ma97", "2.7.0", "8221b607d96554d7a57cc60483c7305ef43a8785dc4171ac2e8da087900a1100", ".zip"),
     HSLVersion("hsl_ma97", "2.6.0", "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66", ".tar.gz"),
 ]
 const hsl_ma97_path = haskey(ENV, "HSL_MA97_PATH") ? ENV["HSL_MA97_PATH"] : joinpath(@__DIR__, "downloads")
-hsl_ma97_version = findversion(hsl_ma97_verions, hsl_ma97_path)
+hsl_ma97_version = findversion(hsl_ma97_versions, hsl_ma97_path)
 const hsl_ma97_archive = isnothing(hsl_ma97_version) ? "" : joinpath(hsl_ma97_path, getname(hsl_ma97_version))
+
+##############################
+# MA86
+##############################
+const hsl_ma86_versions = [
+  HSLVersion("hsl_ma86", "1.7.0",  "845c65bee0bf31507d7b99c87773997012b7b16434da349ad5c361ceb257191e", ".tar.gz"),
+]
+const hsl_ma86_path = haskey(ENV, "HSL_MA86_PATH") ? ENV["HSL_MA86_PATH"] : joinpath(@__DIR__, "downloads")
+hsl_ma86_version = findversion(hsl_ma86_versions, hsl_ma86_path)
+const hsl_ma86_archive = isnothing(hsl_ma86_version) ? "" : joinpath(hsl_ma86_path, getname(hsl_ma86_version))
 
 ##############################
 # Build
 ##############################
-const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
+const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_ma86_archive]
 
 const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
 const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
@@ -97,6 +107,12 @@ if any(isfile.(hsl_archives))
       push!(products, FileProduct(prefix, hsl_ma57_patch, :libhsl_ma57_patch))
     end
     include("build_hsl_ma57.jl")
+  end
+
+  if isfile(hsl_ma86_archive)
+    @info "building ma86"
+    push!(products, FileProduct(prefix, "lib/libhsl_ma86.$so", :libhsl_ma86))
+    include("build_hsl_ma86.jl")
   end
 
   if isfile(hsl_ma97_archive)
