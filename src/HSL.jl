@@ -9,7 +9,7 @@ using OpenBLAS32_jll
 if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
 else
-  error("HSL library not properly installed. Please run Pkg.build(\"HSL\")")
+  @error("HSL library not properly installed. Please run Pkg.build(\"HSL\")")
 end
 
 function __init__()
