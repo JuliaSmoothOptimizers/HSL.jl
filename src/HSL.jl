@@ -19,10 +19,12 @@ function __init__()
 end
 
 # definitions applicable to all packages
-const data_map = Dict{Type, Type}(Float32 => Cfloat,
-                                  Float64 => Cdouble,
-                                  ComplexF32 => Cfloat,
-                                  ComplexF64 => Cdouble)
+const data_map = Dict{Type, Type}(
+  Float32 => Cfloat,
+  Float64 => Cdouble,
+  ComplexF32 => Cfloat,
+  ComplexF64 => Cdouble,
+)
 
 # package-specific definitions
 if (@isdefined libhsl_ma57) || haskey(ENV, "DOCUMENTER_KEY")

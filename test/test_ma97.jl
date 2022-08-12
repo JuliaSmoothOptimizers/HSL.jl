@@ -1,27 +1,26 @@
 function getallocs(A)
-    T = eltype(A)
-    n = size(A,1)
-    ma97 = Ma97(A)
-    matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
-    allocs = @allocated ma97_factorize!(ma97, matrix_type=matrix_type)
-    b = rand(T, n)
-    x = copy(b)
-    allocs += @allocated ma97_solve!(ma97, x)
+  T = eltype(A)
+  n = size(A, 1)
+  ma97 = Ma97(A)
+  matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
+  allocs = @allocated ma97_factorize!(ma97, matrix_type = matrix_type)
+  b = rand(T, n)
+  x = copy(b)
+  allocs += @allocated ma97_solve!(ma97, x)
 end
 
-for T in (Float32, Float64, ComplexF32, ComplexF64 )
-
+for T in (Float32, Float64, ComplexF32, ComplexF64)
   @info "Testing hsl_ma97 with $T data"
   matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
 
   ϵ = sqrt(eps(real(T)))
   n = 5
-  A = convert(T, 3) * sprand(T, n, n, .5)
-  A = A + A' + sparse(T(1)*I, n, n)
+  A = convert(T, 3) * sprand(T, n, n, 0.5)
+  A = A + A' + sparse(T(1) * I, n, n)
 
   # Test symmetric indefinite A.
   ma97 = Ma97(A)
-  ma97_factorize!(ma97, matrix_type=matrix_type)
+  ma97_factorize!(ma97, matrix_type = matrix_type)
   @test ma97.info.flag == 0
 
   # Solve with one rhs.
@@ -39,7 +38,7 @@ for T in (Float32, Float64, ComplexF32, ComplexF64 )
   x_exact = LU \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
-  piv_order, d = ma97_inquire(ma97, matrix_type=matrix_type)
+  piv_order, d = ma97_inquire(ma97, matrix_type = matrix_type)
   @test ma97.info.flag == 0
 
   # Test backslash.
@@ -47,22 +46,22 @@ for T in (Float32, Float64, ComplexF32, ComplexF64 )
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   # Alter d.
-  d[1,1] *= 2
+  d[1, 1] *= 2
   ma97_alter!(ma97, d)
 
   # Test convenience interface.
-  x = ma97_solve(A, b, matrix_type=matrix_type)
+  x = ma97_solve(A, b, matrix_type = matrix_type)
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
   # Test allocations
   @test getallocs(A) == 0
 
   # Test symmetric positive definite A.
-  A = A * A';
+  A = A * A'
   matrix_type = T in (ComplexF32, ComplexF64) ? :herm_pd : :real_spd
 
   ma97 = Ma97(A)
-  ma97_factorize!(ma97, matrix_type=matrix_type)
+  ma97_factorize!(ma97, matrix_type = matrix_type)
   @test ma97.info.flag == 0
 
   b = rand(T, n)
@@ -79,7 +78,7 @@ for T in (Float32, Float64, ComplexF32, ComplexF64 )
   x_exact = LU \ b
   @test norm(x - x_exact) ≤ ϵ * norm(x_exact)
 
-  d = ma97_inquire(ma97, matrix_type=matrix_type)
+  d = ma97_inquire(ma97, matrix_type = matrix_type)
   @test ma97.info.flag == 0
 
   # Test rectangular A.
@@ -103,5 +102,4 @@ for T in (Float32, Float64, ComplexF32, ComplexF64 )
   b = rand(T, 3)
   @test_throws Ma97Exception ma97_min_norm(A, b)
   @test_throws Ma97Exception ma97_solve(ma97, b)
-
 end

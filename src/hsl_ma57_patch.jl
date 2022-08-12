@@ -1,9 +1,7 @@
 ## get factors -----------------------------------------------------------------
 for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
-
   @eval begin
-
-    function ma57_get_factors(ma57 :: Ma57{$typ})
+    function ma57_get_factors(ma57::Ma57{$typ})
 
       # make room for L factor
       nebdu = ma57.info.info[14]
@@ -23,33 +21,70 @@ for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
 
       status = 0
 
-      ccall(($(string(fname)), libhsl_ma57), Nothing,
-            (Ref{Int32},   Ptr{$typ},      Ref{Int32},   Ptr{Int32},       Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{$typ}, Ptr{Int32}, Ptr{Int32},        Ref{Int32}, Ref{Int32}),
-                 ma57.n, ma57.__fact,    ma57.__lfact, ma57.__ifact,    ma57.__lifact,      nebdu,        nzl,        ipl,        irn,        fl,        nzd,         ipd,         id,         d,        ivp,      iperm,    ma57.info.rank,    status)
+      ccall(
+        ($(string(fname)), libhsl_ma57),
+        Nothing,
+        (
+          Ref{Int32},
+          Ptr{$typ},
+          Ref{Int32},
+          Ptr{Int32},
+          Ref{Int32},
+          Ref{Int32},
+          Ref{Int32},
+          Ptr{Int32},
+          Ptr{Int32},
+          Ptr{$typ},
+          Ref{Int32},
+          Ptr{Int32},
+          Ptr{Int32},
+          Ptr{$typ},
+          Ptr{Int32},
+          Ptr{Int32},
+          Ref{Int32},
+          Ref{Int32},
+        ),
+        ma57.n,
+        ma57.__fact,
+        ma57.__lfact,
+        ma57.__ifact,
+        ma57.__lifact,
+        nebdu,
+        nzl,
+        ipl,
+        irn,
+        fl,
+        nzd,
+        ipd,
+        id,
+        d,
+        ivp,
+        iperm,
+        ma57.info.rank,
+        status,
+      )
 
       status < 0 && throw(Ma57Exception("Ma57: Error while retrieving factors", status))
-      s = ma57.control.icntl[15] == 1 ? ma57.__fact[end-ma57.n:end-1] : ones($typ, ma57.n)
+      s = ma57.control.icntl[15] == 1 ? ma57.__fact[(end - ma57.n):(end - 1)] : ones($typ, ma57.n)
       L = SparseMatrixCSC(ma57.n, ma57.n, ipl, irn, fl)
       D = SparseMatrixCSC(ma57.n, ma57.n, ipd, id, d)
 
       return (L, D, s, iperm)
     end
-
   end
 end
 
 ## alter D ---------------------------------------------------------------------
-function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
-
+function ma57_alter_d(ma57::Ma57{T}, d::Array{T, 2}) where {T <: Ma57Data}
   ka = 1
   k2 = ma57.__ifact[1]
   kd = 0
   kw = 4
-  for blk in 1 : abs(ma57.__ifact[3])
+  for blk = 1:abs(ma57.__ifact[3])
     ncols = ma57.__ifact[kw]
     nrows = ma57.__ifact[kw + 1]
     two = false
-    for i = 1 : nrows
+    for i = 1:nrows
       kd = kd + 1
       ma57.__fact[ka] = d[1, kd]
       if ma57.__ifact[kw + 1 + i] < 0
@@ -60,7 +95,8 @@ function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
         k2 = k2 + 1
       else
         status = ma57.info.info[1]
-        d[2, kd] == 0.0 || throw(Ma57Exception("Ma57: Erroneous 2x2 block specified in d[2,$kd]", status))
+        d[2, kd] == 0.0 ||
+          throw(Ma57Exception("Ma57: Erroneous 2x2 block specified in d[2,$kd]", status))
       end
       ka = ka + nrows + 1 - i
     end
@@ -68,7 +104,6 @@ function ma57_alter_d(ma57 :: Ma57{T}, d :: Array{T,2}) where {T <: Ma57Data}
     kw = kw + ncols + 2
   end
 end
-
 
 ## additional docstrings -------------------------------------------------------
 """
