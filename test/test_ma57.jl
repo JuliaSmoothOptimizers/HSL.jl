@@ -14,27 +14,26 @@ function test_ma57(A, M, b, xexact)
   @test norm(x - xexact) ≤ ϵ * norm(xexact)
 
   # test min norm
-  A_mn = A[1:2,:]
+  A_mn = A[1:2, :]
   x_mn, y_mn = ma57_min_norm(A_mn, b[1:2]) # == ma57_solve(A_mn, b[1:2])
   x_mn_star = A_mn' * (inv(Matrix(A_mn * A_mn')) * b[1:2])
   @test norm(x_mn - x_mn_star) ≤ ϵ * norm(x_mn_star)
 
   ## solve least squares
-  A_ls = A[:,1:2]
+  A_ls = A[:, 1:2]
   r_ls, x_ls = ma57_least_squares(A_ls, b)   # == ma57_solve(A_ls, b)
   x_ls_star = qr(Matrix(A_ls)) \ b
   @test norm(x_ls - x_ls_star) ≤ ϵ * norm(x_ls_star)
 end
 
-
 for T in (Float32, Float64)
-
   @info "Testing hsl_ma57 with $T data"
   n = 5
   rows = Int32[1, 1, 2, 2, 3, 3, 5]
   cols = Int32[1, 2, 3, 5, 3, 4, 5]
   vals = T[2, 3, 4, 6, 1, 5, 1]
-  A = sparse(rows, cols, vals, n, n) ; A = A + triu(A, 1)'
+  A = sparse(rows, cols, vals, n, n)
+  A = A + triu(A, 1)'
 
   M = ma57_coord(n, rows, cols, vals)
 
@@ -54,8 +53,8 @@ for T in (Float32, Float64)
   ϵ = sqrt(eps(T))
   @test norm(x - xexact) ≤ ϵ * norm(xexact)
 
-  A = convert(T, 3) * convert(SparseMatrixCSC{T,Int32}, sprand(T, n, n, .5))
-  A = A + A' + convert(SparseMatrixCSC{T,Int32}, sparse(T(1)*I, n, n))
+  A = convert(T, 3) * convert(SparseMatrixCSC{T, Int32}, sprand(T, n, n, 0.5))
+  A = A + A' + convert(SparseMatrixCSC{T, Int32}, sparse(T(1) * I, n, n))
   M = Ma57(A)
   b = rand(T, n)
   xexact = lu(A) \ b
