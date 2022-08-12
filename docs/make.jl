@@ -11,8 +11,11 @@ makedocs(
   pages = ["Reference" => "index.md"]
 )
 
-deploydocs(deps = nothing, make = nothing,
+deploydocs(
+  deps = nothing,
+  make = nothing,
   repo = "github.com/JuliaSmoothOptimizers/HSL.jl.git",
   target = "build",
-  devbranch = "main"
+  devbranch = "main",
+  push_preview = true,
 )
