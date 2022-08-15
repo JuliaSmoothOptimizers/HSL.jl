@@ -52,12 +52,12 @@ the sparse QR factorization in Julia.
 
 When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
 ```JULIA
-(x, y) = ma97_solve(A, b)
+(x, y) = ma97_solve(A, c)
 ```
-solves for the minimum-norm solution, i.e., *x* such that *Ax = b* and *x +
+solves for the minimum-norm solution, i.e., *x* such that *Ax = c* and *x +
 Aᵀ y = 0*. The call
 ```JULIA
-(x, y) = ma97_min_norm(A, b)
+(x, y) = ma97_min_norm(A, c)
 ```
 is also defined, and is equivalent to the above.
 
@@ -101,12 +101,12 @@ the sparse QR factorization in Julia.
 
 When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
 ```JULIA
-(x, y) = ma57_solve(A, b)
+(x, y) = ma57_solve(A, c)
 ```
-solves for the minimum-norm solution, i.e., *x* such that *Ax = b* and *x +
+solves for the minimum-norm solution, i.e., *x* such that *Ax = c* and *x +
 Aᵀ y = 0*. The call
 ```JULIA
-(x, y) = ma57_min_norm(A, b)
+(x, y) = ma57_min_norm(A, c)
 ```
 is also defined, and is equivalent to the above.
 
