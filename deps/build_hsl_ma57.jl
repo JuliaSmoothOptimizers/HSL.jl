@@ -13,6 +13,6 @@ run(
 )
 run(`make install`)
 run(
-  `$(HSL_FC) -fPIC -shared -Wl,$all_load $libdir/libhsl_ma57.a -L$libblas_dir $libblas -L$libmetis_dir -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma57.$dlext`,
+  `$(split(HSL_FC)) -fPIC -shared -Wl,$all_load $libdir/libhsl_ma57.a -L$libblas_dir $libblas -L$libmetis_dir -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma57.$dlext`,
 )
 cd(@__DIR__)
