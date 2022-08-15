@@ -8,7 +8,7 @@ makedocs(
   assets = ["assets/style.css"],
   format = Documenter.HTML(),
   sitename = "HSL.jl",
-  pages = ["Reference" => "index.md"],
+  pages = ["Home" => "index.md", "Tutorial" => "tutorial.md", "Reference" => "reference.md"],
 )
 
 deploydocs(
