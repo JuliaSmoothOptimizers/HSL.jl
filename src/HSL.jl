@@ -5,6 +5,7 @@ using SparseArrays
 
 using METIS4_jll
 using OpenBLAS32_jll
+using libblastrampoline_jll
 
 if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
@@ -13,6 +14,7 @@ else
 end
 
 function __init__()
+  (VERSION ≥ v"1.7") && LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
   if (@isdefined libhsl_ma57) || (@isdefined libhsl_ma97)
     check_deps()
   end

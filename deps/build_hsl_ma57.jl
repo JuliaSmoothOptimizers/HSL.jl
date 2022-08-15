@@ -9,10 +9,10 @@ if isfile(hsl_ma57_patch)
   run(`patch -p1 -i $hsl_ma57_patch`)
 end
 run(
-  `./configure --prefix=$usrdir FC=$(HSL_FC) F77=$(HSL_F77) CC=$(HSL_CC) CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --with-blas="-L$libopenblas_dir -lopenblas" --with-metis="-L$libmetis_dir -lmetis"`,
+  `./configure --prefix=$usrdir FC=$(HSL_FC) F77=$(HSL_F77) CC=$(HSL_CC) CFLAGS=-fPIC FFLAGS="-fPIC -fopenmp" FCFLAGS="-fPIC -fopenmp" --with-blas="-L$libblas_dir $libblas" --with-metis="-L$libmetis_dir -lmetis"`,
 )
 run(`make install`)
 run(
-  `$(HSL_FC) -fPIC -shared -Wl,$all_load $libdir/libhsl_ma57.a -L$libopenblas_dir -lopenblas -L$libmetis_dir -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma57.$so`,
+  `$(HSL_FC) -fPIC -shared -Wl,$all_load $libdir/libhsl_ma57.a -L$libblas_dir $libblas -L$libmetis_dir -lmetis -lgomp -Wl,$noall_load -o $libdir/libhsl_ma57.$dlext`,
 )
 cd(@__DIR__)
