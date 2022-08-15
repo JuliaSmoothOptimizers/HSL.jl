@@ -2,6 +2,7 @@ using BinaryProvider, SHA # requires BinaryProvider 0.3.0 or later
 
 using METIS4_jll
 using OpenBLAS32_jll
+using libblastrampoline_jll
 
 struct HSLVersion
   algname::String
@@ -98,7 +99,8 @@ const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
 const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
 const HSL_CC = haskey(ENV, "HSL_CC") ? ENV["HSL_CC"] : "gcc"
 
-const so = Sys.isapple() ? "dylib" : "so"
+const libblas = VERSION < v"1.7" ? "-lopenblas" : "-lblastrampoline"
+const dlext = Sys.isapple() ? "dylib" : "so"
 const all_load = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 
@@ -107,7 +109,11 @@ const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 if any(isfile.(hsl_archives))
   products = Product[]
 
-  libopenblas_dir = joinpath(OpenBLAS32_jll.artifact_dir, "lib")
+  if VERSION < v"1.7"
+    libblas_dir = joinpath(OpenBLAS32_jll.artifact_dir, "lib")
+  else
+    libblas_dir = joinpath(libblastrampoline_jll.artifact_dir, "lib", "julia")
+  end
   libmetis_dir = joinpath(METIS4_jll.artifact_dir, "lib")
 
   usrdir = joinpath(@__DIR__, "usr")
@@ -116,7 +122,7 @@ if any(isfile.(hsl_archives))
   mkpath(builddir)
   if isfile(hsl_ma57_archive)
     @info "building ma57"
-    push!(products, FileProduct(prefix, "lib/libhsl_ma57.$so", :libhsl_ma57))
+    push!(products, FileProduct(prefix, "lib/libhsl_ma57.$dlext", :libhsl_ma57))
     if isfile(hsl_ma57_patch)
       push!(products, FileProduct(prefix, hsl_ma57_patch, :libhsl_ma57_patch))
     end
@@ -125,7 +131,7 @@ if any(isfile.(hsl_archives))
 
   if isfile(hsl_ma97_archive)
     @info "building ma97"
-    push!(products, FileProduct(prefix, "lib/libhsl_ma97.$so", :libhsl_ma97))
+    push!(products, FileProduct(prefix, "lib/libhsl_ma97.$dlext", :libhsl_ma97))
     include("build_hsl_ma97.jl")
   end
 
