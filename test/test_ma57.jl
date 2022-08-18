@@ -49,7 +49,7 @@ for T in (Float32, Float64)
   LBL = ma57_coord(n, cols, rows, vals, control, info)
   ma57_factorize(LBL)
   x = copy(b)
-  ma57_solve!(LBL, x)
+  ldiv!(LBL, x)
   ϵ = sqrt(eps(T))
   @test norm(x - xexact) ≤ ϵ * norm(xexact)
 
