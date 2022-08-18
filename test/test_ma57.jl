@@ -48,8 +48,9 @@ for T in (Float32, Float64)
   # give lower triangle: swap rows and cols
   LBL = ma57_coord(n, cols, rows, vals, control, info)
   ma57_factorize!(LBL)
+  work = similar(b)
   x = copy(b)
-  ldiv!(LBL, x)
+  ma57_solve!(LBL, x, work)
   ϵ = sqrt(eps(T))
   @test norm(x - xexact) ≤ ϵ * norm(xexact)
 

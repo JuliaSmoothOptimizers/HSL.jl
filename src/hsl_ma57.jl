@@ -7,8 +7,7 @@ export ma57_coord,
   ma57_min_norm,
   ma57_least_squares,
   ma57_get_factors,
-  ma57_alter_d,
-  ldiv!
+  ma57_alter_d
 
 export Ma57Exception
 
@@ -482,12 +481,6 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
       return b
     end
   end
-end
-
-import LinearAlgebra.ldiv!
-function ldiv!(x::Vector, ma57::Ma57, b::Vector)
-  ma57_solve!(ma57, b, x)
-  x .= b
 end
 
 ## iterative refinement
