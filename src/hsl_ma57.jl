@@ -460,6 +460,9 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
   end
 end
 
+import LinearAlgebra.ldiv!
+ldiv!(ma57::Ma57, b::Array) = ma57_solve!(ma57, b)
+
 ## iterative refinement
 function ma57_solve(ma57::Ma57{T}, b::Vector{T}, nitref::Int) where {T <: Ma57Data}
   x = Vector{T}(undef, ma57.n)
