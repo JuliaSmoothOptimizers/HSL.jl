@@ -1,5 +1,6 @@
 export Ma57_Control, Ma57_Info, Ma57
 export ma57_coord,
+  ma57_factorize!,
   ma57_factorize,
   ma57_solve!,
   ma57_solve,
