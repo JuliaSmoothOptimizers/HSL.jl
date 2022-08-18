@@ -6,7 +6,8 @@ export ma57_coord,
   ma57_min_norm,
   ma57_least_squares,
   ma57_get_factors,
-  ma57_alter_d
+  ma57_alter_d,
+  ldiv!
 
 export Ma57Exception
 
