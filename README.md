@@ -107,7 +107,7 @@ rhss = hcat(rhs, rhs)
 
 ## factorize and solve
 LDL = Ma57(K)
-ma57_factorize(LDL)
+ma57_factorize!(LDL)
 LDL.info.rank
 x = ma57_solve(LDL, rhs)  # or x = LBL \ rhs
 norm(K*x - rhs)
