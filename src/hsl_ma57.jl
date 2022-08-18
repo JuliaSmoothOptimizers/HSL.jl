@@ -204,6 +204,9 @@ mutable struct Ma57{T <: Ma57Data}
   __lifact::Int32
   __ifact::Vector{Int32}
 
+  iwork_fact::Vector{Int32}
+  iwork_solve::Vector{Int32}
+
   function Ma57{T}(
     n::Int32,
     nz::Int32,
@@ -215,7 +218,24 @@ mutable struct Ma57{T <: Ma57Data}
   ) where {T}
     lkeep = 5 * n + nz + max(n, nz) + 42
     keep = zeros(Int32, lkeep)
-    new(n, nz, rows, cols, vals, control, info, 1.1, lkeep, keep, 0, T[], 0, Int32[])
+    new(
+      n,
+      nz,
+      rows,
+      cols,
+      vals,
+      control,
+      info,
+      1.1,
+      lkeep,
+      keep,
+      0,
+      T[],
+      0,
+      Int32[],
+      Vector{Int32}(undef, n),
+      Vector{Int32}(undef, n),
+    )
   end
 end
 
@@ -309,7 +329,7 @@ end
 ## factorize -------------------------------------------------------------------
 for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
   @eval begin
-    function ma57_factorize(ma57::Ma57{$typ})
+    function ma57_factorize!(ma57::Ma57{$typ})
       if ma57.__lfact <= 0 || ma57.__lifact <= 0
         status = ma57.info.info[1]
         throw(Ma57Exception("Ma57: Symbolic analysis must be performed first", status))
@@ -320,7 +340,6 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
       if length(ma57.__ifact) < ma57.__lifact
         ma57.__ifact = Vector{Int32}(undef, ma57.__lifact)
       end
-      iwork = Vector{Int32}(undef, ma57.n)
 
       factorized = false
       while !factorized
@@ -352,7 +371,7 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
           ma57.__lifact,
           ma57.__lkeep,
           ma57.__keep,
-          iwork,
+          ma57.iwork_fact,
           ma57.control.icntl,
           ma57.control.cntl,
           ma57.info.info,
@@ -391,7 +410,7 @@ end
 ## be passed to other functions, e.g., `ma57_solve()`.
 function ma57_factorize(A::SparseMatrixCSC{T, Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   ma57 = Ma57(A; kwargs...)
-  ma57_factorize(ma57)
+  ma57_factorize!(ma57)
   return ma57
 end
 
@@ -401,23 +420,26 @@ ma57_factorise = ma57_factorize
 ## solve -----------------------------------------------------------------------
 function ma57_solve(ma57::Ma57{T}, b::Array{T}; kwargs...) where {T <: Ma57Data}
   x = copy(b)
-  ma57_solve!(ma57, x; kwargs...)
+  ma57_solve!(ma57, x, Vector{T}(undef, ma57.n * size(b, 2)); kwargs...)
   return x
 end
 
 for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
   @eval begin
-    """Solve a symmetric linear system. The symbolic analysis and
-    numerical factorization must have been performed and must have succeeded.
     """
-    function ma57_solve!(ma57::Ma57{$typ}, b::Array{$typ}; job::Symbol = :A)
+        ma57_solve!(ma57, b, work; job::Symbol = :A)
+    
+    Solve a symmetric linear system `ma57 * x = b`, overwriting `b` to store `x`.
+    `work` should be a `Vector{eltype(b)}` of length `ma57.n * size(b, 2)`.
+    The symbolic analysis and numerical factorization must have been performed and must have succeeded.
+    """
+    function ma57_solve!(ma57::Ma57{$typ}, b::Array{$typ}, work::Vector{$typ}; job::Symbol = :A)
       size(b, 1) == ma57.n || throw(Ma57Exception("Ma57: rhs size mismatch", 0))
       nrhs = size(b, 2)
-
       j = jobs57[job]
-      iwork = Vector{Int32}(undef, ma57.n)
       lwork = ma57.n * nrhs
-      work = Vector{$typ}(undef, lwork)
+      @assert length(work) == lwork
+
       ccall(
         ($(string(fname)), libhsl_ma57),
         Nothing,
@@ -448,7 +470,7 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
         ma57.n,
         work,
         lwork,
-        iwork,
+        ma57.iwork_solve,
         ma57.control.icntl,
         ma57.info.info,
       )
@@ -462,22 +484,38 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
 end
 
 import LinearAlgebra.ldiv!
-ldiv!(ma57::Ma57, b::Array) = ma57_solve!(ma57, b)
+function ldiv!(x::Vector, ma57::Ma57, b::Vector)
+  ma57_solve!(ma57, b, x)
+  x .= b
+end
 
 ## iterative refinement
 function ma57_solve(ma57::Ma57{T}, b::Vector{T}, nitref::Int) where {T <: Ma57Data}
   x = Vector{T}(undef, ma57.n)
-  ma57_solve!(ma57, b, x, nitref)
+  ma57_solve(ma57, b, x, nitref)
   return x
 end
 
 for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
   @eval begin
+    """
+        ma57_solve!(ma57, b, x, resid, work, nitref)
 
-    ## Solve a symmetric linear system with iterative refinement.
-    ## The symbolic analysis and numerical factorization must have been performed
-    ## and must have succeeded.
-    function ma57_solve!(ma57::Ma57{$typ}, b::Vector{$typ}, x::Vector{$typ}, nitref::Int)
+    Solve a symmetric linear system `ma57 * x = b`  with iterative refinement.
+    `ma57.control.icntl[9]` should have been set to the maximum number of iterative refinements wanted.
+    `resid` should be a storage `Vector{eltype(b)}` of size `ma57.n`
+    `work` should be a storage `Vector{eltype(b)}` of size `ma57.n` if `ma57.control.icntl[9] == 1`,
+    and of size `4 * ma57.n` otherwise.
+    The symbolic analysis and numerical factorization must have been performed and must have succeeded.
+    """
+    function ma57_solve!(
+      ma57::Ma57{$typ},
+      b::Vector{$typ},
+      x::Vector{$typ},
+      resid::Vector{$typ},
+      work::Vector{$typ},
+      nitref::Int,
+    )
       if nitref == 0
         @warn "Ma57: calling this version of `solve()` with `nitref=0` is wasteful"
         return ma57_solve!(ma57, b)
@@ -487,11 +525,11 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
       current_nitref = ma57.control.icntl[9]
       ma57.control.icntl[9] = max(0, nitref)
       job = ma57.control.icntl[9] == 1 ? 1 : 0
-      resid = Vector{$typ}(undef, ma57.n)
-
-      iwork = ma57.control.icntl[9] > 1 ? Vector{Int32}(undef, ma57.n) : Int32[]
+      @assert length(resid) == ma57.n
+      iwork = ma57.control.icntl[9] > 1 ? ma57.iwork_solve : Int32[]
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
-      work = Vector{$typ}(undef, lwork)
+      @assert length(work) == lwork
+
       ccall(
         ($(string(fname)), libhsl_ma57),
         Nothing,
@@ -562,6 +600,24 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
   end
 end
 
+"""
+    ma57_solve!(ma57, b, x, nitref)
+
+Solve a symmetric linear system `ma57 * x = b`  with iterative refinement.
+`ma57.control.icntl[9]` should have been set to the maximum number of iterative refinements wanted.
+The symbolic analysis and numerical factorization must have been performed and must have succeeded.
+"""
+function ma57_solve(ma57::Ma57{T}, b::Vector{T}, x::Vector{T}, nitref::Int) where {T <: Ma57Data}
+  ma57_solve!(
+    ma57,
+    b,
+    x,
+    Vector{T}(undef, ma57.n),
+    Vector{T}(undef, (ma57.control.icntl[9] == 1) ? ma57.n : 4 * ma57.n),
+    nitref,
+  )
+end
+
 ## overload backslash to solve with MA57.
 import Base.\
 \(ma57::Ma57{T}, b::Array{T}) where {T <: Ma57Data} = ma57_solve(ma57, b)
@@ -573,7 +629,7 @@ function ma57_solve(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57Data
   m < n && (return ma57_min_norm(A, b))
   m > n && (return ma57_least_squares(A, b))
   x = copy(b)
-  ma57_solve!(A, x)
+  ma57_solve(Ma57(A), x)
   return x
 end
 
@@ -589,7 +645,7 @@ function ma57_min_norm(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57D
   (m, n) = size(A)
   K = [sparse(T(1) * I, n, n) spzeros(T, n, m); A T[0.0].*sparse(T(1) * I, m, m)]
   M = Ma57(K)
-  ma57_factorize(M)
+  ma57_factorize!(M)
   rhs = [zeros(T, n); b]
   xy57 = ma57_solve(M, rhs)
   x57 = xy57[1:n]
@@ -614,7 +670,7 @@ function ma57_least_squares(
   (m, n) = size(A)
   K = [sparse(T(1) * I, m, m) spzeros(T, m, n); A' T[0.0].*sparse(T(1) * I, n, n)]
   M = Ma57(K)
-  ma57_factorize(M)
+  ma57_factorize!(M)
   rhs = [b; zeros(T, n)]
   rx57 = ma57_solve(M, rhs)
   r57 = rx57[1:m]
