@@ -17,11 +17,17 @@ b \\ c
 ```
 Special cases occur when ``H`` is the identity matrix and either ``b = 0`` or ``c = 0``, which correspond to the least-squares problem
 ```math
-\min_y \ \|A^T y - b\|
+\begin{equation}
+  \label{LS}
+  \min_y \ \|A^T y - b\|
+\end{equation}
 ```
 and to the least-norm problem
 ```math
-\min_x \ \|x\| \ \text{subject to } Ax = c
+\begin{equation}
+  \label{LN}
+  \min_x \ \|x\| \ \text{subject to } Ax = c
+\end{equation}
 ```
 respectively.
 
@@ -50,25 +56,25 @@ x = ma97_solve(LBL, rhs)  # or x = LBL \ rhs
 There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
-When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
-```JULIA
-(x, y) = ma97_solve(A, c)
-```
-solves for the minimum-norm solution, i.e., *x* such that *Ax = c* and *x +
-Aᵀ y = 0*. The call
-```JULIA
-(x, y) = ma97_min_norm(A, c)
-```
-is also defined, and is equivalent to the above.
-
 When *m* > *n* and has full column rank,
 ```JULIA
 (r, x) = ma97_solve(A, b)
 ```
-solves for the least-squares solution, i.e., *x* such that *r = b - Ax*
+solves \eqref{LS}, i.e., *x* such that *r = b - Ax*
 satisfies *Aᵀ r = 0*. The call
 ```JULIA
 (r, x) = ma97_least_squares(A, b)
+```
+is also defined, and is equivalent to the above.
+
+When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
+```JULIA
+(x, y) = ma97_solve(A, c)
+```
+solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
+Aᵀ y = 0*. The call
+```JULIA
+(x, y) = ma97_min_norm(A, c)
 ```
 is also defined, and is equivalent to the above.
 
@@ -99,25 +105,25 @@ xx = ma57_solve(LDL, rhss)  # or x = LBL \ rhss
 There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
-When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
-```JULIA
-(x, y) = ma57_solve(A, c)
-```
-solves for the minimum-norm solution, i.e., *x* such that *Ax = c* and *x +
-Aᵀ y = 0*. The call
-```JULIA
-(x, y) = ma57_min_norm(A, c)
-```
-is also defined, and is equivalent to the above.
-
 When *m* > *n* and has full column rank,
 ```JULIA
 (r, x) = ma57_solve(A, b)
 ```
-solves for the least-squares solution, i.e., *x* such that *r = b - Ax*
+solves \eqref{LS}, i.e., *x* such that *r = b - Ax*
 satisfies *Aᵀ r = 0*. The call
 ```JULIA
 (r, x) = ma57_least_squares(A, b)
+```
+is also defined, and is equivalent to the above.
+
+When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
+```JULIA
+(x, y) = ma57_solve(A, c)
+```
+solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
+Aᵀ y = 0*. The call
+```JULIA
+(x, y) = ma57_min_norm(A, c)
 ```
 is also defined, and is equivalent to the above. Example:
 

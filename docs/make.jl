@@ -6,7 +6,11 @@ makedocs(
   doctest = false,
   strict = true,
   assets = ["assets/style.css"],
-  format = Documenter.HTML(),
+  format = Documenter.HTML(
+    mathengine = Documenter.MathJax(Dict(:TeX => Dict(
+        :equationNumbers => Dict(:autoNumber => "AMS"),
+    ))),
+  ),
   sitename = "HSL.jl",
   pages = ["Home" => "index.md", "Tutorial" => "tutorial.md", "Reference" => "reference.md"],
 )
