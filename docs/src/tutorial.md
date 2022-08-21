@@ -3,33 +3,35 @@
 HSL MA57 and MA97 can be used for the solution of symmetric, possibly indefinite, linear systems.
 They are often used for the solution of saddle-point systems, i.e., systems of the form
 ```math
-\begin{bmatrix}
-H & A^T \\
-A &
-\end{bmatrix}
-\begin{bmatrix}
-x \\ y
-\end{bmatrix}
-=
-\begin{bmatrix}
-b \\ c
-\end{bmatrix}.
+\begin{equation}
+  \label{SP}
+  \begin{bmatrix}
+    -H & A^T \\
+     A & G
+  \end{bmatrix}
+  \begin{bmatrix}
+    x \\ y
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    c \\ b
+  \end{bmatrix}.
+\end{equation}
 ```
-Special cases occur when ``H`` is the identity matrix and either ``b = 0`` or ``c = 0``, which correspond to the least-squares problem
+A special case occurs when $H = 0$, $G = I$ and $c = 0$, which corresponds to the least-squares problem
 ```math
 \begin{equation}
   \label{LS}
-  \min_y \ \|A^T y - b\|
+  \min_x \ \|A x - b\|_2
 \end{equation}
 ```
-and to the least-norm problem
+Another special case occurs when $H = -I$, $G = 0$ and $c = 0$, which corresponds to the least-norm problem
 ```math
 \begin{equation}
   \label{LN}
-  \min_x \ \|x\| \ \text{subject to } Ax = c
+  \min_x \ \|x\| \ \text{subject to } Ax = b.
 \end{equation}
 ```
-respectively.
 
 ## HSL_MA97
 
@@ -56,25 +58,25 @@ x = ma97_solve(LBL, rhs)  # or x = LBL \ rhs
 There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
-When *m* > *n* and has full column rank,
+When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
 ```JULIA
 (r, x) = ma97_solve(A, b)
 ```
-solves \eqref{LS}, i.e., *x* such that *r = b - Ax*
-satisfies *Aᵀ r = 0*. The call
+returns $x$ that solves \eqref{LS} and residual $r := b - Ax$ corresponding to $y$ in \eqref{SP}.
+The call
 ```JULIA
 (r, x) = ma97_least_squares(A, b)
 ```
 is also defined, and is equivalent to the above.
 
-When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
+When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 ```JULIA
-(x, y) = ma97_solve(A, c)
+(x, y) = ma97_solve(A, b)
 ```
-solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
-Aᵀ y = 0*. The call
+returns $x$ that solves \eqref{LN} and $y$ such that $x = -A^T y$ (and therefore $A A^T (-y) = b$).
+The call
 ```JULIA
-(x, y) = ma97_min_norm(A, c)
+(x, y) = ma97_min_norm(A, b)
 ```
 is also defined, and is equivalent to the above.
 
@@ -105,25 +107,25 @@ xx = ma57_solve(LDL, rhss)  # or x = LBL \ rhss
 There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
-When *m* > *n* and has full column rank,
+When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
 ```JULIA
 (r, x) = ma57_solve(A, b)
 ```
-solves \eqref{LS}, i.e., *x* such that *r = b - Ax*
-satisfies *Aᵀ r = 0*. The call
+returns $x$ that solves \eqref{LS} and residual $r := b - Ax$ corresponding to $y$ in \eqref{SP}.
+The call
 ```JULIA
 (r, x) = ma57_least_squares(A, b)
 ```
 is also defined, and is equivalent to the above.
 
-When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
+When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 ```JULIA
-(x, y) = ma57_solve(A, c)
+(x, y) = ma57_solve(A, b)
 ```
-solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
-Aᵀ y = 0*. The call
+returns $x$ that solves \eqref{LN} and $y$ such that $x = -A^T y$ (and therefore $A A^T (-y) = b$).
+The call
 ```JULIA
-(x, y) = ma57_min_norm(A, c)
+(x, y) = ma57_min_norm(A, b)
 ```
 is also defined, and is equivalent to the above. Example:
 
