@@ -109,8 +109,8 @@ When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
 ```JULIA
 (r, x) = ma57_solve(A, b)
 ```
-solves \eqref{LS}, i.e., *x* such that *r = b - Ax*
-satisfies *Aᵀ r = 0*. The call
+solves \eqref{LS}.
+The call
 ```JULIA
 (r, x) = ma57_least_squares(A, b)
 ```
