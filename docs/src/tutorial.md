@@ -3,17 +3,19 @@
 HSL MA57 and MA97 can be used for the solution of symmetric, possibly indefinite, linear systems.
 They are often used for the solution of saddle-point systems, i.e., systems of the form
 ```math
-\begin{bmatrix}
-H & A^T \\
-A &
-\end{bmatrix}
-\begin{bmatrix}
-x \\ y
-\end{bmatrix}
-=
-\begin{bmatrix}
-b \\ c
-\end{bmatrix}.
+\begin{equation}
+  \label{SP}
+  \begin{bmatrix}
+    -H & A^T \\
+     A & G
+  \end{bmatrix}
+  \begin{bmatrix}
+    x \\ y
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    c \\ b
+  \end{bmatrix}.
 ```
 Special cases occur when ``H`` is the identity matrix and either ``b = 0`` or ``c = 0``, which correspond to the least-squares problem
 ```math
