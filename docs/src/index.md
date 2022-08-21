@@ -62,7 +62,7 @@ Note that Homebrew for Silicon installs in `/opt/homebrew` whereas Homebrew for 
 
 Next, install gcc/gfortran version 7 for Intel:
 ```
-/usr/local/bin/brew install gcc@7
+arch -x86_64 /usr/local/bin/brew install gcc@7
 ```
 
 Finally, define the environment variables
