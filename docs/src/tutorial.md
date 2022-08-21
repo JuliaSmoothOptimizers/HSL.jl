@@ -16,6 +16,7 @@ They are often used for the solution of saddle-point systems, i.e., systems of t
   \begin{bmatrix}
     c \\ b
   \end{bmatrix}.
+\end{equation}
 ```
 A special case occurs when $H = 0$, $G = I$ and $c = 0$, which corresponds to the least-squares problem
 ```math
@@ -24,12 +25,13 @@ A special case occurs when $H = 0$, $G = I$ and $c = 0$, which corresponds to th
   \min_x \ \|A x - b\|_2
 \end{equation}
 ```
-Another special case occur when $H = -I$, $G = 0$ and $c = 0$, which corresponds to the least-norm problem
+Another special case occurs when $H = -I$, $G = 0$ and $c = 0$, which corresponds to the least-norm problem
 ```math
 \begin{equation}
   \label{LN}
   \min_x \ \|x\| \ \text{subject to } Ax = b.
 \end{equation}
+```
 
 ## HSL_MA97
 
