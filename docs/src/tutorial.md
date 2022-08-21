@@ -73,7 +73,7 @@ When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 ```JULIA
 (x, y) = ma97_solve(A, b)
 ```
-solves \eqref{LN}.
+returns $x$ that solves \eqref{LN} and $y$ such that $x = -A^T y$ (and therefore $A A^T (-y) = b$).
 The call
 ```JULIA
 (x, y) = ma97_min_norm(A, b)
@@ -111,7 +111,7 @@ When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
 ```JULIA
 (r, x) = ma57_solve(A, b)
 ```
-solves \eqref{LS}.
+returns $x$ that solves \eqref{LS} and residual $r := b - Ax$ corresponding to $y$ in \eqref{SP}.
 The call
 ```JULIA
 (r, x) = ma57_least_squares(A, b)
@@ -122,7 +122,7 @@ When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 ```JULIA
 (x, y) = ma57_solve(A, b)
 ```
-solves \eqref{LN}.
+returns $x$ that solves \eqref{LN} and $y$ such that $x = -A^T y$ (and therefore $A A^T (-y) = b$).
 The call
 ```JULIA
 (x, y) = ma57_min_norm(A, b)
