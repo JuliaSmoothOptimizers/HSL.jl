@@ -71,8 +71,8 @@ When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
 ```JULIA
 (x, y) = ma97_solve(A, c)
 ```
-solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
-Aᵀ y = 0*. The call
+solves \eqref{LN}.
+The call
 ```JULIA
 (x, y) = ma97_min_norm(A, c)
 ```
