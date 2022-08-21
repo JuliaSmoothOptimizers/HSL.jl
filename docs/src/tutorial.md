@@ -24,14 +24,12 @@ Special cases occur when ``H`` is the identity matrix and either ``b = 0`` or ``
   \min_x \ \|A x - b\|_2
 \end{equation}
 ```
-and to the least-norm problem
+Another special case occur when $H = -I$, $G = 0$ and $c = 0$, which corresponds to the least-norm problem
 ```math
 \begin{equation}
   \label{LN}
-  \min_x \ \|x\| \ \text{subject to } Ax = c
+  \min_x \ \|x\| \ \text{subject to } Ax = b.
 \end{equation}
-```
-respectively.
 
 ## HSL_MA97
 
