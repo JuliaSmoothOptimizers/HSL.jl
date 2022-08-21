@@ -38,6 +38,38 @@ Should it be necessary, you can set the compilers to use by setting the environm
 * `HSL_F77`: the Fortran 77 compiler (default: the same as `FC`)
 * `HSL_CC`: the C compiler (default: `gcc`).
 
+### General Guidelines on Compilers
+
+The version of gcc and gfortran used to compile HSL.jl should be based on the same version of the shared `libgfortran` library as the version of Julia being used.
+On Linux, Julia ≥ 1.8 is based on `libgfortran` version 5, whereas on macOS, they are based on `libgfortran` version 4.
+Thus for instance, versions of gcc/gfortran as recent as 11 are appropriate on Linux, but version 7 could be used on macOS.
+On macOS, the compilers can be installed with Homebrew using
+```
+brew install gcc@7
+```
+
+### Installing on Apple Silicon
+
+Homebrew does not (yet) provide precompiled binaries for gcc/gfortran based on `libgfortran` version 4.
+One solution is to use Julia and the compilers built for Intel Macs via Rosetta.
+First make sure that Rosetta is installed by following, e.g., [these instructions](https://osxdaily.com/2020/12/04/how-install-rosetta-2-apple-silicon-mac).
+
+You may now install Homebrew for Intel Macs on your Silicon Mac:
+```
+arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+Note that Homebrew for Silicon installs in `/opt/homebrew` whereas Homebrew for Intel installs in `/usr/local`.
+
+Next, install gcc/gfortran version 7 for Intel:
+```
+/usr/local/bin/brew install gcc@7
+```
+
+Finally, define the environment variables
+* `HSL_FC=/usr/local/bin/gfortran-7 -arch x86_64`
+* `HSL_CC=/usr/local/bin/gcc-7 -arch x86_64`
+prior to building HSL.jl from the Julia command prompt.
+
 ## Supported Packages
 
 ### HSL_MA97
