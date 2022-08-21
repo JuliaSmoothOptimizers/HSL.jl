@@ -116,7 +116,7 @@ The call
 ```
 is also defined, and is equivalent to the above.
 
-When *A* is *m*-by-*n* with *m* < *n* and has full row rank,
+When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 ```JULIA
 (x, y) = ma57_solve(A, c)
 ```
