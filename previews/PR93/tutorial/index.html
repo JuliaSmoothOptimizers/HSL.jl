@@ -35,8 +35,8 @@ the sparse QR factorization in Julia.
 When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,</code></pre><p>JULIA (r, x) = ma97_solve(A, b)</p><pre><code class="nohighlight hljs">solves \eqref{LS}.
 The call</code></pre><p>JULIA (r, x) = ma97<em>least</em>squares(A, b)</p><pre><code class="nohighlight hljs">is also defined, and is equivalent to the above.
 
-When *A* is *m*-by-*n* with *m* &lt; *n* and has full row rank,</code></pre><p>JULIA (x, y) = ma97_solve(A, c)</p><pre><code class="nohighlight hljs">solves \eqref{LN}.
-The call</code></pre><p>JULIA (x, y) = ma97<em>min</em>norm(A, c)</p><pre><code class="nohighlight hljs">is also defined, and is equivalent to the above.
+When *A* is *m*-by-*n* with *m* &lt; *n* and has full row rank,</code></pre><p>JULIA (x, y) = ma97_solve(A, c)</p><pre><code class="nohighlight hljs">solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
+Aᵀ y = 0*. The call</code></pre><p>JULIA (x, y) = ma97<em>min</em>norm(A, c)</p><pre><code class="nohighlight hljs">is also defined, and is equivalent to the above.
 
 ## HSL_MA57
 
