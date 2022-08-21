@@ -62,7 +62,7 @@ When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
 ```JULIA
 (r, x) = ma97_solve(A, b)
 ```
-solves \eqref{LS}.
+returns $x$ that solves \eqref{LS} and residual $r := b - Ax$ corresponding to $y$ in \eqref{SP}.
 The call
 ```JULIA
 (r, x) = ma97_least_squares(A, b)
