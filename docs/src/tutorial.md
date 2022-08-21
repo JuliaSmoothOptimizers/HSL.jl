@@ -21,7 +21,7 @@ Special cases occur when ``H`` is the identity matrix and either ``b = 0`` or ``
 ```math
 \begin{equation}
   \label{LS}
-  \min_y \ \|A^T y - b\|
+  \min_x \ \|A x - b\|_2
 \end{equation}
 ```
 and to the least-norm problem
