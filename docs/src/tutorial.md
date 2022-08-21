@@ -125,7 +125,7 @@ When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 solves \eqref{LN}.
 The call
 ```JULIA
-(x, y) = ma57_min_norm(A, c)
+(x, y) = ma57_min_norm(A, b)
 ```
 is also defined, and is equivalent to the above. Example:
 
