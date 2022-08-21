@@ -120,8 +120,8 @@ When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
 ```JULIA
 (x, y) = ma57_solve(A, c)
 ```
-solves \eqref{LN}, i.e., *x* such that *Ax = c* and *x +
-Aᵀ y = 0*. The call
+solves \eqref{LN}.
+The call
 ```JULIA
 (x, y) = ma57_min_norm(A, c)
 ```
