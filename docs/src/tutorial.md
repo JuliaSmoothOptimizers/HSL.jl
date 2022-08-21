@@ -105,7 +105,7 @@ xx = ma57_solve(LDL, rhss)  # or x = LBL \ rhss
 There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
-When *m* > *n* and has full column rank,
+When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
 ```JULIA
 (r, x) = ma57_solve(A, b)
 ```
