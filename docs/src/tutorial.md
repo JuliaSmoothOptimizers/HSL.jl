@@ -17,7 +17,7 @@ They are often used for the solution of saddle-point systems, i.e., systems of t
     c \\ b
   \end{bmatrix}.
 ```
-Special cases occur when ``H`` is the identity matrix and either ``b = 0`` or ``c = 0``, which correspond to the least-squares problem
+A special case occurs when $H = 0$, $G = I$ and $c = 0$, which corresponds to the least-squares problem
 ```math
 \begin{equation}
   \label{LS}
