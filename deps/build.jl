@@ -96,7 +96,7 @@ const hsl_ma97_archive =
 const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
 
 const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
-const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : ENV["HSL_FC"]
+const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
 const HSL_CC = haskey(ENV, "HSL_CC") ? ENV["HSL_CC"] : "gcc"
 
 const libblas = VERSION < v"1.7" ? "-lopenblas" : "-lblastrampoline"
