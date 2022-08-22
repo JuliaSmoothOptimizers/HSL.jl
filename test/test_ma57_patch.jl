@@ -1,6 +1,6 @@
 function test_ma57_patch(A, M, b, xexact)
   ϵ = sqrt(eps(eltype(A)))
-  ma57_factorize(M)
+  ma57_factorize!(M)
 
   # extract factors
   (L, D, s, p) = ma57_get_factors(M)

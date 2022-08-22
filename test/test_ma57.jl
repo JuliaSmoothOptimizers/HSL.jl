@@ -5,7 +5,7 @@ getindex_traverse_col(::AbstractUnitRange, lo::Integer, hi::Integer) = lo:hi
 
 function test_ma57(A, M, b, xexact)
   ϵ = sqrt(eps(eltype(A)))
-  ma57_factorize(M)
+  ma57_factorize!(M)
   x = ma57_solve(M, b)
   @test norm(x - xexact) ≤ ϵ * norm(xexact)
 
@@ -47,9 +47,10 @@ for T in (Float32, Float64)
   control.icntl[6] = 4  # choose a different ordering
   # give lower triangle: swap rows and cols
   LBL = ma57_coord(n, cols, rows, vals, control, info)
-  ma57_factorize(LBL)
+  ma57_factorize!(LBL)
+  work = similar(b)
   x = copy(b)
-  ldiv!(LBL, x)
+  ma57_solve!(LBL, x, work)
   ϵ = sqrt(eps(T))
   @test norm(x - xexact) ≤ ϵ * norm(xexact)
 

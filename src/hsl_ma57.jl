@@ -1,13 +1,13 @@
 export Ma57_Control, Ma57_Info, Ma57
 export ma57_coord,
+  ma57_factorize!,
   ma57_factorize,
   ma57_solve!,
   ma57_solve,
   ma57_min_norm,
   ma57_least_squares,
   ma57_get_factors,
-  ma57_alter_d,
-  ldiv!
+  ma57_alter_d
 
 export Ma57Exception
 
@@ -93,9 +93,9 @@ and solve.
 ```JULIA
 julia> using HSL
 julia> T = Float64;
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A);
 julia> M.info
 HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
@@ -168,20 +168,23 @@ const jobs57 = Dict{Symbol, Int}(
 
 All keyword arguments are passed directly to `ma57_coord()`.
 
+## Stored information:
+
+* `M.info.largest_front::Int`: order of largest frontal matrix
+* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
+* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
+* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `M`
+* `M.info.rank::Int`: rank of factorization of `M`
+* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
+
 ## Example:
 
 ```JULIA
-
 julia> T = Float64;
-
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
-
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
-
+julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A)
-
 HSL.Ma57{Float64}(5, 7, Int32[1, 1, 2, 2, 3, 3, 5], Int32[1, 2, 3, 5, 3, 4, 5], [2.0, 3.0, 4.0, 6.0, 1.0, 5.0, 1.0], HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 0, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0]), HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 1.1, 81, Int32[5, 4, 3, 2, 1, 2, 9, 0, 0, 0  …  4, 3, 3, 2, 2, 1, 1, 0, 0, 0], 48, Float64[], 53, Int32[])
 ```
 """
@@ -204,6 +207,9 @@ mutable struct Ma57{T <: Ma57Data}
   __lifact::Int32
   __ifact::Vector{Int32}
 
+  iwork_fact::Vector{Int32}
+  iwork_solve::Vector{Int32}
+
   function Ma57{T}(
     n::Int32,
     nz::Int32,
@@ -215,7 +221,24 @@ mutable struct Ma57{T <: Ma57Data}
   ) where {T}
     lkeep = 5 * n + nz + max(n, nz) + 42
     keep = zeros(Int32, lkeep)
-    new(n, nz, rows, cols, vals, control, info, 1.1, lkeep, keep, 0, T[], 0, Int32[])
+    new(
+      n,
+      nz,
+      rows,
+      cols,
+      vals,
+      control,
+      info,
+      1.1,
+      lkeep,
+      keep,
+      0,
+      T[],
+      0,
+      Int32[],
+      Vector{Int32}(undef, n),
+      Vector{Int32}(undef, n),
+    )
   end
 end
 
@@ -307,9 +330,34 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
 end
 
 ## factorize -------------------------------------------------------------------
+"""
+# Factorize `Ma57` object in-place.
+
+    ma57_factorize!(M)
+
+## Input arguments:
+
+* `M::Ma57`: `Ma57` object
+
+## Return values:
+
+* `M::Ma57`: `Ma57` object
+
+## Example:
+```JULIA
+julia> using HSL
+julia> T = Float64;
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+julia> A = sparse(rows, cols, vals);
+julia> M = Ma57(A)
+julia> ma57_factorize!(M)      ## factorize `Ma57` object in place
+"""
+function ma57_factorize! end
+
 for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
   @eval begin
-    function ma57_factorize(ma57::Ma57{$typ})
+    function ma57_factorize!(ma57::Ma57{$typ})
       if ma57.__lfact <= 0 || ma57.__lifact <= 0
         status = ma57.info.info[1]
         throw(Ma57Exception("Ma57: Symbolic analysis must be performed first", status))
@@ -320,7 +368,6 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
       if length(ma57.__ifact) < ma57.__lifact
         ma57.__ifact = Vector{Int32}(undef, ma57.__lifact)
       end
-      iwork = Vector{Int32}(undef, ma57.n)
 
       factorized = false
       while !factorized
@@ -352,7 +399,7 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
           ma57.__lifact,
           ma57.__lkeep,
           ma57.__keep,
-          iwork,
+          ma57.iwork_fact,
           ma57.control.icntl,
           ma57.control.cntl,
           ma57.info.info,
@@ -381,7 +428,7 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
       ma57.info.num_negative_eigs = ma57.info.info[24]
       ma57.info.rank = ma57.info.info[25]
       ma57.info.num_pivot_sign_changes = ma57.info.info[26]
-      return nothing
+      return ma57
     end
   end
 end
@@ -389,9 +436,42 @@ end
 ## convenience method that combines the symbolic analysis and numerical
 ## factorization phases. An MA57 instance is returned, that can subsequently
 ## be passed to other functions, e.g., `ma57_solve()`.
+"""
+# Factorize a sparse matrix.
+
+    M = ma57_factorize(A)
+
+## Input arguments:
+
+* `A::SparseMatrixCSC{T<:Ma57Data,Int}`: sparse matrix
+
+## Return values:
+
+* `M::Ma57`: factorized `Ma57` object
+
+## Stored information:
+
+* `M.info.largest_front::Int`: order of largest frontal matrix
+* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
+* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
+* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `A`
+* `M.info.rank::Int`: rank of factorization of `A`
+* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
+
+## Example:
+
+```JULIA
+julia> using HSL
+julia> T = Float64;
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+julia> A = sparse(rows, cols, vals);
+julia> M = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
+```
+"""
 function ma57_factorize(A::SparseMatrixCSC{T, Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   ma57 = Ma57(A; kwargs...)
-  ma57_factorize(ma57)
+  ma57_factorize!(ma57)
   return ma57
 end
 
@@ -401,23 +481,41 @@ ma57_factorise = ma57_factorize
 ## solve -----------------------------------------------------------------------
 function ma57_solve(ma57::Ma57{T}, b::Array{T}; kwargs...) where {T <: Ma57Data}
   x = copy(b)
-  ma57_solve!(ma57, x; kwargs...)
+  ma57_solve!(ma57, x, Vector{T}(undef, ma57.n * size(b, 2)); kwargs...)
   return x
 end
 
+"""
+    ma57_solve!(ma57, b, work; job::Symbol = :A)
+    
+Solve a symmetric linear system `ma57 * x = b`, overwriting `b` to store `x`.
+`work` should be a `Vector{eltype(b)}` of length `ma57.n * size(b, 2)`.
+The symbolic analysis and numerical factorization must have been performed and must have succeeded.
+
+# Solve with iterative refinement
+
+    ma57_solve!(ma57, b, x, resid, work, nitref)
+
+Solve a symmetric linear system `ma57 * x = b`  with iterative refinement.
+`ma57.control.icntl[9]` should have been set to the maximum number of iterative refinements wanted.
+`resid` should be a storage `Vector{eltype(b)}` of size `ma57.n`
+`work` should be a storage `Vector{eltype(b)}` of size `ma57.n` if `ma57.control.icntl[9] == 1`,
+and of size `4 * ma57.n` otherwise.
+The symbolic analysis and numerical factorization must have been performed and must have succeeded.
+"""
+function ma57_solve! end
+
 for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
   @eval begin
-    """Solve a symmetric linear system. The symbolic analysis and
-    numerical factorization must have been performed and must have succeeded.
     """
-    function ma57_solve!(ma57::Ma57{$typ}, b::Array{$typ}; job::Symbol = :A)
+    """
+    function ma57_solve!(ma57::Ma57{$typ}, b::Array{$typ}, work::Vector{$typ}; job::Symbol = :A)
       size(b, 1) == ma57.n || throw(Ma57Exception("Ma57: rhs size mismatch", 0))
       nrhs = size(b, 2)
-
       j = jobs57[job]
-      iwork = Vector{Int32}(undef, ma57.n)
       lwork = ma57.n * nrhs
-      work = Vector{$typ}(undef, lwork)
+      @assert length(work) == lwork
+
       ccall(
         ($(string(fname)), libhsl_ma57),
         Nothing,
@@ -448,7 +546,7 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
         ma57.n,
         work,
         lwork,
-        iwork,
+        ma57.iwork_solve,
         ma57.control.icntl,
         ma57.info.info,
       )
@@ -461,23 +559,23 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
   end
 end
 
-import LinearAlgebra.ldiv!
-ldiv!(ma57::Ma57, b::Array) = ma57_solve!(ma57, b)
-
 ## iterative refinement
 function ma57_solve(ma57::Ma57{T}, b::Vector{T}, nitref::Int) where {T <: Ma57Data}
   x = Vector{T}(undef, ma57.n)
-  ma57_solve!(ma57, b, x, nitref)
+  ma57_solve(ma57, b, x, nitref)
   return x
 end
 
 for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
   @eval begin
-
-    ## Solve a symmetric linear system with iterative refinement.
-    ## The symbolic analysis and numerical factorization must have been performed
-    ## and must have succeeded.
-    function ma57_solve!(ma57::Ma57{$typ}, b::Vector{$typ}, x::Vector{$typ}, nitref::Int)
+    function ma57_solve!(
+      ma57::Ma57{$typ},
+      b::Vector{$typ},
+      x::Vector{$typ},
+      resid::Vector{$typ},
+      work::Vector{$typ},
+      nitref::Int,
+    )
       if nitref == 0
         @warn "Ma57: calling this version of `solve()` with `nitref=0` is wasteful"
         return ma57_solve!(ma57, b)
@@ -487,11 +585,11 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
       current_nitref = ma57.control.icntl[9]
       ma57.control.icntl[9] = max(0, nitref)
       job = ma57.control.icntl[9] == 1 ? 1 : 0
-      resid = Vector{$typ}(undef, ma57.n)
-
-      iwork = ma57.control.icntl[9] > 1 ? Vector{Int32}(undef, ma57.n) : Int32[]
+      @assert length(resid) == ma57.n
+      iwork = ma57.control.icntl[9] > 1 ? ma57.iwork_solve : Int32[]
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
-      work = Vector{$typ}(undef, lwork)
+      @assert length(work) == lwork
+
       ccall(
         ($(string(fname)), libhsl_ma57),
         Nothing,
@@ -562,142 +660,6 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
   end
 end
 
-## overload backslash to solve with MA57.
-import Base.\
-\(ma57::Ma57{T}, b::Array{T}) where {T <: Ma57Data} = ma57_solve(ma57, b)
-
-## convenience method that combines the symbolic analysis, numerical
-## factorization and solution phases.
-function ma57_solve(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57Data, Ti <: Integer}
-  (m, n) = size(A)
-  m < n && (return ma57_min_norm(A, b))
-  m > n && (return ma57_least_squares(A, b))
-  x = copy(b)
-  ma57_solve!(A, x)
-  return x
-end
-
-"""
-Solve the minimum-norm problem
-    minimize ‖x‖  subject to Ax=b,
-where A has shape m-by-n with m < n,
-by solving the saddle-point system
-    [ I  A' ] [ x ]   [ 0 ]
-    [ A     ] [ y ] = [ b ].
-"""
-function ma57_min_norm(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57Data, Ti <: Integer}
-  (m, n) = size(A)
-  K = [sparse(T(1) * I, n, n) spzeros(T, n, m); A T[0.0].*sparse(T(1) * I, m, m)]
-  M = Ma57(K)
-  ma57_factorize(M)
-  rhs = [zeros(T, n); b]
-  xy57 = ma57_solve(M, rhs)
-  x57 = xy57[1:n]
-  y57 = xy57[(n + 1):(n + m)]
-  return (x57, y57)
-end
-
-ma57_min_norm(A::Array{T, 2}, b::Array{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
-
-"""
-Solve the least-squares problem
-    minimize ‖Ax - b‖,
-where A has shape m-by-n with m > n,
-by solving the saddle-point system
-    [ I   A ] [ r ]   [ b ]
-    [ A'    ] [ x ] = [ 0 ].
-"""
-function ma57_least_squares(
-  A::SparseMatrixCSC{T, Ti},
-  b::Array{T},
-) where {T <: Ma57Data, Ti <: Integer}
-  (m, n) = size(A)
-  K = [sparse(T(1) * I, m, m) spzeros(T, m, n); A' T[0.0].*sparse(T(1) * I, n, n)]
-  M = Ma57(K)
-  ma57_factorize(M)
-  rhs = [b; zeros(T, n)]
-  rx57 = ma57_solve(M, rhs)
-  r57 = rx57[1:m]
-  x57 = rx57[(m + 1):(m + n)]
-  return (r57, x57)
-end
-
-ma57_least_squares(A::Array{T, 2}, b::Array{T}) where {T <: Ma57Data} =
-  ma57_least_squares(sparse(A), b)
-
-## additional docstrings -------------------------------------------------------
-"""
-# Factorize `Ma57` object.
-
-  ma57_factorize(M)
-
-## Input arguments:
-
-* `M::Ma57`: `Ma57` object
-
-## Return values:
-
-* (none)
-
-## Stored information:
-
-* `M.info.largest_front::Int`: order of largest frontal matrix
-* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
-* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
-* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `M`
-* `M.info.rank::Int`: rank of factorization of `M`
-* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
-
-# Factorize a sparse matrix.
-
-## Input arguments:
-
-* `A::SparseMatrixCSC{T<:Ma57Data,Int}`: sparse matrix
-
-## Return values:
-
-* `M::Ma57`: factorized `Ma57` object
-
-## Stored information:
-
-* `M.info.largest_front::Int`: order of largest frontal matrix
-* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
-* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
-* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `A`
-* `M.info.rank::Int`: rank of factorization of `A`
-* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
-
-## Example:
-
-```JULIA
-
-julia> using HSL
-
-julia> T = Float64;
-
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
-
-julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
-
-julia> M = Ma57(A)
-
-julia> ma57_factorize(M)      ## factorize `Ma57` object in place
-
-julia> F = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
-
-julia> M.info.largest_front
-
-4
-
-julia> A.info.largest_front   ## same result
-
-4
-```
-"""
-ma57_factorize, ma57_factorise
-
 """
 # System solve.
 
@@ -752,38 +714,96 @@ ma57_factorize, ma57_factorise
 ## Example:
 
 ```JULIA
-
 julia> using HSL
-
 julia> T = Float64;
-
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
-
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
-
+julia> A = sparse(rows, cols, vals);
 julia> b = T[8, 45, 31, 15, 17]
-
 julia> ϵ = sqrt(eps(eltype(A)))
-
 julia> xexact = T[1, 2, 3, 4, 5]
-
 julia> M = Ma57(A)
-
-julia> ma57_factorize(M)
-
+julia> ma57_factorize!(M)
 julia> x = ma57_solve(M, b)      ## solve without iterative refinement
-
 julia> norm(x - xexact) ≤ ϵ * norm(xexact)
-
 true
-
 julia> xx = ma57_solve(M, b, 2)  ## solve with iterative refinement
-
 julia> norm(xx - xexact) ≤ ϵ * norm(xexact)
-
 true
 ```
 """
-ma57_solve
+function ma57_solve end
+
+function ma57_solve(ma57::Ma57{T}, b::Vector{T}, x::Vector{T}, nitref::Int) where {T <: Ma57Data}
+  ma57_solve!(
+    ma57,
+    b,
+    x,
+    Vector{T}(undef, ma57.n),
+    Vector{T}(undef, (ma57.control.icntl[9] == 1) ? ma57.n : 4 * ma57.n),
+    nitref,
+  )
+end
+
+## overload backslash to solve with MA57.
+import Base.\
+\(ma57::Ma57{T}, b::Array{T}) where {T <: Ma57Data} = ma57_solve(ma57, b)
+
+## convenience method that combines the symbolic analysis, numerical
+## factorization and solution phases.
+function ma57_solve(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57Data, Ti <: Integer}
+  (m, n) = size(A)
+  m < n && (return ma57_min_norm(A, b))
+  m > n && (return ma57_least_squares(A, b))
+  x = copy(b)
+  ma57_solve(Ma57(A), x)
+  return x
+end
+
+"""
+Solve the minimum-norm problem
+    minimize ‖x‖  subject to Ax=b,
+where A has shape m-by-n with m < n,
+by solving the saddle-point system
+    [ I  A' ] [ x ]   [ 0 ]
+    [ A     ] [ y ] = [ b ].
+"""
+function ma57_min_norm(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57Data, Ti <: Integer}
+  (m, n) = size(A)
+  K = [sparse(T(1) * I, n, n) spzeros(T, n, m); A T[0.0].*sparse(T(1) * I, m, m)]
+  M = Ma57(K)
+  ma57_factorize!(M)
+  rhs = [zeros(T, n); b]
+  xy57 = ma57_solve(M, rhs)
+  x57 = xy57[1:n]
+  y57 = xy57[(n + 1):(n + m)]
+  return (x57, y57)
+end
+
+ma57_min_norm(A::Array{T, 2}, b::Array{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
+
+"""
+Solve the least-squares problem
+    minimize ‖Ax - b‖,
+where A has shape m-by-n with m > n,
+by solving the saddle-point system
+    [ I   A ] [ r ]   [ b ]
+    [ A'    ] [ x ] = [ 0 ].
+"""
+function ma57_least_squares(
+  A::SparseMatrixCSC{T, Ti},
+  b::Array{T},
+) where {T <: Ma57Data, Ti <: Integer}
+  (m, n) = size(A)
+  K = [sparse(T(1) * I, m, m) spzeros(T, m, n); A' T[0.0].*sparse(T(1) * I, n, n)]
+  M = Ma57(K)
+  ma57_factorize!(M)
+  rhs = [b; zeros(T, n)]
+  rx57 = ma57_solve(M, rhs)
+  r57 = rx57[1:m]
+  x57 = rx57[(m + 1):(m + n)]
+  return (r57, x57)
+end
+
+ma57_least_squares(A::Array{T, 2}, b::Array{T}) where {T <: Ma57Data} =
+  ma57_least_squares(sparse(A), b)
