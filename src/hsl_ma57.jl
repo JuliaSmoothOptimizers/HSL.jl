@@ -93,9 +93,9 @@ and solve.
 ```JULIA
 julia> using HSL
 julia> T = Float64;
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
+julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A);
 julia> M.info
 HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
@@ -168,20 +168,23 @@ const jobs57 = Dict{Symbol, Int}(
 
 All keyword arguments are passed directly to `ma57_coord()`.
 
+## Stored information:
+
+* `M.info.largest_front::Int`: order of largest frontal matrix
+* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
+* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
+* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `M`
+* `M.info.rank::Int`: rank of factorization of `M`
+* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
+
 ## Example:
 
 ```JULIA
-
 julia> T = Float64;
-
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
-
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
-
+julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A)
-
 HSL.Ma57{Float64}(5, 7, Int32[1, 1, 2, 2, 3, 3, 5], Int32[1, 2, 3, 5, 3, 4, 5], [2.0, 3.0, 4.0, 6.0, 1.0, 5.0, 1.0], HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 0, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0]), HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 1.1, 81, Int32[5, 4, 3, 2, 1, 2, 9, 0, 0, 0  …  4, 3, 3, 2, 2, 1, 1, 0, 0, 0], 48, Float64[], 53, Int32[])
 ```
 """
@@ -328,7 +331,7 @@ end
 
 ## factorize -------------------------------------------------------------------
 """
-# Factorize `Ma57` object.
+# Factorize `Ma57` object in-place.
 
     ma57_factorize!(M)
 
@@ -338,16 +341,7 @@ end
 
 ## Return values:
 
-* (none)
-
-## Stored information:
-
-* `M.info.largest_front::Int`: order of largest frontal matrix
-* `M.info.num_2x2_pivots::Int`: number of 2x2 pivots used in factorization
-* `M.info.num_delayed_pivots::Int`: total number of fully-summed variables that were passed to the father node because of pivoting considerations
-* `M.info.num_negative_eigs::Int`: number of negative eigenvalues in factorization of `M`
-* `M.info.rank::Int`: rank of factorization of `M`
-* `M.info.num_pivot_sign_changes::Int`: number of sign changes of pivot when icntl(7) = 3 (ie, no pivoting)
+* `M::Ma57`: `Ma57` object
 """
 function ma57_factorize! end
 
@@ -424,7 +418,7 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
       ma57.info.num_negative_eigs = ma57.info.info[24]
       ma57.info.rank = ma57.info.info[25]
       ma57.info.num_pivot_sign_changes = ma57.info.info[26]
-      return nothing
+      return ma57
     end
   end
 end
@@ -457,29 +451,17 @@ end
 ## Example:
 
 ```JULIA
-
 julia> using HSL
-
 julia> T = Float64;
-
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
-
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
-
+julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A)
-
-julia> ma57_factorize(M)      ## factorize `Ma57` object in place
-
+julia> ma57_factorize!(M)      ## factorize `Ma57` object in place
 julia> F = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
-
 julia> M.info.largest_front
-
 4
-
 julia> A.info.largest_front   ## same result
-
 4
 ```
 """
@@ -728,37 +710,21 @@ end
 ## Example:
 
 ```JULIA
-
 julia> using HSL
-
 julia> T = Float64;
-
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
-
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
-
-julia> A = sparse(rows, cols, vals); A = A + triu(A, 1)';
-
+julia> A = sparse(rows, cols, vals);
 julia> b = T[8, 45, 31, 15, 17]
-
 julia> ϵ = sqrt(eps(eltype(A)))
-
 julia> xexact = T[1, 2, 3, 4, 5]
-
 julia> M = Ma57(A)
-
-julia> ma57_factorize(M)
-
+julia> ma57_factorize!(M)
 julia> x = ma57_solve(M, b)      ## solve without iterative refinement
-
 julia> norm(x - xexact) ≤ ϵ * norm(xexact)
-
 true
-
 julia> xx = ma57_solve(M, b, 2)  ## solve with iterative refinement
-
 julia> norm(xx - xexact) ≤ ϵ * norm(xexact)
-
 true
 ```
 """
