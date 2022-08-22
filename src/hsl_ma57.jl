@@ -342,6 +342,16 @@ end
 ## Return values:
 
 * `M::Ma57`: `Ma57` object
+
+## Example:
+```JULIA
+julia> using HSL
+julia> T = Float64;
+julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> vals = T[2, 3, 4, 6, 1, 5, 1];
+julia> A = sparse(rows, cols, vals);
+julia> M = Ma57(A)
+julia> ma57_factorize!(M)      ## factorize `Ma57` object in place
 """
 function ma57_factorize! end
 
@@ -456,13 +466,7 @@ julia> T = Float64;
 julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 julia> A = sparse(rows, cols, vals);
-julia> M = Ma57(A)
-julia> ma57_factorize!(M)      ## factorize `Ma57` object in place
-julia> F = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
-julia> M.info.largest_front
-4
-julia> A.info.largest_front   ## same result
-4
+julia> M = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
 ```
 """
 function ma57_factorize(A::SparseMatrixCSC{T, Ti}; kwargs...) where {T <: Ma57Data, Ti <: Integer}
