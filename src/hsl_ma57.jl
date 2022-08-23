@@ -50,33 +50,33 @@ HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 1, 5, 1, 0, 10, 1, 16, 16, 10, 100,
 mutable struct Ma57_Control{T <: Ma57Data}
   icntl::Vector{Int32}
   cntl::Vector{T}
+end
 
-  function Ma57_Control{T}(;
-    sqd::Bool = false,
-    print_level::Int = 0,
-    unit_diagnostics::Int = 6,
-    unit_error::Int = 6,
-    unit_warning::Int = 6,
-  ) where {T}
-    icntl = zeros(Int32, 20)
-    cntl = zeros(T, 5)
-    if T == Float32
-      ccall((:ma57i_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
-    elseif T == Float64
-      ccall((:ma57id_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
-    end
-    icntl[1] = unit_error
-    icntl[2] = unit_warning
-    icntl[3] = unit_diagnostics
-    icntl[5] = print_level
-    icntl[10] = 1  # want condition number estimates if performing iterative refinement
-    if sqd
-      cntl[1] = eps(T)
-      icntl[7] = 1
-    end
-    control = new(icntl, cntl)
-    return control
+function Ma57_Control{T}(;
+  sqd::Bool = false,
+  print_level::Int = 0,
+  unit_diagnostics::Int = 6,
+  unit_error::Int = 6,
+  unit_warning::Int = 6,
+) where {T}
+  icntl = zeros(Int32, 20)
+  cntl = zeros(T, 5)
+  if T == Float32
+    ccall((:ma57i_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+  elseif T == Float64
+    ccall((:ma57id_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
   end
+  icntl[1] = unit_error
+  icntl[2] = unit_warning
+  icntl[3] = unit_diagnostics
+  icntl[5] = print_level
+  icntl[10] = 1  # want condition number estimates if performing iterative refinement
+  if sqd
+    cntl[1] = eps(T)
+    icntl[7] = 1
+  end
+  control = Ma57_Control{T}(icntl, cntl)
+  return control
 end
 
 ## diagnostics (2) -------------------------------------------------------------
@@ -120,10 +120,10 @@ mutable struct Ma57_Info{T <: Ma57Data}
   cond1::T
   cond2::T
   error_inf_norm::T
+end
 
-  function Ma57_Info{T}() where {T}
-    new(zeros(Int, 40), zeros(T, 20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-  end
+function Ma57_Info{T}() where {T}
+  Ma57_Info{T}(zeros(Int, 40), zeros(T, 20), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 end
 
 ## option dictionaries ---------------------------------------------------------
@@ -209,37 +209,37 @@ mutable struct Ma57{T <: Ma57Data}
 
   iwork_fact::Vector{Int32}
   iwork_solve::Vector{Int32}
+end
 
-  function Ma57{T}(
-    n::Int32,
-    nz::Int32,
-    rows::Vector{Int32},
-    cols::Vector{Int32},
-    vals::Vector{T},
-    control::Ma57_Control{T},
-    info::Ma57_Info{T},
-  ) where {T}
-    lkeep = 5 * n + nz + max(n, nz) + 42
-    keep = zeros(Int32, lkeep)
-    new(
-      n,
-      nz,
-      rows,
-      cols,
-      vals,
-      control,
-      info,
-      1.1,
-      lkeep,
-      keep,
-      0,
-      T[],
-      0,
-      Int32[],
-      Vector{Int32}(undef, n),
-      Vector{Int32}(undef, n),
-    )
-  end
+function Ma57{T}(
+  n::Int32,
+  nz::Int32,
+  rows::Vector{Int32},
+  cols::Vector{Int32},
+  vals::Vector{T},
+  control::Ma57_Control{T},
+  info::Ma57_Info{T},
+) where {T}
+  lkeep = 5 * n + nz + max(n, nz) + 42
+  keep = zeros(Int32, lkeep)
+  Ma57{T}(
+    n,
+    nz,
+    rows,
+    cols,
+    vals,
+    control,
+    info,
+    1.1,
+    lkeep,
+    keep,
+    0,
+    T[],
+    0,
+    Int32[],
+    Vector{Int32}(undef, n),
+    Vector{Int32}(undef, n),
+  )
 end
 
 ## helper function to create `Ma57` object
