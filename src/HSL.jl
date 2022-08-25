@@ -14,7 +14,12 @@ else
 end
 
 function __init__()
-  (VERSION ≥ v"1.7") && LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
+  if VERSION ≥ v"1.7"
+    config = LinearAlgebra.BLAS.lbt_get_config()
+    if !any(lib -> lib.interface == :lp64, config.loaded_libs)
+      LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
+    end
+  end
   if (@isdefined libhsl_ma57) || (@isdefined libhsl_ma97)
     check_deps()
   end
