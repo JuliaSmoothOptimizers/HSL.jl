@@ -87,8 +87,27 @@ function Ma97_Control{T}(;
   unit_error::Int = 6,
   unit_warning::Int = 6,
 ) where {T}
-  control =
-    Ma97_Control{T}(0, 0, 0, 0.0, 0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0.0, zeros(Cint, 5), zeros(T, 10))
+  control = Ma97_Control{T}(
+    0,
+    0,
+    0,
+    0.0,
+    0,
+    0,
+    0,
+    0.0,
+    0.0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0.0,
+    zeros(Cint, 5),
+    zeros(T, 10),
+  )
 
   if T == Float32
     ccall((:ma97_default_control_s, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float32}},), control)
@@ -217,7 +236,27 @@ mutable struct Ma97_Info{T <: Ma97Real}
 end
 
 function Ma97_Info{T}() where {T}
-  return Ma97_Info{T}(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, zeros(Cint, 5), zeros(T, 10))
+  return Ma97_Info{T}(
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    zeros(Cint, 5),
+    zeros(T, 10),
+  )
 end
 
 # in the Ma97 type, we need to maintain a constraint on the types
