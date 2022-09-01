@@ -79,32 +79,32 @@ mutable struct Ma97_Control{T <: Ma97Real}
 
   "spare real storage currently unused"
   rspare::Vector{T}
+end
 
-  function Ma97_Control{T}(;
-    print_level::Int = -1,
-    unit_diagnostics::Int = 6,
-    unit_error::Int = 6,
-    unit_warning::Int = 6,
-  ) where {T}
-    control =
-      new(0, 0, 0, 0.0, 0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0.0, zeros(Cint, 5), zeros(T, 10))
+function Ma97_Control{T}(;
+  print_level::Int = -1,
+  unit_diagnostics::Int = 6,
+  unit_error::Int = 6,
+  unit_warning::Int = 6,
+) where {T}
+  control =
+    Ma97_Control{T}(0, 0, 0, 0.0, 0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0.0, zeros(Cint, 5), zeros(T, 10))
 
-    if T == Float32
-      ccall((:ma97_default_control_s, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float32}},), control)
-    elseif T == Float64
-      ccall((:ma97_default_control_d, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float64}},), control)
-    elseif T == ComplexF32
-      ccall((:ma97_default_control_c, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float32}},), control)
-    elseif T == ComplexF64
-      ccall((:ma97_default_control_z, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float64}},), control)
-    end
-    control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
-    control.print_level = print_level
-    control.unit_diagnostics = unit_diagnostics
-    control.unit_error = unit_error
-    control.unit_warning = unit_warning
-    return control
+  if T == Float32
+    ccall((:ma97_default_control_s, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float32}},), control)
+  elseif T == Float64
+    ccall((:ma97_default_control_d, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float64}},), control)
+  elseif T == ComplexF32
+    ccall((:ma97_default_control_c, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float32}},), control)
+  elseif T == ComplexF64
+    ccall((:ma97_default_control_z, libhsl_ma97), Nothing, (Ref{Ma97_Control{Float64}},), control)
   end
+  control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
+  control.print_level = print_level
+  control.unit_diagnostics = unit_diagnostics
+  control.unit_error = unit_error
+  control.unit_warning = unit_warning
+  return control
 end
 
 const orderings97 = Dict{Symbol, Int}(
@@ -214,10 +214,10 @@ mutable struct Ma97_Info{T <: Ma97Real}
 
   "spare real storage currently unused"
   rspare::Vector{T}
+end
 
-  function Ma97_Info{T}() where {T}
-    return new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, zeros(Cint, 5), zeros(T, 10))
-  end
+function Ma97_Info{T}() where {T}
+  return Ma97_Info{T}(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, zeros(Cint, 5), zeros(T, 10))
 end
 
 # in the Ma97 type, we need to maintain a constraint on the types
