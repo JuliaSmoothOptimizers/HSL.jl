@@ -150,21 +150,30 @@ if any(isfile.(hsl_archives))
     if isfile(hsl_ma57_archive)
       write(io, "  global libhsl_ma57\n")
       write(io, "  if !isfile(libhsl_ma57)\n")
-      write(io, "    error(\"\$(libhsl_ma57) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
+      write(
+        io,
+        "    error(\"\$(libhsl_ma57) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n",
+      )
       write(io, "  end\n")
       write(io, "\n")
     end
     if isfile(hsl_ma57_patch)
       write(io, "  global libhsl_ma57_patch\n")
       write(io, "  if !isfile(libhsl_ma57_patch)\n")
-      write(io, "    error(\"\$(libhsl_ma57_patch) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
+      write(
+        io,
+        "    error(\"\$(libhsl_ma57_patch) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n",
+      )
       write(io, "  end\n")
       write(io, "\n")
     end
     if isfile(hsl_ma97_archive)
       write(io, "  global libhsl_ma97\n")
       write(io, "  if !isfile(libhsl_ma97)\n")
-      write(io, "    error(\"\$(libhsl_ma97) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
+      write(
+        io,
+        "    error(\"\$(libhsl_ma97) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n",
+      )
       write(io, "  end\n")
     end
     write(io, "end\n")
