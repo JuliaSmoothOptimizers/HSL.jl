@@ -24,7 +24,7 @@ function test_ma57_patch(A, M, b, xexact)
 
   # alter the D factor
   d1 = abs.(diag(D))
-  d2 = [diag(D, 1); 0]
+  d2 = [diag(D, 1); 0][:]
   ma57_alter_d(M, [Vector(d1)'; Vector(d2)'])
 end
 
