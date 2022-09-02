@@ -1,4 +1,4 @@
-using BinaryProvider, SHA # requires BinaryProvider 0.3.0 or later
+using SHA
 
 using METIS4_jll
 using OpenBLAS32_jll
@@ -37,10 +37,6 @@ function findversion(versions::Vector{HSLVersion}, path::AbstractString)
   end
   return nothing
 end
-
-# Parse some basic command-line arguments
-const verbose = "--verbose" in ARGS
-const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
 
 ##############################
 # MA57
@@ -107,8 +103,6 @@ const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 @info "using compilers" HSL_FC HSL_F77 HSL_CC
 
 if any(isfile.(hsl_archives))
-  products = Product[]
-
   if VERSION < v"1.7"
     libblas_dir = joinpath(OpenBLAS32_jll.artifact_dir, "lib")
   else
@@ -120,26 +114,61 @@ if any(isfile.(hsl_archives))
   libdir = joinpath(usrdir, "lib")
   builddir = joinpath(usrdir, "src")
   mkpath(builddir)
+
+  path_deps = joinpath(@__DIR__, "deps.jl")
+  open(path_deps, "w") do io
+    write(io, "import Libdl\n")
+    write(io, "\n")
+  end
+
   if isfile(hsl_ma57_archive)
     @info "building ma57"
-    push!(products, FileProduct(prefix, "lib/libhsl_ma57.$dlext", :libhsl_ma57))
+    path_libhsl_ma57 = joinpath(libdir, "libhsl_ma57.$dlext")
+    open(path_deps, "a") do io
+      write(io, "const libhsl_ma57 = \"$path_libhsl_ma57\"\n")
+    end
     if isfile(hsl_ma57_patch)
-      push!(products, FileProduct(prefix, hsl_ma57_patch, :libhsl_ma57_patch))
+      open(path_deps, "a") do io
+        write(io, "const libhsl_ma57_patch = \"$hsl_ma57_patch\"\n")
+      end
     end
     include("build_hsl_ma57.jl")
   end
 
   if isfile(hsl_ma97_archive)
     @info "building ma97"
-    push!(products, FileProduct(prefix, "lib/libhsl_ma97.$dlext", :libhsl_ma97))
+    path_libhsl_ma97 = joinpath(libdir, "libhsl_ma97.$dlext")
+    open(path_deps, "a") do io
+      write(io, "const libhsl_ma97 = \"$path_libhsl_ma97\"\n")
+    end
     include("build_hsl_ma97.jl")
   end
 
-  @assert(all(satisfied.(products)))
-
-  # Write out a deps.jl file that will contain mappings for our products
-  write_deps_file(joinpath(@__DIR__, "deps.jl"), products, verbose = verbose)
+  open(path_deps, "a") do io
+    write(io, "\n")
+    write(io, "function check_deps()\n")
+    if isfile(hsl_ma57_archive)
+      write(io, "  global libhsl_ma57\n")
+      write(io, "  if !isfile(libhsl_ma57)\n")
+      write(io, "    error(\"\$(libhsl_ma57) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
+      write(io, "  end\n")
+      write(io, "\n")
+    end
+    if isfile(hsl_ma57_patch)
+      write(io, "  global libhsl_ma57_patch\n")
+      write(io, "  if !isfile(libhsl_ma57_patch)\n")
+      write(io, "    error(\"\$(libhsl_ma57_patch) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
+      write(io, "  end\n")
+      write(io, "\n")
+    end
+    if isfile(hsl_ma97_archive)
+      write(io, "  global libhsl_ma97\n")
+      write(io, "  if !isfile(libhsl_ma97)\n")
+      write(io, "    error(\"\$(libhsl_ma97) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
+      write(io, "  end\n")
+    end
+    write(io, "end\n")
+  end
 else
   @info "No archive found."
-  write_deps_file(joinpath(@__DIR__, "deps.jl"), Product[], verbose = verbose)
 end
