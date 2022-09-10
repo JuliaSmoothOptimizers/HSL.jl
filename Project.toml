@@ -1,6 +1,6 @@
 name = "HSL"
 uuid = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -13,6 +13,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 libblastrampoline_jll = "8e850b90-86db-534c-a0d3-1478176c7d93"
 
 [compat]
-METIS4_jll = "4.0.3"
+METIS4_jll = "400.0.300"
 OpenBLAS32_jll = "0.3.9"
 julia = "^1.6.0"
