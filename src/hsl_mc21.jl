@@ -17,23 +17,17 @@ function mc21ad(n, icn, licn, ip, lenr, iperm, numnz, iw)
 end
 
 """
-    iperm = mc21(A; sym)
+    p = mc21(A::SparseMatrixCSC; sym::Bool=false)
 
-Given a sparse matrix A, this function attempts to find a row permutation
-that makes the matrix A[iperm,:] have nonzeros on its diagonal.
+Given a sparse matrix A, this function attempts to find a column permutation `p`
+that makes the matrix A[:,p] have nonzeros on its diagonal.
 """
 function mc21(A::SparseMatrixCSC; sym::Bool=false)
   n, m = size(A)
   n == m || error("A is not square!")
-  if sym
-    B = A
-  else
-    B = similar(A)
-    transpose!(B, A)
-  end
-  icn = convert(Vector{Int32}, B.rowval)
+  icn = convert(Vector{Int32}, A.rowval)
   licn = length(icn)
-  ip = convert(Vector{Int32}, B.colptr)
+  ip = convert(Vector{Int32}, A.colptr)
   lenr = [ip[k+1] - ip[k] for k=1:n]
   iperm = zeros(Int32, n)
   numnz = Ref{Int32}(0)
