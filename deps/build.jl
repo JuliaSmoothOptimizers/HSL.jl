@@ -60,7 +60,7 @@ const hsl_ma57_patch = joinpath(hsl_ma57_path, "get_factors.patch")
 ##############################
 # MA97
 ##############################
-const hsl_ma97_verions = [
+const hsl_ma97_versions = [
   HSLVersion(
     "hsl_ma97",
     "2.7.0",
@@ -82,14 +82,37 @@ const hsl_ma97_verions = [
 ]
 const hsl_ma97_path =
   haskey(ENV, "HSL_MA97_PATH") ? ENV["HSL_MA97_PATH"] : joinpath(@__DIR__, "downloads")
-hsl_ma97_version = findversion(hsl_ma97_verions, hsl_ma97_path)
+hsl_ma97_version = findversion(hsl_ma97_versions, hsl_ma97_path)
 const hsl_ma97_archive =
   isnothing(hsl_ma97_version) ? "" : joinpath(hsl_ma97_path, getname(hsl_ma97_version))
 
 ##############################
+# MC21
+##############################
+const hsl_mc21_versions = [
+  HSLVersion(
+    "mc21",
+    "1.0.0",
+    "9d2a509a35e7826f564ff637098e7d0e205a87cb99826ec1ee9c1e9b21c6d71a",
+    ".tar.gz",
+  ),
+  HSLVersion(
+    "mc21",
+    "1.0.0",
+    "fc5b2cdced0486a18ae1ee0ea375040d779fe17cd69db9c5c8819b50dd962c63",
+    ".zip",
+  ),
+]
+const hsl_mc21_path =
+  haskey(ENV, "HSL_MC21_PATH") ? ENV["HSL_MC21_PATH"] : joinpath(@__DIR__, "downloads")
+hsl_mc21_version = findversion(hsl_mc21_versions, hsl_mc21_path)
+const hsl_mc21_archive =
+  isnothing(hsl_mc21_version) ? "" : joinpath(hsl_mc21_path, getname(hsl_mc21_version))
+
+##############################
 # Build
 ##############################
-const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive]
+const hsl_archives = [hsl_ma57_archive, hsl_ma97_archive, hsl_mc21_archive]
 
 const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
 const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
@@ -144,6 +167,15 @@ if any(isfile.(hsl_archives))
     include("build_hsl_ma97.jl")
   end
 
+  if isfile(hsl_mc21_archive)
+    @info "building mc21"
+    path_libhsl_mc21 = joinpath(libdir, "libhsl_mc21.$dlext")
+    open(path_deps, "a") do io
+      write(io, "const libhsl_mc21 = \"$path_libhsl_mc21\"\n")
+    end
+    include("build_hsl_mc21.jl")
+  end
+
   open(path_deps, "a") do io
     write(io, "\n")
     write(io, "function check_deps()\n")
@@ -173,6 +205,16 @@ if any(isfile.(hsl_archives))
       write(
         io,
         "    error(\"\$(libhsl_ma97) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n",
+      )
+      write(io, "  end\n")
+      write(io, "\n")
+    end
+    if isfile(hsl_mc21_archive)
+      write(io, "  global libhsl_mc21\n")
+      write(io, "  if !isfile(libhsl_mc21)\n")
+      write(
+        io,
+        "    error(\"\$(libhsl_mc21) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n",
       )
       write(io, "  end\n")
     end

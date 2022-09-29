@@ -18,3 +18,7 @@ end
 if @isdefined libhsl_ma97
   include("test_ma97.jl")
 end
+
+if @isdefined libhsl_mc21
+  include("test_mc21.jl")
+end

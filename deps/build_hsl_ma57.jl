@@ -4,7 +4,7 @@ elseif hsl_ma57_version.ext == ".zip"
   run(`unzip $hsl_ma57_archive -d $builddir`)
 end
 
-cd("$builddir/hsl_ma57-$(hsl_ma57_version.version)")
+cd("$builddir/$(hsl_ma57_version.algname)-$(hsl_ma57_version.version)")
 if isfile(hsl_ma57_patch)
   run(`patch -p1 -i $hsl_ma57_patch`)
 end
