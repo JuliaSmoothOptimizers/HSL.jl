@@ -20,7 +20,7 @@ function __init__()
       LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
     end
   end
-  if (@isdefined libhsl_ma57) || (@isdefined libhsl_ma97) || (@isdefined libhsl_mc21)
+  if (@isdefined libhsl_ma57) || (@isdefined libhsl_ma97) || (@isdefined libmc21)
     check_deps()
   end
 end
@@ -43,8 +43,8 @@ end
 if (@isdefined libhsl_ma97) || haskey(ENV, "DOCUMENTER_KEY")
   include("hsl_ma97.jl")
 end
-if (@isdefined libhsl_mc21) || haskey(ENV, "DOCUMENTER_KEY")
-  include("hsl_mc21.jl")
+if (@isdefined libmc21) || haskey(ENV, "DOCUMENTER_KEY")
+  include("mc21.jl")
 end
 
 end

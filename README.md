@@ -26,8 +26,9 @@ least temporarily. For example, if you are on OSX and are using Homebrew, you
 can hide METIS 5 with `brew unlink metis`. After the install procedure is
 complete, it is fine to link `metis` again with `brew link metis`.
 
-Set the environment variables `HSL_MA57_PATH` and `HSL_MA97_PATH` to specify where the source archives `tar.gz` are stored.
-Alternatively, you can use the `zip` archive as long as `unzip` is installed on your system.
+Set the environment variable `HSL_ARCHIVES_PATH` to specify where the source archives `tar.gz` and `zip` are stored.
+You can use the `zip` archives as long as `unzip` is installed on your system.
+If archives are stored in different folders, you can also set the environment variable `<ALGNAME>_PATH`, e.g. `HSL_MA57_PATH` or `MC21_PATH`.
 The `HSL` Julia module will take care of compilation.
 Once the source archives have been placed in the locations indicated by the environment variables, run
 

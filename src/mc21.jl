@@ -3,14 +3,14 @@ export mc21
 # mc21a and mc21ad routines are identical.
 #
 # function mc21a(n, icn, licn, ip, lenr, iperm, numnz, iw)
-#   ccall((:mc21a_, libhsl_mc21),
+#   ccall((:mc21a_, libmc21),
 #         Nothing,
 #         (Ref{Int32}, Ptr{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ref{Int32}, Ptr{Int32}),
 #          n         , icn       , licn      , ip        , lenr      , iperm     , numnz     , iw)
 # end
 
 function mc21ad(n, icn, licn, ip, lenr, iperm, numnz, iw)
-  ccall((:mc21ad_, libhsl_mc21),
+  ccall((:mc21ad_, libmc21),
         Nothing,
         (Ref{Int32}, Ptr{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ref{Int32}, Ptr{Int32}),
          n         , icn       , licn      , ip        , lenr      , iperm     , numnz     , iw)
