@@ -5,7 +5,6 @@ using OpenBLAS32_jll
 using libblastrampoline_jll
 
 struct HSLVersion
-  algname::String
   version::String
   sha::String
   ext::String
@@ -13,7 +12,7 @@ end
 
 include("versions.jl")
 
-getname(ver::HSLVersion) = ver.algname * "-" * ver.version * ver.ext
+getname(software::String, ver::HSLVersion) = software * "-" * ver.version * ver.ext
 
 function checksha(version::HSLVersion, archivepath::String)
   if isfile(archivepath)
@@ -37,14 +36,13 @@ function findversion(software::String)
   versions = hsl_collection[software]
   for path in paths
     for version in versions
-      archivename = getname(version)
+      archivename = getname(software, version)
       archivepath = joinpath(path, archivename)
       if isfile(archivepath)
         if checksha(version, archivepath)
-          patch = joinpath(path, "get_factors.patch")
-          return archivepath, version, patch
+          return archivepath, version, path
         else
-          error("Archive found but didn't match SHA for $(ver.algname).")
+          @error("Archive found but didn't match SHA for $(software).")
         end
       end
     end
@@ -54,15 +52,15 @@ end
 
 const hsl_versions = Dict{String,HSLVersion}()
 const hsl_archives = Dict{String,String}()
-const hsl_patchs   = Dict{String,String}()
+const hsl_patches  = Dict{String,String}()
 
 for software in keys(hsl_collection)
-  path, version, patchs = findversion(software)
+  archivepath, version, path = findversion(software)
   if version ≠ nothing
     hsl_versions[software] = version
-    hsl_archives[software] = path
+    hsl_archives[software] = archivepath
     if software == "hsl_ma57"
-      hsl_patchs[software] = patchs
+      hsl_patches[software] = joinpath(path, "get_factors.patch")
     end
   end
 end
@@ -95,9 +93,9 @@ function build_hsl(software::String)
     error("The extension $extension is not supported.")
   end
 
-  cd("$builddir/$(version.algname)-$(version.version)")
-  if haskey(hsl_patchs, software) && isfile(hsl_patchs[software])
-    run(`patch -p1 -i $(hsl_patchs[software])`)
+  cd("$builddir/$(software)-$(version.version)")
+  if haskey(hsl_patches, software) && isfile(hsl_patches[software])
+    run(`patch -p1 -i $(hsl_patches[software])`)
   end
   run(`./configure --prefix=$usrdir
                    FC=$(HSL_FC)
@@ -148,9 +146,9 @@ if any(isfile.(values(hsl_archives)))
       open(path_deps, "a") do io
         write(io, "const lib$(software) = \"$(path_libhsl)\"\n")
       end
-      if haskey(hsl_patchs, software) && isfile(hsl_patchs[software])
+      if haskey(hsl_patches, software) && isfile(hsl_patches[software])
         open(path_deps, "a") do io
-          write(io, "const lib$(software)_patch = \"$(hsl_patchs[software])\"\n")
+          write(io, "const lib$(software)_patch = \"$(hsl_patches[software])\"\n")
         end
       end
       build_hsl(software)
@@ -169,7 +167,7 @@ if any(isfile.(values(hsl_archives)))
         write(io, "  end\n")
         write(io, "\n")
       end
-      if haskey(hsl_patchs, software) && isfile(hsl_patchs[software])
+      if haskey(hsl_patches, software) && isfile(hsl_patches[software])
         write(io, "  global lib$(software)_patch\n")
         write(io, "  if !isfile(lib$(software)_patch)\n")
         write(io, "    error(\"\$(lib$(software)_patch) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
