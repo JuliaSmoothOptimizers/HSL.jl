@@ -12,7 +12,7 @@ end
 
 include("versions.jl")
 
-getname(software::String, ver::HSLVersion) = software * "-" * ver.version * ver.ext
+getname(software::String, ver::HSLVersion; extension::Bool=true) = software * "-" * ver.version * (extension ? ver.ext : "")
 
 function checksha(version::HSLVersion, archivepath::String)
   if isfile(archivepath)
@@ -40,9 +40,10 @@ function findversion(software::String)
       archivepath = joinpath(path, archivename)
       if isfile(archivepath)
         if checksha(version, archivepath)
+          @info "found $(archivepath)"
           return archivepath, version, path
         else
-          @error("Archive found but didn't match SHA for $(software).")
+          @error("SHA mismatch for $(archivepath)")
         end
       end
     end
@@ -60,7 +61,11 @@ for software in keys(hsl_collection)
     hsl_versions[software] = version
     hsl_archives[software] = archivepath
     if software == "hsl_ma57"
-      hsl_patches[software] = joinpath(path, "get_factors.patch")
+      patchpath = joinpath(path, "get_factors.patch")
+      if isfile(patchpath)
+        @info "found $(patchpath)"
+        hsl_patches[software] = patchpath
+      end
     end
   end
 end
@@ -93,8 +98,9 @@ function build_hsl(software::String)
     error("The extension $extension is not supported.")
   end
 
-  cd("$builddir/$(software)-$(version.version)")
-  if haskey(hsl_patches, software) && isfile(hsl_patches[software])
+  foldername = getname(software, version, extension=false)
+  cd("$builddir/$(foldername)")
+  if haskey(hsl_patches, software)
     run(`patch -p1 -i $(hsl_patches[software])`)
   end
   run(`./configure --prefix=$usrdir
@@ -119,8 +125,7 @@ end
 
 @info "using compilers" HSL_FC HSL_F77 HSL_CC
 
-println(values(hsl_archives))
-if any(isfile.(values(hsl_archives)))
+if !isempty(hsl_archives)
   if VERSION < v"1.7" || (Sys.iswindows() && VERSION < v"1.9")
     libblas_dir = joinpath(OpenBLAS32_jll.artifact_dir, "lib")
   else
@@ -133,49 +138,65 @@ if any(isfile.(values(hsl_archives)))
   builddir = joinpath(usrdir, "src")
   mkpath(builddir)
 
+  # generate deps.jl
   path_deps = joinpath(@__DIR__, "deps.jl")
   open(path_deps, "w") do io
     write(io, "import Libdl\n")
     write(io, "\n")
   end
 
+  # write the path of all compiled libraries
   for software in keys(hsl_collection)
-    if haskey(hsl_archives, software) && isfile(hsl_archives[software])
+    if haskey(hsl_archives, software)
       @info "building $(software)"
+      build_hsl(software)
       path_libhsl = joinpath(libdir, "lib$(software).$dlext")
       open(path_deps, "a") do io
         write(io, "const lib$(software) = \"$(path_libhsl)\"\n")
-      end
-      if haskey(hsl_patches, software) && isfile(hsl_patches[software])
-        open(path_deps, "a") do io
-          write(io, "const lib$(software)_patch = \"$(hsl_patches[software])\"\n")
+        if software == "hsl_ma57"
+          write(io, "const $(software)_patched = $(haskey(hsl_patches, software))\n")
         end
       end
-      build_hsl(software)
     end
   end
 
+  # write the constant `available_hsl_algorithms`
+  open(path_deps, "a") do io
+    write(io, "\n")
+    write(io, "const available_hsl_algorithms = (")
+    nalgorithms = 0
+    for software in keys(hsl_archives)
+      if nalgorithms == 0
+        write(io, "\"$(software)\"")
+      else
+        write(io, ", \"$(software)\"")
+      end
+      nalgorithms += 1
+    end
+    write(io, ")\n")
+  end
+
+  # write the function `check_deps`
   open(path_deps, "a") do io
     write(io, "\n")
     write(io, "function check_deps()\n")
+    write(io, "\n")
+    write(io, "  global available_hsl_algorithms\n")
     for software in keys(hsl_collection)
       #! format: off
-      if haskey(hsl_archives, software) && isfile(hsl_archives[software])
+      if haskey(hsl_archives, software)
+        write(io, "\n")
         write(io, "  global lib$(software)\n")
+        if software == "hsl_ma57"
+          write(io, "  global $(software)_patched\n")
+        end
         write(io, "  if !isfile(lib$(software))\n")
         write(io, "    error(\"\$(lib$(software)) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
         write(io, "  end\n")
-        write(io, "\n")
-      end
-      if haskey(hsl_patches, software) && isfile(hsl_patches[software])
-        write(io, "  global lib$(software)_patch\n")
-        write(io, "  if !isfile(lib$(software)_patch)\n")
-        write(io, "    error(\"\$(lib$(software)_patch) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
-        write(io, "  end\n")
-        write(io, "\n")
       end
       #! format: on
     end
+    write(io, "\n")
     write(io, "end\n")
   end
 else

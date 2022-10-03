@@ -36,7 +36,7 @@ const data_map = Dict{Type, Type}(
 # package-specific definitions
 if (@isdefined libhsl_ma57) || haskey(ENV, "DOCUMENTER_KEY")
   include("hsl_ma57.jl")
-  if (@isdefined libhsl_ma57_patch) || haskey(ENV, "DOCUMENTER_KEY")
+  if hsl_ma57_patched || haskey(ENV, "DOCUMENTER_KEY")
     include("hsl_ma57_patch.jl")
   end
 end

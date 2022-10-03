@@ -10,7 +10,7 @@ end
 
 if @isdefined libhsl_ma57
   include("test_ma57.jl")
-  if @isdefined libhsl_ma57_patch
+  if hsl_ma57_patched
     include("test_ma57_patch.jl")
   end
 end
