@@ -166,11 +166,8 @@ if !isempty(hsl_archives)
     write(io, "const available_hsl_algorithms = (")
     nalgorithms = 0
     for software in keys(hsl_archives)
-      if nalgorithms == 0
-        write(io, "\"$(software)\"")
-      else
-        write(io, ", \"$(software)\"")
-      end
+      (nalgorithms > 0) && write(io, ", ")
+      write(io, "\"$(software)\"")
       nalgorithms += 1
     end
     write(io, ")\n")
