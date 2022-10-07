@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tutorial · HSL.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="HSL.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">HSL.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Tutorial</a><ul class="internal"><li><a class="tocitem" href="#HSL_MA97"><span>HSL_MA97</span></a></li><li><a class="tocitem" href="#HSL_MA57"><span>HSL_MA57</span></a></li></ul></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Tutorial</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Tutorial</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaSmoothOptimizers/HSL.jl/blob/main/docs/src/tutorial.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Tutorial"><a class="docs-heading-anchor" href="#Tutorial">Tutorial</a><a id="Tutorial-1"></a><a class="docs-heading-anchor-permalink" href="#Tutorial" title="Permalink"></a></h1><p>HSL MA57 and MA97 can be used for the solution of symmetric, possibly indefinite, linear systems. They are often used for the solution of saddle-point systems, i.e., systems of the form</p><p class="math-container">\[\begin{equation}
+  \label{SP}
+  \begin{bmatrix}
+    -H &amp; A^T \\
+     A &amp; G
+  \end{bmatrix}
+  \begin{bmatrix}
+    x \\ y
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    c \\ b
+  \end{bmatrix}.
+\end{equation}\]</p><p>A special case occurs when <span>$H = 0$</span>, <span>$G = I$</span> and <span>$c = 0$</span>, which corresponds to the least-squares problem</p><p class="math-container">\[\begin{equation}
+  \label{LS}
+  \min_x \ \|A x - b\|_2
+\end{equation}\]</p><p>Another special case occurs when <span>$H = -I$</span>, <span>$G = 0$</span> and <span>$c = 0$</span>, which corresponds to the least-norm problem</p><p class="math-container">\[\begin{equation}
+  \label{LN}
+  \min_x \ \|x\| \ \text{subject to } Ax = b.
+\end{equation}\]</p><h2 id="HSL_MA97"><a class="docs-heading-anchor" href="#HSL_MA97">HSL_MA97</a><a id="HSL_MA97-1"></a><a class="docs-heading-anchor-permalink" href="#HSL_MA97" title="Permalink"></a></h2><p>Supported versions:</p><ul><li>2.6.0</li><li>2.7.0</li></ul><p><a href="http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html">HSL_MA97</a>: an OpenMP-based direct solver for symmetric linear systems. Example:</p><pre><code class="language-JULIA hljs">using MatrixMarket
+using HSL
+
+K = MatrixMarket.mmread(&quot;K.mtx&quot;)  # only the lower triangle
+rhs = readdlm(&quot;rhs.rhs&quot;)
+
+LBL = Ma97(K)
+ma97_factorize!(LBL)
+x = ma97_solve(LBL, rhs)  # or x = LBL \ rhs</code></pre><h3 id="Rectangular-Systems"><a class="docs-heading-anchor" href="#Rectangular-Systems">Rectangular Systems</a><a id="Rectangular-Systems-1"></a><a class="docs-heading-anchor-permalink" href="#Rectangular-Systems" title="Permalink"></a></h3><p>There is a convenience interface to solve rectangular systems that complements the sparse QR factorization in Julia.</p><p>When <span>$A$</span> is <span>$m$</span>-by-<span>$n$</span> with <span>$m \geq n$</span> and has full column rank,</p><pre><code class="language-JULIA hljs">(r, x) = ma97_solve(A, b)</code></pre><p>returns <span>$x$</span> that solves \eqref{LS} and residual <span>$r := b - Ax$</span> corresponding to <span>$y$</span> in \eqref{SP}. The call</p><pre><code class="language-JULIA hljs">(r, x) = ma97_least_squares(A, b)</code></pre><p>is also defined, and is equivalent to the above.</p><p>When <span>$A$</span> is <span>$m$</span>-by-<span>$n$</span> with <span>$m \leq n$</span> and has full row rank,</p><pre><code class="language-JULIA hljs">(x, y) = ma97_solve(A, b)</code></pre><p>returns <span>$x$</span> that solves \eqref{LN} and <span>$y$</span> such that <span>$x = -A^T y$</span> (and therefore <span>$A A^T (-y) = b$</span>). The call</p><pre><code class="language-JULIA hljs">(x, y) = ma97_min_norm(A, b)</code></pre><p>is also defined, and is equivalent to the above.</p><h2 id="HSL_MA57"><a class="docs-heading-anchor" href="#HSL_MA57">HSL_MA57</a><a id="HSL_MA57-1"></a><a class="docs-heading-anchor-permalink" href="#HSL_MA57" title="Permalink"></a></h2><p><a href="http://www.hsl.rl.ac.uk/specs/ma57.pdf">HSL_MA57</a> version 5.2.0: a sparse, multifrontal solver for symmetric linear systems. Example:</p><pre><code class="language-JULIA hljs">using MatrixMarket
+using HSL
+
+K = MatrixMarket.mmread(&quot;examples/K_0.mtx&quot;)  # only the lower triangle
+rhs = readdlm(&quot;examples/rhs_0.rhs&quot;)
+rhss = hcat(rhs, rhs)
+
+## factorize and solve
+LDL = Ma57(K)
+ma57_factorize(LDL)
+LDL.info.rank
+x = ma57_solve(LDL, rhs)  # or x = LBL \ rhs
+norm(K*x - rhs)
+xx = ma57_solve(LDL, rhss)  # or x = LBL \ rhss</code></pre><h3 id="Rectangular-Systems-2"><a class="docs-heading-anchor" href="#Rectangular-Systems-2">Rectangular Systems</a><a class="docs-heading-anchor-permalink" href="#Rectangular-Systems-2" title="Permalink"></a></h3><p>There is a convenience interface to solve rectangular systems that complements the sparse QR factorization in Julia.</p><p>When <span>$A$</span> is <span>$m$</span>-by-<span>$n$</span> with <span>$m \geq n$</span> and has full column rank,</p><pre><code class="language-JULIA hljs">(r, x) = ma57_solve(A, b)</code></pre><p>returns <span>$x$</span> that solves \eqref{LS} and residual <span>$r := b - Ax$</span> corresponding to <span>$y$</span> in \eqref{SP}. The call</p><pre><code class="language-JULIA hljs">(r, x) = ma57_least_squares(A, b)</code></pre><p>is also defined, and is equivalent to the above.</p><p>When <span>$A$</span> is <span>$m$</span>-by-<span>$n$</span> with <span>$m \leq n$</span> and has full row rank,</p><pre><code class="language-JULIA hljs">(x, y) = ma57_solve(A, b)</code></pre><p>returns <span>$x$</span> that solves \eqref{LN} and <span>$y$</span> such that <span>$x = -A^T y$</span> (and therefore <span>$A A^T (-y) = b$</span>). The call</p><pre><code class="language-JULIA hljs">(x, y) = ma57_min_norm(A, b)</code></pre><p>is also defined, and is equivalent to the above. Example:</p><pre><code class="language-JULIA hljs">using MatrixMarket
+using HSL
+
+K = MatrixMarket.mmread(&quot;examples/K_0.mtx&quot;)  # only the lower triangle
+rhs = readdlm(&quot;examples/rhs_0.rhs&quot;)
+
+## solve min norm
+K_mn = K[1:200,:]
+x_mn, y_mn = ma57_min_norm(K_mn, rhs[1:200]) # == ma57_solve(K_mn, rhs[1:200])
+
+## solve least squares
+K_ls = K[:,1:200]
+r_ls, x_ls = ma57_least_squares(K_ls, rhs)   # == ma57_solve(K_ls, rhs)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Friday 7 October 2022 13:53">Friday 7 October 2022</span>. Using Julia version 1.8.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
