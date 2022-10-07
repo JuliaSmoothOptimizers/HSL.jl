@@ -12,7 +12,8 @@ end
 
 include("versions.jl")
 
-getname(software::String, ver::HSLVersion; extension::Bool=true) = software * "-" * ver.version * (extension ? ver.ext : "")
+getname(software::String, ver::HSLVersion; extension::Bool = true) =
+  software * "-" * ver.version * (extension ? ver.ext : "")
 
 function checksha(version::HSLVersion, archivepath::String)
   if isfile(archivepath)
@@ -51,9 +52,9 @@ function findversion(software::String)
   return nothing, nothing, nothing
 end
 
-const hsl_versions = Dict{String,HSLVersion}()
-const hsl_archives = Dict{String,String}()
-const hsl_patches  = Dict{String,String}()
+const hsl_versions = Dict{String, HSLVersion}()
+const hsl_archives = Dict{String, String}()
+const hsl_patches = Dict{String, String}()
 
 for software in keys(hsl_collection)
   archivepath, version, path = findversion(software)
