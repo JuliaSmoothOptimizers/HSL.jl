@@ -6,6 +6,7 @@ using Test
 
 if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
+  @info("available_hsl_algorithms: $(available_hsl_algorithms)")
 end
 
 if @isdefined libhsl_ma57

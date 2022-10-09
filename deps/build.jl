@@ -163,11 +163,11 @@ if !isempty(hsl_archives)
   # write the constant `available_hsl_algorithms`
   open(path_deps, "a") do io
     write(io, "\n")
-    write(io, "const available_hsl_algorithms = (")
+    write(io, "const available_hsl_algorithms = Dict{String, VersionNumber}(")
     nalgorithms = 0
     for software in keys(hsl_archives)
       (nalgorithms > 0) && write(io, ", ")
-      write(io, "\"$(software)\"")
+      write(io, "\"$(software)\" => v\"$(hsl_versions[software].version)\"")
       nalgorithms += 1
     end
     write(io, ")\n")
