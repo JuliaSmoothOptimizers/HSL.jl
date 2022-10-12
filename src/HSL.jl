@@ -20,7 +20,7 @@ function __init__()
       LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
     end
   end
-  if isdefined(available_hsl_algorithms)
+  if (@isdefined available_hsl_algorithms)
     check_deps()
   end
 end
@@ -34,7 +34,7 @@ const data_map = Dict{Type, Type}(
 )
 
 # package-specific definitions
-if isdefined(available_hsl_algorithms)
+if (@isdefined available_hsl_algorithms)
   for package in keys(available_hsl_algorithms)
     include("$(package).jl")
     if package == "hsl_ma57" && hsl_ma57_patched
