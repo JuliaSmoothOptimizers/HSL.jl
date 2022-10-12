@@ -4,7 +4,7 @@ using LinearAlgebra
 using SparseArrays
 using Test
 
-if isdefined(HSL.available_hsl_algorithms)
+if (@isdefined HSL.available_hsl_algorithms)
   for (software, version) in HSL.available_hsl_algorithms
     @info("$software: v\"$version\"")
   end
