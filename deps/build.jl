@@ -136,10 +136,12 @@ if !isempty(hsl_archives)
   usrdir = joinpath(@__DIR__, "usr")
   libdir = joinpath(usrdir, "lib")
   builddir = joinpath(usrdir, "src")
+  isdir(usrdir) && rm(usrdir, recursive=true)
   mkpath(builddir)
 
   # generate deps.jl
   path_deps = joinpath(@__DIR__, "deps.jl")
+  isfile(path_deps) && rm(path_deps)
   open(path_deps, "w") do io
     write(io, "import Libdl\n")
     write(io, "\n")
