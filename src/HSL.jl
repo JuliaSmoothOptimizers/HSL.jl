@@ -20,7 +20,7 @@ function __init__()
       LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
     end
   end
-  if (@isdefined libhsl_ma57) || (@isdefined libhsl_ma97) || (@isdefined libmc21)
+  if isdefined(available_hsl_algorithms)
     check_deps()
   end
 end
@@ -34,17 +34,13 @@ const data_map = Dict{Type, Type}(
 )
 
 # package-specific definitions
-if (@isdefined libhsl_ma57) || haskey(ENV, "DOCUMENTER_KEY")
-  include("hsl_ma57.jl")
-  if hsl_ma57_patched || haskey(ENV, "DOCUMENTER_KEY")
-    include("hsl_ma57_patch.jl")
+if isdefined(available_hsl_algorithms)
+  for package in keys(available_hsl_algorithms)
+    include("$(package).jl")
+    if package == "hsl_ma57" && hsl_ma57_patched
+      include("hsl_ma57_patch.jl")
+    end
   end
-end
-if (@isdefined libhsl_ma97) || haskey(ENV, "DOCUMENTER_KEY")
-  include("hsl_ma97.jl")
-end
-if (@isdefined libmc21) || haskey(ENV, "DOCUMENTER_KEY")
-  include("mc21.jl")
 end
 
 end
