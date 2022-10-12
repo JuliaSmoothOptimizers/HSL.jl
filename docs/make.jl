@@ -5,8 +5,10 @@ makedocs(
   modules = [HSL],
   doctest = false,
   strict = true,
-  assets = ["assets/style.css"],
   format = Documenter.HTML(
+    assets = ["assets/style.css"],
+    ansicolor = true,
+    prettyurls = get(ENV, "CI", nothing) == "true",
     mathengine = Documenter.MathJax(
       Dict(:TeX => Dict(:equationNumbers => Dict(:autoNumber => "AMS"))),
     ),
@@ -16,10 +18,7 @@ makedocs(
 )
 
 deploydocs(
-  deps = nothing,
-  make = nothing,
   repo = "github.com/JuliaSmoothOptimizers/HSL.jl.git",
-  target = "build",
   devbranch = "main",
   push_preview = true,
 )
