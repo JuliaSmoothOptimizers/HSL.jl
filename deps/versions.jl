@@ -30,7 +30,10 @@ hsl_collection["fd15"] = []
 
 hsl_collection["kb05"] = []
 hsl_collection["kb06"] = []
-hsl_collection["kb07"] = []
+hsl_collection["kb07"] = [
+  HSLVersion("1.0.0", "24e5016b06768561773fd0172b9647f239b44c533eb9596815a6d8c4c60d940f", ".tar.gz"),
+  HSLVersion("1.0.0", "df731a4ca9728ec085c7b12b9a4dbb573f779763bd5c37ae918823a67aca68ba", ".zip"),
+]
 hsl_collection["kb08"] = []
 hsl_collection["hsl_kb22"] = []
 
