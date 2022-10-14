@@ -9,10 +9,16 @@ METIS4_jll = "40b5814e-7855-5c9f-99f7-a735ce3fdf8b"
 OpenBLAS32_jll = "656ef2d0-ae68-5445-9ca0-591084a874a2"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 libblastrampoline_jll = "8e850b90-86db-534c-a0d3-1478176c7d93"
 
 [compat]
 METIS4_jll = "400.0.300"
 OpenBLAS32_jll = "0.3.9"
 julia = "^1.6.0"
+
+[extras]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Random", "Test"]
