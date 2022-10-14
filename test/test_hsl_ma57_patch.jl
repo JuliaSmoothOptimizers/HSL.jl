@@ -30,8 +30,8 @@ end
 
 for T in (Float32, Float64)
   @info "Testing hsl_ma57_patch with $T data"
-  rows = Int32[1, 1, 2, 2, 3, 3, 5]
-  cols = Int32[1, 2, 3, 5, 3, 4, 5]
+  rows = Cint[1, 1, 2, 2, 3, 3, 5]
+  cols = Cint[1, 2, 3, 5, 3, 4, 5]
   vals = T[2, 3, 4, 6, 1, 5, 1]
   A = sparse(rows, cols, vals)
   A = A + triu(A, 1)'
@@ -43,8 +43,8 @@ for T in (Float32, Float64)
   test_ma57_patch(A, M, b, xexact)
 
   n = 5
-  A = convert(T, 3) * convert(SparseMatrixCSC{T, Int32}, sprand(T, n, n, 0.5))
-  A = A + A' + convert(SparseMatrixCSC{T, Int32}, sparse(T(1) * I, n, n))
+  A = convert(T, 3) * convert(SparseMatrixCSC{T, Cint}, sprand(T, n, n, 0.5))
+  A = A + A' + convert(SparseMatrixCSC{T, Cint}, sparse(T(1) * I, n, n))
   M = Ma57(A)
   b = rand(T, n)
   xexact = lu(A) \ b
