@@ -83,7 +83,6 @@ const dlext = Sys.isapple() ? "dylib" : "so"
 const all_load = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
 
-#! format: off
 function build_hsl(software::String)
 
   version = hsl_versions[software]
@@ -121,7 +120,6 @@ function build_hsl(software::String)
   end
   cd(@__DIR__)
 end
-#! format: on
 
 @info "using compilers" HSL_FC HSL_F77 HSL_CC
 
@@ -182,7 +180,6 @@ if !isempty(hsl_archives)
     write(io, "\n")
     write(io, "  global available_hsl_algorithms\n")
     for software in keys(hsl_collection)
-      #! format: off
       if haskey(hsl_archives, software)
         write(io, "\n")
         write(io, "  global lib$(software)\n")
@@ -193,7 +190,6 @@ if !isempty(hsl_archives)
         write(io, "    error(\"\$(lib$(software)) does not exist, Please re-run Pkg.build(\\\"HSL.jl\\\"), and restart Julia.\")\n")
         write(io, "  end\n")
       end
-      #! format: on
     end
     write(io, "\n")
     write(io, "end\n")
