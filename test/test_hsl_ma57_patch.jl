@@ -28,25 +28,26 @@ function test_ma57_patch(A, M, b, xexact)
   ma57_alter_d(M, [Vector(d1)'; Vector(d2)'])
 end
 
-for T in (Float32, Float64)
-  @info "Testing hsl_ma57_patch with $T data"
-  rows = Cint[1, 1, 2, 2, 3, 3, 5]
-  cols = Cint[1, 2, 3, 5, 3, 4, 5]
-  vals = T[2, 3, 4, 6, 1, 5, 1]
-  A = sparse(rows, cols, vals)
-  A = A + triu(A, 1)'
+@testset "hsl_ma57_patch" begin
+  @testset "Data Type: $T" for T in (Float32, Float64)
+    rows = Cint[1, 1, 2, 2, 3, 3, 5]
+    cols = Cint[1, 2, 3, 5, 3, 4, 5]
+    vals = T[2, 3, 4, 6, 1, 5, 1]
+    A = sparse(rows, cols, vals)
+    A = A + triu(A, 1)'
 
-  M = ma57_coord(5, rows, cols, vals)
+    M = ma57_coord(5, rows, cols, vals)
 
-  b = T[8, 45, 31, 15, 17]
-  xexact = T[1, 2, 3, 4, 5]
-  test_ma57_patch(A, M, b, xexact)
+    b = T[8, 45, 31, 15, 17]
+    xexact = T[1, 2, 3, 4, 5]
+    test_ma57_patch(A, M, b, xexact)
 
-  n = 5
-  A = convert(T, 3) * convert(SparseMatrixCSC{T, Cint}, sprand(T, n, n, 0.5))
-  A = A + A' + convert(SparseMatrixCSC{T, Cint}, sparse(T(1) * I, n, n))
-  M = Ma57(A)
-  b = rand(T, n)
-  xexact = lu(A) \ b
-  test_ma57_patch(A, M, b, xexact)
+    n = 5
+    A = convert(T, 3) * convert(SparseMatrixCSC{T, Cint}, sprand(T, n, n, 0.5))
+    A = A + A' + convert(SparseMatrixCSC{T, Cint}, sparse(T(1) * I, n, n))
+    M = Ma57(A)
+    b = rand(T, n)
+    xexact = lu(A) \ b
+    test_ma57_patch(A, M, b, xexact)
+  end
 end

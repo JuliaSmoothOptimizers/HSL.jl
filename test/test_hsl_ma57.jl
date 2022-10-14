@@ -26,38 +26,39 @@ function test_ma57(A, M, b, xexact)
   @test norm(x_ls - x_ls_star) ≤ ϵ * norm(x_ls_star)
 end
 
-for T in (Float32, Float64)
-  @info "Testing hsl_ma57 with $T data"
-  n = 5
-  rows = Cint[1, 1, 2, 2, 3, 3, 5]
-  cols = Cint[1, 2, 3, 5, 3, 4, 5]
-  vals = T[2, 3, 4, 6, 1, 5, 1]
-  A = sparse(rows, cols, vals, n, n)
-  A = A + triu(A, 1)'
+@testset "hsl_ma57" begin
+  @testset "Data Type: $T" for T in (Float32, Float64)
+    n = 5
+    rows = Cint[1, 1, 2, 2, 3, 3, 5]
+    cols = Cint[1, 2, 3, 5, 3, 4, 5]
+    vals = T[2, 3, 4, 6, 1, 5, 1]
+    A = sparse(rows, cols, vals, n, n)
+    A = A + triu(A, 1)'
 
-  M = ma57_coord(n, rows, cols, vals)
+    M = ma57_coord(n, rows, cols, vals)
 
-  b = T[8, 45, 31, 15, 17]
-  xexact = T[1, 2, 3, 4, 5]
-  test_ma57(A, M, b, xexact)
+    b = T[8, 45, 31, 15, 17]
+    xexact = T[1, 2, 3, 4, 5]
+    test_ma57(A, M, b, xexact)
 
-  # test with non-default options
-  control = Ma57_Control{T}()
-  info = Ma57_Info{T}()
-  control.icntl[6] = 4  # choose a different ordering
-  # give lower triangle: swap rows and cols
-  LBL = ma57_coord(n, cols, rows, vals, control, info)
-  ma57_factorize!(LBL)
-  work = similar(b)
-  x = copy(b)
-  ma57_solve!(LBL, x, work)
-  ϵ = sqrt(eps(T))
-  @test norm(x - xexact) ≤ ϵ * norm(xexact)
+    # test with non-default options
+    control = Ma57_Control{T}()
+    info = Ma57_Info{T}()
+    control.icntl[6] = 4  # choose a different ordering
+    # give lower triangle: swap rows and cols
+    LBL = ma57_coord(n, cols, rows, vals, control, info)
+    ma57_factorize!(LBL)
+    work = similar(b)
+    x = copy(b)
+    ma57_solve!(LBL, x, work)
+    ϵ = sqrt(eps(T))
+    @test norm(x - xexact) ≤ ϵ * norm(xexact)
 
-  A = convert(T, 3) * convert(SparseMatrixCSC{T, Cint}, sprand(T, n, n, 0.5))
-  A = A + A' + convert(SparseMatrixCSC{T, Cint}, sparse(T(1) * I, n, n))
-  M = Ma57(A)
-  b = rand(T, n)
-  xexact = lu(A) \ b
-  test_ma57(A, M, b, xexact)
+    A = convert(T, 3) * convert(SparseMatrixCSC{T, Cint}, sprand(T, n, n, 0.5))
+    A = A + A' + convert(SparseMatrixCSC{T, Cint}, sparse(T(1) * I, n, n))
+    M = Ma57(A)
+    b = rand(T, n)
+    xexact = lu(A) \ b
+    test_ma57(A, M, b, xexact)
+  end
 end
