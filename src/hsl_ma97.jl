@@ -315,8 +315,8 @@ for (fname, freename, typ) in (("ma97_analyse_s", "ma97_free_akeep_s", Float32),
       control = Ma97_Control{$S}(; kwargs...)
       info = Ma97_Info{$S}()
       M = Ma97{$typ, $S}(
-        [convert(Ptr{Cvoid}, Cvoid)],
-        [convert(Ptr{Cvoid}, Cvoid)],
+        [Ptr{Cvoid}(C_NULL)],
+        [Ptr{Cvoid}(C_NULL)],
         n,
         colptr,
         rowval,
