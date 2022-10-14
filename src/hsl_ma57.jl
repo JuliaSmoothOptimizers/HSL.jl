@@ -44,11 +44,11 @@ end
 ```JULIA
 julia> using HSL
 julia> Ma57_Control{Float64}(print_level=1)
-HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 1, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0])
+HSL.Ma57_Control{Float64}(Cint[6, 6, 6, -1, 1, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0])
 ```
 """
 mutable struct Ma57_Control{T <: Ma57Data}
-  icntl::Vector{Int32}
+  icntl::Vector{Cint}
   cntl::Vector{T}
 end
 
@@ -59,12 +59,12 @@ function Ma57_Control{T}(;
   unit_error::Int = 6,
   unit_warning::Int = 6,
 ) where {T}
-  icntl = zeros(Int32, 20)
+  icntl = zeros(Cint, 20)
   cntl = zeros(T, 5)
   if T == Float32
-    ccall((:ma57i_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+    ccall((:ma57i_, libhsl_ma57), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
   elseif T == Float64
-    ccall((:ma57id_, libhsl_ma57), Nothing, (Ptr{T}, Ptr{Int32}), cntl, icntl)
+    ccall((:ma57id_, libhsl_ma57), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
   end
   icntl[1] = unit_error
   icntl[2] = unit_warning
@@ -93,24 +93,24 @@ and solve.
 ```JULIA
 julia> using HSL
 julia> T = Float64;
-julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> rows = Cint[1, 2, 3, 5, 3, 4, 5]; cols = Cint[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A);
 julia> M.info
-HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+HSL.Ma57_Info{Float64}(Cint[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 ```
 """
 mutable struct Ma57_Info{T <: Ma57Data}
-  info::Vector{Int32}
+  info::Vector{Cint}
   rinfo::Vector{T}
 
-  largest_front::Int32
-  num_2x2_pivots::Int32
-  num_delayed_pivots::Int32
-  num_negative_eigs::Int32
-  rank::Int32
-  num_pivot_sign_changes::Int32
+  largest_front::Cint
+  num_2x2_pivots::Cint
+  num_delayed_pivots::Cint
+  num_negative_eigs::Cint
+  rank::Cint
+  num_pivot_sign_changes::Cint
 
   backward_error1::T
   backward_error2::T
@@ -181,47 +181,47 @@ All keyword arguments are passed directly to `ma57_coord()`.
 
 ```JULIA
 julia> T = Float64;
-julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> rows = Cint[1, 2, 3, 5, 3, 4, 5]; cols = Cint[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A)
-HSL.Ma57{Float64}(5, 7, Int32[1, 1, 2, 2, 3, 3, 5], Int32[1, 2, 3, 5, 3, 4, 5], [2.0, 3.0, 4.0, 6.0, 1.0, 5.0, 1.0], HSL.Ma57_Control{Float64}(Int32[6, 6, 6, -1, 0, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0]), HSL.Ma57_Info{Float64}(Int32[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 1.1, 81, Int32[5, 4, 3, 2, 1, 2, 9, 0, 0, 0  …  4, 3, 3, 2, 2, 1, 1, 0, 0, 0], 48, Float64[], 53, Int32[])
+HSL.Ma57{Float64}(5, 7, Cint[1, 1, 2, 2, 3, 3, 5], Cint[1, 2, 3, 5, 3, 4, 5], [2.0, 3.0, 4.0, 6.0, 1.0, 5.0, 1.0], HSL.Ma57_Control{Float64}(Cint[6, 6, 6, -1, 0, 5, 1, 0, 10, 1, 16, 16, 10, 100, 1, 0, 0, 0, 0, 0], [0.01, 1.0e-20, 0.5, 0.0, 0.0]), HSL.Ma57_Info{Float64}(Cint[0, 0, 0, 0, 12, 13, 4, 2, 48, 53  …  0, 0, 0, 0, 0, 2, 0, 0, 0, 0], [10.0, 34.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 1.1, 81, Cint[5, 4, 3, 2, 1, 2, 9, 0, 0, 0  …  4, 3, 3, 2, 2, 1, 1, 0, 0, 0], 48, Float64[], 53, Cint[])
 ```
 """
 mutable struct Ma57{T <: Ma57Data}
-  n::Int32
-  nz::Int32
-  rows::Vector{Int32}
-  cols::Vector{Int32}
+  n::Cint
+  nz::Cint
+  rows::Vector{Cint}
+  cols::Vector{Cint}
   vals::Vector{T}
   control::Ma57_Control{T}
   info::Ma57_Info{T}
 
   multiplier::T
 
-  __lkeep::Int32
-  __keep::Vector{Int32}
+  __lkeep::Cint
+  __keep::Vector{Cint}
 
-  __lfact::Int32
+  __lfact::Cint
   __fact::Vector{T}
-  __lifact::Int32
-  __ifact::Vector{Int32}
+  __lifact::Cint
+  __ifact::Vector{Cint}
 
-  iwork_fact::Vector{Int32}
-  iwork_solve::Vector{Int32}
+  iwork_fact::Vector{Cint}
+  iwork_solve::Vector{Cint}
 end
 
 function Ma57{T}(
-  n::Int32,
-  nz::Int32,
-  rows::Vector{Int32},
-  cols::Vector{Int32},
+  n::Cint,
+  nz::Cint,
+  rows::Vector{Cint},
+  cols::Vector{Cint},
   vals::Vector{T},
   control::Ma57_Control{T},
   info::Ma57_Info{T},
 ) where {T}
   lkeep = 5 * n + nz + max(n, nz) + 42
-  keep = zeros(Int32, lkeep)
+  keep = zeros(Cint, lkeep)
   Ma57{T}(
     n,
     nz,
@@ -236,9 +236,9 @@ function Ma57{T}(
     0,
     T[],
     0,
-    Int32[],
-    Vector{Int32}(undef, n),
-    Vector{Int32}(undef, n),
+    Cint[],
+    Vector{Cint}(undef, n),
+    Vector{Cint}(undef, n),
   )
 end
 
@@ -246,13 +246,14 @@ end
 function Ma57(A::SparseMatrixCSC{T, Ti}, args...; kwargs...) where {T <: Ma57Data, Ti <: Integer}
   m, n = size(A)
   m == n || throw(Ma57Exception("Ma57: input matrix must be square", 0))
-  L = tril(convert(SparseMatrixCSC{data_map[T], Int32}, A))
+  L = tril(convert(SparseMatrixCSC{data_map[T], Cint}, A))
   return ma57_coord(L.n, findnz(L)..., args...; kwargs...)
 end
 
-Ma57(A::Array{T, 2}, args...; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A), args...; kwargs...)
+Ma57(A::Matrix{T}, args...; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A), args...; kwargs...)
 
-for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
+for (fname, typ) in (("ma57a_", Float32),
+                     ("ma57ad_", Float64))
   @eval begin
 
     ## helper function to instantiate an object of type `Ma57` and perform the
@@ -279,44 +280,22 @@ for (fname, typ) in ((:ma57a_, Float32), (:ma57ad_, Float64))
     ) where {Ti <: Integer}
       nz = length(cols)
       M = Ma57{$typ}(
-        convert(Int32, n),
-        convert(Int32, nz),
-        convert(Vector{Int32}, rows),
-        convert(Vector{Int32}, cols),
+        convert(Cint, n),
+        convert(Cint, nz),
+        convert(Vector{Cint}, rows),
+        convert(Vector{Cint}, cols),
         nzval,
         control,
         info,
       )
 
-      iwork = Vector{Int32}(undef, 5 * n)
+      iwork = Vector{Cint}(undef, 5 * n)
 
       ## perform symbolic analysis.
-      ccall(
-        ($(string(fname)), libhsl_ma57),
-        Nothing,
-        (
-          Ref{Int32},
-          Ref{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ref{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{$typ},
-        ),
-        M.n,
-        M.nz,
-        M.rows,
-        M.cols,
-        M.__lkeep,
-        M.__keep,
-        iwork,
-        M.control.icntl,
-        M.info.info,
-        M.info.rinfo,
-      )
+      ccall(($fname, libhsl_ma57),
+             Cvoid,
+            (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}      , Ptr{Cint}  , Ptr{$typ}   ),
+             M.n      , M.nz     , M.rows   , M.cols   , M.__lkeep, M.__keep , iwork    , M.control.icntl, M.info.info, M.info.rinfo)
 
       status = M.info.info[1]
       status > 0 && @warn "Ma57: analyze returns with code $status"
@@ -347,7 +326,7 @@ end
 ```JULIA
 julia> using HSL
 julia> T = Float64;
-julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> rows = Cint[1, 2, 3, 5, 3, 4, 5]; cols = Cint[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 julia> A = sparse(rows, cols, vals);
 julia> M = Ma57(A)
@@ -355,7 +334,8 @@ julia> ma57_factorize!(M)      ## factorize `Ma57` object in place
 """
 function ma57_factorize! end
 
-for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
+for (fname, typ) in (("ma57b_", Float32),
+                    ("ma57bd_", Float64))
   @eval begin
     function ma57_factorize!(ma57::Ma57{$typ})
       if ma57.__lfact <= 0 || ma57.__lifact <= 0
@@ -366,45 +346,15 @@ for (fname, typ) in ((:ma57b_, Float32), (:ma57bd_, Float64))
         ma57.__fact = Vector{$typ}(undef, ma57.__lfact)
       end
       if length(ma57.__ifact) < ma57.__lifact
-        ma57.__ifact = Vector{Int32}(undef, ma57.__lifact)
+        ma57.__ifact = Vector{Cint}(undef, ma57.__lifact)
       end
 
       factorized = false
       while !factorized
-        ccall(
-          ($(string(fname)), libhsl_ma57),
-          Nothing,
-          (
-            Ref{Int32},
-            Ref{Int32},
-            Ptr{$typ},
-            Ptr{$typ},
-            Ref{Int32},
-            Ptr{Int32},
-            Ref{Int32},
-            Ref{Int32},
-            Ptr{Int32},
-            Ptr{Int32},
-            Ptr{Int32},
-            Ptr{$typ},
-            Ptr{Int32},
-            Ptr{$typ},
-          ),
-          ma57.n,
-          ma57.nz,
-          ma57.vals,
-          ma57.__fact,
-          ma57.__lfact,
-          ma57.__ifact,
-          ma57.__lifact,
-          ma57.__lkeep,
-          ma57.__keep,
-          ma57.iwork_fact,
-          ma57.control.icntl,
-          ma57.control.cntl,
-          ma57.info.info,
-          ma57.info.rinfo,
-        )
+        ccall(($fname, libhsl_ma57),
+               Cvoid,
+              (Ref{Cint}, Ref{Cint}, Ptr{$typ}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}   , Ptr{Cint}  , Ptr{Cint}      , Ptr{Cint}         , Ptr{$typ}        , Ptr{Cint}     , Ptr{$typ}      ),
+               ma57.n   , ma57.nz  , ma57.vals, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, ma57.__lkeep, ma57.__keep, ma57.iwork_fact, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
         status = ma57.info.info[1]
         status > 0 && @warn "Ma57: factorize returns with code $status"
@@ -463,7 +413,7 @@ end
 ```JULIA
 julia> using HSL
 julia> T = Float64;
-julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> rows = Cint[1, 2, 3, 5, 3, 4, 5]; cols = Cint[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 julia> A = sparse(rows, cols, vals);
 julia> M = ma57_factorize(A)  ## factorize sparse matrix and return `Ma57` object
@@ -505,10 +455,9 @@ The symbolic analysis and numerical factorization must have been performed and m
 """
 function ma57_solve! end
 
-for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
+for (fname, typ) in (("ma57c_" , Float32),
+                     ("ma57cd_", Float64))
   @eval begin
-    """
-    """
     function ma57_solve!(ma57::Ma57{$typ}, b::Array{$typ}, work::Vector{$typ}; job::Symbol = :A)
       size(b, 1) == ma57.n || throw(Ma57Exception("Ma57: rhs size mismatch", 0))
       nrhs = size(b, 2)
@@ -516,40 +465,10 @@ for (fname, typ) in ((:ma57c_, Float32), (:ma57cd_, Float64))
       lwork = ma57.n * nrhs
       @assert length(work) == lwork
 
-      ccall(
-        ($(string(fname)), libhsl_ma57),
-        Nothing,
-        (
-          Ref{Int32},
-          Ref{Int32},
-          Ptr{$typ},
-          Ref{Int32},
-          Ptr{Int32},
-          Ref{Int32},
-          Ref{Int32},
-          Ptr{$typ},
-          Ref{Int32},
-          Ptr{$typ},
-          Ref{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-        ),
-        j,
-        ma57.n,
-        ma57.__fact,
-        ma57.__lfact,
-        ma57.__ifact,
-        ma57.__lifact,
-        nrhs,
-        b,
-        ma57.n,
-        work,
-        lwork,
-        ma57.iwork_solve,
-        ma57.control.icntl,
-        ma57.info.info,
-      )
+      ccall(($fname, libhsl_ma57),
+             Cvoid,
+            (Ref{Cint}, Ref{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{Cint}       , Ptr{Cint}         , Ptr{Cint}     ),
+             j        , ma57.n   , ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nrhs     , b        , ma57.n   , work     , lwork    , ma57.iwork_solve, ma57.control.icntl, ma57.info.info)
 
       status = ma57.info.info[1]
       status > 0 && @warn "Ma57: solve returns with code $status"
@@ -566,7 +485,8 @@ function ma57_solve(ma57::Ma57{T}, b::Vector{T}, nitref::Int) where {T <: Ma57Da
   return x
 end
 
-for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
+for (fname, typ) in (("ma57d_" , Float32),
+                     ("ma57dd_", Float64))
   @eval begin
     function ma57_solve!(
       ma57::Ma57{$typ},
@@ -586,54 +506,15 @@ for (fname, typ) in ((:ma57d_, Float32), (:ma57dd_, Float64))
       ma57.control.icntl[9] = max(0, nitref)
       job = ma57.control.icntl[9] == 1 ? 1 : 0
       @assert length(resid) == ma57.n
-      iwork = ma57.control.icntl[9] > 1 ? ma57.iwork_solve : Int32[]
+      iwork = ma57.control.icntl[9] > 1 ? ma57.iwork_solve : Cint[]
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
       @assert length(work) == lwork
 
       ccall(
-        ($(string(fname)), libhsl_ma57),
-        Nothing,
-        (
-          Ref{Int32},
-          Ref{Int32},
-          Ref{Int32},
-          Ptr{$typ},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{$typ},
-          Ref{Int32},
-          Ptr{Int32},
-          Ref{Int32},
-          Ptr{$typ},
-          Ptr{$typ},
-          Ptr{$typ},
-          Ptr{$typ},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{$typ},
-          Ptr{Int32},
-          Ptr{$typ},
-        ),
-        job,
-        ma57.n,
-        ma57.nz,
-        ma57.vals,
-        ma57.rows,
-        ma57.cols,
-        ma57.__fact,
-        ma57.__lfact,
-        ma57.__ifact,
-        ma57.__lifact,
-        b,
-        x,
-        resid,
-        work,
-        iwork,
-        ma57.control.icntl,
-        ma57.control.cntl,
-        ma57.info.info,
-        ma57.info.rinfo,
-      )
+        ($fname, libhsl_ma57),
+         Cvoid,
+        (Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}         , Ptr{$typ}        , Ptr{Cint}     , Ptr{$typ}      ),
+         job      , ma57.n   , ma57.nz  , ma57.vals, ma57.rows, ma57.cols, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, b        , x        , resid    , work     , iwork    , ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
       status = ma57.info.info[1]
       status > 0 && @warn "Ma57: solve returns with code $status"
@@ -716,7 +597,7 @@ end
 ```JULIA
 julia> using HSL
 julia> T = Float64;
-julia> rows = Int32[1, 2, 3, 5, 3, 4, 5]; cols = Int32[1, 1, 2, 2, 3, 3, 5];
+julia> rows = Cint[1, 2, 3, 5, 3, 4, 5]; cols = Cint[1, 1, 2, 2, 3, 3, 5];
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 julia> A = sparse(rows, cols, vals);
 julia> b = T[8, 45, 31, 15, 17]
@@ -780,7 +661,7 @@ function ma57_min_norm(A::SparseMatrixCSC{T, Ti}, b::Array{T}) where {T <: Ma57D
   return (x57, y57)
 end
 
-ma57_min_norm(A::Array{T, 2}, b::Array{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
+ma57_min_norm(A::Matrix{T}, b::Array{T}) where {T <: Ma57Data} = ma57_min_norm(sparse(A), b)
 
 """
 Solve the least-squares problem
@@ -805,5 +686,5 @@ function ma57_least_squares(
   return (r57, x57)
 end
 
-ma57_least_squares(A::Array{T, 2}, b::Array{T}) where {T <: Ma57Data} =
+ma57_least_squares(A::Matrix{T}, b::Array{T}) where {T <: Ma57Data} =
   ma57_least_squares(sparse(A), b)

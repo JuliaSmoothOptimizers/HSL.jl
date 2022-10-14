@@ -5,7 +5,7 @@
        0 14 0 16]
   Aᴴ = sparse(A')
   iperm = mc21(Aᴴ)
-  @test iperm == Int32[1; 4; 2; 3]
+  @test iperm == Cint[1; 4; 2; 3]
 
   n = 100
   A = rand(n, n)

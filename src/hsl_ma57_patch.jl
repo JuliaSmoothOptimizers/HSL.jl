@@ -1,68 +1,31 @@
 ## get factors -----------------------------------------------------------------
-for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
+for (fname, typ) in (("ma57lf_" , Float32),
+                     ("ma57lfd_", Float64))
   @eval begin
     function ma57_get_factors(ma57::Ma57{$typ})
 
       # make room for L factor
       nebdu = ma57.info.info[14]
       nzl = nebdu
-      ipl = Vector{Int32}(undef, ma57.n + 1)
-      irn = Vector{Int32}(undef, nzl)
+      ipl = Vector{Cint}(undef, ma57.n + 1)
+      irn = Vector{Cint}(undef, nzl)
       fl = Vector{$typ}(undef, nzl)
 
       # make room for D; note that entire 2x2 blocks are stored
       nzd = 2 * ma57.info.num_2x2_pivots + ma57.n
-      ipd = Vector{Int32}(undef, ma57.n + 1)
-      id = Vector{Int32}(undef, nzd)
+      ipd = Vector{Cint}(undef, ma57.n + 1)
+      id = Vector{Cint}(undef, nzd)
       d = Vector{$typ}(undef, nzd)
 
-      ivp = Vector{Int32}(undef, ma57.n)
-      iperm = Vector{Int32}(undef, ma57.n)
+      ivp = Vector{Cint}(undef, ma57.n)
+      iperm = Vector{Cint}(undef, ma57.n)
 
       status = 0
 
-      ccall(
-        ($(string(fname)), libhsl_ma57),
-        Nothing,
-        (
-          Ref{Int32},
-          Ptr{$typ},
-          Ref{Int32},
-          Ptr{Int32},
-          Ref{Int32},
-          Ref{Int32},
-          Ref{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{$typ},
-          Ref{Int32},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ptr{$typ},
-          Ptr{Int32},
-          Ptr{Int32},
-          Ref{Int32},
-          Ref{Int32},
-        ),
-        ma57.n,
-        ma57.__fact,
-        ma57.__lfact,
-        ma57.__ifact,
-        ma57.__lifact,
-        nebdu,
-        nzl,
-        ipl,
-        irn,
-        fl,
-        nzd,
-        ipd,
-        id,
-        d,
-        ivp,
-        iperm,
-        ma57.info.rank,
-        status,
-      )
+      ccall(($fname, libhsl_ma57),
+             Cvoid,
+            (Ref{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}     , Ref{Cint}),
+             ma57.n   , ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nebdu    , nzl      , ipl      , irn      , fl       , nzd      , ipd      , id       , d        , ivp      , iperm    , ma57.info.rank, status   )
 
       status < 0 && throw(Ma57Exception("Ma57: Error while retrieving factors", status))
       s = ma57.control.icntl[15] == 1 ? ma57.__fact[(end - ma57.n):(end - 1)] : ones($typ, ma57.n)
@@ -75,7 +38,7 @@ for (fname, typ) in ((:ma57lf_, Float32), (:ma57lfd_, Float64))
 end
 
 ## alter D ---------------------------------------------------------------------
-function ma57_alter_d(ma57::Ma57{T}, d::Array{T, 2}) where {T <: Ma57Data}
+function ma57_alter_d(ma57::Ma57{T}, d::Matrix{T}) where {T <: Ma57Data}
   ka = 1
   k2 = ma57.__ifact[1]
   kd = 0
@@ -128,8 +91,8 @@ end
 
 * `L::SparseMatrixCSC{T<:Ma57Data,Int}`: L factor
 * `D::SparseMatrixCSC{T<:Ma57Data,Int}`: D factor
-* `s::Array{T,1}`: diagonal components of scaling matrix S
-* `iperm::Array{Int,1}`: array representin permutation matrix P
+* `s::Vector{T}`: diagonal components of scaling matrix S
+* `iperm::Vector{Int}`: array representin permutation matrix P
 
 ## Example:
 
@@ -139,7 +102,7 @@ julia> using HSL
 
 julia> T = Float64;
 
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+julia> rows = Cint[1, 1, 2, 2, 3, 3, 5]; cols = Cint[1, 2, 3, 5, 3, 4, 5];
 
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 
@@ -174,7 +137,7 @@ ma57_get_factors
 ## Input arguments:
 
 * `M::Ma57`: `Ma57` object
-* `F::Array{Float64,2}`: diagonal adjustment
+* `F::Matrix{Float64}`: diagonal adjustment
 
 
 ## Example:
@@ -184,7 +147,7 @@ julia> using HSL
 
 julia> T = Float64;
 
-julia> rows = Int32[1, 1, 2, 2, 3, 3, 5]; cols = Int32[1, 2, 3, 5, 3, 4, 5];
+julia> rows = Cint[1, 1, 2, 2, 3, 3, 5]; cols = Cint[1, 2, 3, 5, 3, 4, 5];
 
 julia> vals = T[2, 3, 4, 6, 1, 5, 1];
 
