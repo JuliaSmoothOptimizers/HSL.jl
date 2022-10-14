@@ -2,7 +2,7 @@ using HSL
 using LinearAlgebra, SparseArrays
 using Test, Random
 
-Random.seed!(666)  # Random tests are diabolic
+Random.seed!(666)  # Random tests are diabolical
 
 if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
   include("../deps/deps.jl")
