@@ -12,7 +12,8 @@ end
 
 include("versions.jl")
 
-getname(software::String, ver::HSLVersion; extension::Bool=true) = software * "-" * ver.version * (extension ? ver.ext : "")
+getname(software::String, ver::HSLVersion; extension::Bool = true) =
+  software * "-" * ver.version * (extension ? ver.ext : "")
 
 function checksha(version::HSLVersion, archivepath::String)
   if isfile(archivepath)
@@ -51,9 +52,9 @@ function findversion(software::String)
   return nothing, nothing, nothing
 end
 
-const hsl_versions = Dict{String,HSLVersion}()
-const hsl_archives = Dict{String,String}()
-const hsl_patches  = Dict{String,String}()
+const hsl_versions = Dict{String, HSLVersion}()
+const hsl_archives = Dict{String, String}()
+const hsl_patches = Dict{String, String}()
 
 for software in keys(hsl_collection)
   archivepath, version, path = findversion(software)
@@ -78,7 +79,8 @@ const HSL_FC = haskey(ENV, "HSL_FC") ? ENV["HSL_FC"] : "gfortran"
 const HSL_F77 = haskey(ENV, "HSL_F77") ? ENV["HSL_F77"] : HSL_FC
 const HSL_CC = haskey(ENV, "HSL_CC") ? ENV["HSL_CC"] : "gcc"
 
-const libblas = VERSION < v"1.7" || (Sys.iswindows() && VERSION < v"1.9") ? "-lopenblas" : "-lblastrampoline"
+const libblas =
+  VERSION < v"1.7" || (Sys.iswindows() && VERSION < v"1.9") ? "-lopenblas" : "-lblastrampoline"
 const dlext = Sys.isapple() ? "dylib" : "so"
 const all_load = Sys.isapple() ? "-all_load" : "--whole-archive"
 const noall_load = Sys.isapple() ? "-noall_load" : "--no-whole-archive"
@@ -136,7 +138,7 @@ if !isempty(hsl_archives)
   usrdir = joinpath(@__DIR__, "usr")
   libdir = joinpath(usrdir, "lib")
   builddir = joinpath(usrdir, "src")
-  isdir(usrdir) && rm(usrdir, recursive=true)
+  isdir(usrdir) && rm(usrdir, recursive = true)
   mkpath(builddir)
 
   # generate deps.jl
