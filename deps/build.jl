@@ -121,6 +121,11 @@ function build_hsl(software::String)
   cd(@__DIR__)
 end
 
+# Julia doesn't recompile the module HSL.jl when we build new HSL packages because the `src` folder is not modified.
+# We always want to recompile the module HSL.jl when a new deps/deps.jl is generated because "included" files in src/HSL.jl depend on it.
+precompiled_HSL = joinpath(DEPOT_PATH[1], "compiled", "v" * string(VERSION.major) * "."  * string(VERSION.minor), "HSL")
+isdir(precompiled_HSL) && rm(precompiled_HSL, recursive=true)
+
 @info "using compilers" HSL_FC HSL_F77 HSL_CC
 
 if !isempty(hsl_archives)
