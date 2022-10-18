@@ -50,7 +50,7 @@ pipeline {
   stages {
     stage('clone Setup') {
       when {
-        expression { env.repo && env.repo }
+        expression { env.repo && env.org && env.pullrequest  }
       }
       steps {
         sh "git clone ${JENKINS_SETUP_URL} || true"
@@ -58,7 +58,7 @@ pipeline {
     }
     stage('run tests') {
       when {
-        expression { env.repo && env.repo }
+        expression { env.repo && env.org && env.pullrequest }
       }
       steps {
         script {
