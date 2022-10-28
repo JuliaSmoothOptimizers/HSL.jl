@@ -53,7 +53,10 @@ hsl_collection["ma43"] = []
 hsl_collection["ma44"] = []
 hsl_collection["ma46"] = []
 hsl_collection["ma48"] = []
-hsl_collection["hsl_ma48"] = []
+hsl_collection["hsl_ma48"] = [
+  # HSLVersion("3.3.0", "fb0a537157c55ba839c6d11e3e9895814d1e1d8c09efb330f59014cef4445da0", ".tar.gz"),
+  # HSLVersion("3.3.0", "12b14175e305b8242e1f9488683e7f9711720e85baa09fa5353f2c20dc5ecfa0", ".zip"),
+]
 hsl_collection["ma49"] = []
 hsl_collection["ma50"] = []
 hsl_collection["ma51"] = []
@@ -62,7 +65,10 @@ hsl_collection["hsl_ma54"] = []
 hsl_collection["hsl_ma55"] = []
 hsl_collection["ma57"] = []
 hsl_collection["hsl_ma57"] = [
-  HSLVersion("5.2.0","aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347e326cf584", ".tar.gz"),
+  HSLVersion("5.2.0", "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347e326cf584", ".tar.gz"),
+  HSLVersion("5.2.0", "caa11e4b5534886fc63f30a8d68302833146352a936aeab89392c35ccc24bf4a", ".zip"),
+  # HSLVersion("5.3.2", "98f38fa583e67c3e00a2897dc2b5d9940fb5b2b94eff1855cb2fe329c02317c7", ".tar.gz"),
+  # HSLVersion("5.3.2", "2d406ef8eaf4a876160324b7487e9abc5916ec1446b0a04c5846fc06eec2608a", ".zip"),
 ]
 hsl_collection["ma60"] = []
 hsl_collection["ma61"] = []
@@ -75,16 +81,29 @@ hsl_collection["hsl_ma69"] = []
 hsl_collection["ma72"] = []
 hsl_collection["hsl_ma74"] = []
 hsl_collection["ma75"] = []
-hsl_collection["hsl_ma77"] = []
+hsl_collection["hsl_ma77"] = [
+  # HSLVersion("6.3.0", "7d0d8675aa0a80889853a3115c6cd4c07739ab5117c93d0a6cca9d234c97b3bb", ".tar.gz"),
+  # HSLVersion("6.3.0", "2117c2ec285969ad50ed9b6b7e23fea4b66f8198eea3edba883845e8979b8ac0", ".zip"),
+]
 hsl_collection["hsl_ma78"] = []
 hsl_collection["hsl_ma79"] = []
 hsl_collection["hsl_ma85"] = []
-hsl_collection["hsl_ma86"] = []
-hsl_collection["hsl_ma87"] = []
+hsl_collection["hsl_ma86"] = [
+  # HSLVersion("1.7.2", "96d82da3d8125acee66901c6547d31d0f2a5374fc570728a3fbc6544212c7578", ".tar.gz"),
+  # HSLVersion("1.7.2", "966bdb81fc88c0d33d28902f38df56ca04578afd30f774d140f1ae908cf81bb4", ".zip"),
+]
+hsl_collection["hsl_ma87"] = [
+  # HSLVersion("2.6.3", "22178125cae4d40939795df1bc9d607802b1e5a4554633baa46e75c759fed473", ".tar.gz"),
+  # HSLVersion("2.6.3", "f5a726f207347cb1f97179a8ba702f92bef616dec808173172648967a6ca987f", ".zip"),
+]
 hsl_collection["hsl_ma97"] = [
-  HSLVersion("2.7.0","ac3a081d3a28e9ecb8871ce769f4ced2a5ffa5a9c36defbd2c844ae3493ccb37",".tar.gz"),
-  HSLVersion("2.7.0","8221b607d96554d7a57cc60483c7305ef43a8785dc4171ac2e8da087900a1100",".zip"),
-  HSLVersion("2.6.0","be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66",".tar.gz"),
+  HSLVersion("2.5.0", "9ceb858f09045d406c3cf399dcc07b4c7f716f29a5e5f55a77dc8b09d55e0c4e", ".tar.gz"),
+  HSLVersion("2.5.0", "c976e73edf32accf3ca2270ed1c1f5c465642d9f086ec289f268b81bdff91c41", ".zip"),
+  HSLVersion("2.6.0", "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66", ".tar.gz"),
+  # HSLVersion("2.7.0", "ac3a081d3a28e9ecb8871ce769f4ced2a5ffa5a9c36defbd2c844ae3493ccb37", ".tar.gz"),
+  # HSLVersion("2.7.0", "8221b607d96554d7a57cc60483c7305ef43a8785dc4171ac2e8da087900a1100", ".zip"),
+  # HSLVersion("2.7.2", "a81e4eef63cc52cee2df00061d7d9f915b03e29598d73f6017f12104b6321053", ".tar.gz"),
+  # HSLVersion("2.7.2", "15fbd570a7ccc1c0c31d9dd0c4fb01196f3c2fd2cbc348f549941dacde909fde", ".zip"),
 ]
 
 ## MC: Computations with real matrices and vectors
@@ -116,16 +135,36 @@ hsl_collection["mc57"] = []
 hsl_collection["mc58"] = []
 hsl_collection["mc59"] = []
 hsl_collection["mc60"] = []
-hsl_collection["mc61"] = []
+hsl_collection["mc61"] = [
+  # HSLVersion("1.1.0", "6f535c7d8919b8a3c8bcf8b847fc4d2616a4aaf60ea403f882fa9b14ecc856a5", ".tar.gz"),
+  # HSLVersion("1.1.0", "a970314f841557dd8ec32414713461ffec8786ccafd07ca4ce006836af8e7701", ".zip"),
+]
 hsl_collection["mc62"] = []
 hsl_collection["mc63"] = []
-hsl_collection["mc64"] = []
-hsl_collection["hsl_mc64"] = []
+hsl_collection["mc64"] = [
+  # HSLVersion("1.6.0", "a24621c88f8a535278e92b7f0f88ad880d137da8db8ef21e1da85c9817033217", ".tar.gz"),
+  # HSLVersion("1.6.0", "71e9deb76913fac6e555f5c2117ada8911c606ca59beec87c8ebe60338d7e511", ".zip"),
+]
+hsl_collection["hsl_mc64"] = [
+  # HSLVersion("2.4.0", "3c0b60479e3a473ec27b2082b4de3045782b21010806dcce6d503e4db1ae058e", ".tar.gz"),
+  # HSLVersion("2.4.0", "f1e550a091d12e71ac562343c4d10ed13ceb2a788c967ee650bcf79e692f64f8", ".zip"),
+]
 hsl_collection["hsl_mc65"] = []
-hsl_collection["hsl_mc66"] = []
+hsl_collection["hsl_mc66"] = [
+  # HSLVersion("2.2.0", "3326abdab8fededbbaa6abebb24294dcc3cfa0e6810390664063a3f764a7f201", ".tar.gz"),
+  # HSLVersion("2.2.0", "bc17cfca531bb2407ab53570bf8fa725e0c3265a0bfa4ce492ac54ad89856abc", ".zip"),
+  # HSLVersion("2.2.1", "cb7df2591c1a01783f8a07cfe7a20bcd4ba9ef7a1169a68b0f117cd1683066dd", ".tar.gz"),
+  # HSLVersion("2.2.1", "8ff58f90855a67081a35d79fcca60ad4fc97c2dce78c99c1ff4f225cdcd39b6c", ".zip"),
+]
 hsl_collection["mc67"] = []
-hsl_collection["hsl_mc68"] = []
-hsl_collection["hsl_mc69"] = []
+hsl_collection["hsl_mc68"] = [
+  # HSLVersion("3.3.2", "eecdc3d171821afde2f15eb56cd6c509f73d0869bdc6b823f06ad08bbe294f5c", ".tar.gz"),
+  # HSLVersion("3.3.2", "b305a52c54cf0eb78431b9b658dc29b8f96b901788e13177e8d3624f8cd5eba2", ".zip"),
+]
+hsl_collection["hsl_mc69"] = [
+  # HSLVersion("1.4.2", "281746f27956dad0b0c030300779c367aa0a346f2fddb0dec240f36a9043429e", ".tar.gz"),
+  # HSLVersion("1.4.2", "74bcf41fea2d42f0486c8d1908c68ccbf2d59e47108ac9b8cdf370187bd8b2ed", ".zip"),
+]
 hsl_collection["mc71"] = []
 hsl_collection["mc72"] = []
 hsl_collection["hsl_mc73"] = []
@@ -134,8 +173,14 @@ hsl_collection["mc77"] = [
   HSLVersion("1.0.1", "ce17e4bdb854a68e9813ebf03f2c22e7b9078c9cead57ee86798ecee3aaeb0b0", ".tar.gz"),
   HSLVersion("1.0.1", "0faea13e4ab2150a394b663e363d382e0e1409486e349513c7f66560321cb7a9", ".zip"),
 ]
-hsl_collection["hsl_mc78"] = []
-hsl_collection["hsl_mc79"] = []
+hsl_collection["hsl_mc78"] = [
+  # HSLVersion("1.5.0", "838b60669ee6bed33ae734783bb415fac3d675e015456d789c9a8a4a87c8ca12", ".tar.gz"),
+  # HSLVersion("1.5.0", "7558656f8878f85d2cfd75af0f33cb172b3b0ab190c18a3f8ba008fa01e5d84f", ".zip"),
+]
+hsl_collection["hsl_mc79"] = [
+  # HSLVersion("1.1.0", "605e10370f319fce1463bbfc6e4b8345dcf8f30d4316a581f1d454e30f8e152c", ".tar.gz"),
+  # HSLVersion("1.1.0", "2adcc8bfc9c7f55a36babf8530de46740b3c7d52ef3030387438e1f4f8b1484f", ".zip"),
+]
 hsl_collection["hsl_mc80"] = []
 hsl_collection["hsl_mc81"] = []
 
@@ -165,7 +210,10 @@ hsl_collection["mi11"] = []
 hsl_collection["mi12"] = []
 hsl_collection["hsl_mi13"] = []
 hsl_collection["mi15"] = []
-hsl_collection["hsl_mi20"] = []
+hsl_collection["hsl_mi20"] = [
+  # HSLVersion("2.0.0", "944ac04e621809c032a88b37ddfc21dd74f2aff6613553b273caf64d6f613f2e", ".tar.gz"),
+  # HSLVersion("2.0.0", "341badedce169b1fe15c18bc1aa9508c1cc08660467866ba9ab2a9e400ee1ca9", ".zip"),
+]
 hsl_collection["mi21"] = []
 hsl_collection["mi23"] = []
 hsl_collection["mi24"] = []
@@ -177,7 +225,10 @@ hsl_collection["hsl_mi29"] = []
 hsl_collection["hsl_mi30"] = []
 hsl_collection["hsl_mi31"] = []
 hsl_collection["hsl_mi32"] = []
-hsl_collection["hsl_mi35"] = []
+hsl_collection["hsl_mi35"] = [
+  # HSLVersion("2.0.1", "9a5ce9a56f5674c730d8d2a51ff53e8e8ae139d3e60b8eea899af8144b6c8d1d", ".tar.gz"),
+  # HSLVersion("2.0.1", "39d22d55dd36776e5400313b8c2915bb39823b19740aee7a390937072f7cd7b1", ".zip"),
+]
 
 ## MP: MPI dependant packages
 
