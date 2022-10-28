@@ -130,7 +130,10 @@ hsl_collection["mc71"] = []
 hsl_collection["mc72"] = []
 hsl_collection["hsl_mc73"] = []
 hsl_collection["mc75"] = []
-hsl_collection["mc77"] = []
+hsl_collection["mc77"] = [
+  HSLVersion("1.0.1", "ce17e4bdb854a68e9813ebf03f2c22e7b9078c9cead57ee86798ecee3aaeb0b0", ".tar.gz"),
+  HSLVersion("1.0.1", "0faea13e4ab2150a394b663e363d382e0e1409486e349513c7f66560321cb7a9", ".zip"),
+]
 hsl_collection["hsl_mc78"] = []
 hsl_collection["hsl_mc79"] = []
 hsl_collection["hsl_mc80"] = []
