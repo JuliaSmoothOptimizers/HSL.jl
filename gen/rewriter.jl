@@ -6,6 +6,8 @@ type_modifications = Dict("realtype_s_" => "Float32",
                           "pkgtype_d_"  => "Float64", 
                           "pkgtype_c_"  => "ComplexF32",
                           "pkgtype_z_"  => "ComplexF64",
+                          "pkgtype_i_"  => "Cint",
+                          "pkgtype_l_"  => "Clong",
                           "_pkgtype_i_" => "Cint",
                           "_pkgtype_l_" => "Clong",
                           "cntltype_s_" => "Float32",
@@ -71,7 +73,7 @@ function rewrite!(path::String, name::String, optimized::Bool)
       end
     end
 
-    if name == "hsl_mc68" || name == "hsl_mc78"
+    if name == "hsl_mc68" || name == "hsl_mc78" || name == "hsl_mc79"
       for type in ("T", "Cint", "Clong")
         updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
         updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
@@ -79,7 +81,7 @@ function rewrite!(path::String, name::String, optimized::Bool)
     end
 
     if name == "hsl_mc69"
-      updated_text = replace(updated_text, "const Int32 = Int32\n" => "")
+      updated_text = replace(updated_text, "const Int32 = Int32\n" => "")  # const hsl_matrix_type = Int32
     end
   end 
   write(path, updated_text)
