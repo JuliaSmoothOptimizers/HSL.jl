@@ -1,4 +1,4 @@
-name: CI_M1
+name: CI_Linux
 on:
   push:
     branches:
@@ -7,8 +7,8 @@ on:
     types: [opened, synchronize, reopened]
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - macOS - ${{ matrix.arch }} - ${{ github.event_name }}
-    runs-on: [self-hosted, macOS]
+    name: Julia ${{ matrix.version }} - linux - ${{ matrix.arch }} - ${{ github.event_name }}
+    runs-on: [self-hosted, linux]
     strategy:
       fail-fast: false
       matrix:
