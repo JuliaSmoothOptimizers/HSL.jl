@@ -1,6 +1,6 @@
 name = "HSL"
 uuid = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
-version = "0.3.2"
+version = "0.3.3"
 
 [deps]
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
