@@ -21,4 +21,5 @@ The possible values for `library` are:
 - `"hsl_mc68"`;
 - `"hsl_mc69"`;
 - `"hsl_mc78"`;
+- `"hsl_mc79"`;
 - `"hsl_mi20"`.

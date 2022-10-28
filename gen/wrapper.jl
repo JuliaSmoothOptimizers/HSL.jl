@@ -18,6 +18,7 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
   options["general"]["output_file_path"] = joinpath("..", "src", "$(name).jl")
   optimized && (options["general"]["output_ignorelist"] = ["$(solver)realtype_[sdcz]_\$",
                                                            "$(solver)pkgtype_[sdcz]_\$",
+                                                           "$(solver)pkgtype_[il]_\$",
                                                            "$(solver)_pkgtype_[il]_\$",
                                                            "$(solver)cntltype_[sdcz]_\$",
                                                            "$(solver)_control_[dczl]\$",
@@ -79,6 +80,10 @@ function main(name::String="all"; optimized::Bool=false)
 
   if name == "all" || name == "hsl_mc78"
     wrapper("hsl_mc78", ["$hsl/hsl_mc78i.h", "$hsl/hsl_mc78l.h"], optimized)
+  end
+
+  if name == "all" || name == "hsl_mc79"
+    wrapper("hsl_mc79", ["$hsl/hsl_mc79i.h"], optimized)
   end
 
   if name == "all" || name == "hsl_mi20"
