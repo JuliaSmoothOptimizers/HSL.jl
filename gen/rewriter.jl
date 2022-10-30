@@ -36,8 +36,6 @@ structure_modifications = Dict("_control_s}"       => "_control{Float32}}",
                                "_sinfo_s}"         => "_sinfo{Float32}}",
                                "_sinfo_d}"         => "_sinfo{Float64}}")
 
-other_modifications = Dict("hsl_matrix_type" => "Int32")
-
 function rewrite!(path::String, name::String, optimized::Bool)
   solver = split(name, "_")[2]
   text = read(path, String)
@@ -48,9 +46,6 @@ function rewrite!(path::String, name::String, optimized::Bool)
     end
     for (keys, vals) in structure_modifications
       updated_text = replace(updated_text, solver * keys => solver * vals)
-    end
-    for (keys, vals) in other_modifications
-      updated_text = replace(updated_text, keys => vals)
     end
     for structure in ("control", "info", "solve_control", "ainfo", "sinfo", "finfo")
       updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_s" => "mutable struct $(solver)_$(structure){T}")
@@ -78,10 +73,6 @@ function rewrite!(path::String, name::String, optimized::Bool)
         updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
         updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
       end
-    end
-
-    if name == "hsl_mc69"
-      updated_text = replace(updated_text, "const Int32 = Int32\n" => "")  # const hsl_matrix_type = Int32
     end
   end 
   write(path, updated_text)
