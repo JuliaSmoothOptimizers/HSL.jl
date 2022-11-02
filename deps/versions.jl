@@ -264,3 +264,10 @@ hsl_collection["hsl_zb01"] = []
 ## ZD: Derived types
 
 hsl_collection["hsl_zd11"] = []
+
+## HSL for IPOPT
+
+hsl_collection["coinhsl"] = [
+  HSLVersion("2021.05.05", "f4fa0eee24a181fbc88e8fe5a1c49443c34bb32b93b9f5b3a9c482324f87fa1d", ".tar.gz"),
+  HSLVersion("2021.05.05", "80a38ddca1bbedc8eb03a941d9a39478a3fd7b1bddbd2ae8220214a4ef59e4f9", ".zip"),
+]

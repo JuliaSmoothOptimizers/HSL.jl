@@ -3,6 +3,7 @@ module HSL
 using LinearAlgebra
 using SparseArrays
 
+using SHA
 using METIS4_jll
 using OpenBLAS32_jll
 using libblastrampoline_jll
@@ -33,9 +34,17 @@ const data_map = Dict{Type, Type}(
   ComplexF64 => Cdouble,
 )
 
+function getsha(archivepath::String)
+  !isfile(archivepath) && error("$archivepath is not a file!")
+  open(archivepath) do f
+    return bytes2hex(sha256(f))
+  end
+end
+
 # package-specific definitions
 if @isdefined available_hsl_algorithms
   for package in keys(available_hsl_algorithms)
+    package == "coinhsl" && continue
     include("$(package).jl")
     if package == "hsl_ma57" && hsl_ma57_patched
       include("hsl_ma57_patch.jl")
