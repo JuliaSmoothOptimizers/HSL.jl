@@ -14,6 +14,7 @@ if @isdefined available_hsl_algorithms
   end
 
   for package in keys(available_hsl_algorithms)
+    package == "coinhsl" && continue
     include("test_$(package).jl")
     if package == "hsl_ma57" && hsl_ma57_patched
       include("test_hsl_ma57_patch.jl")
