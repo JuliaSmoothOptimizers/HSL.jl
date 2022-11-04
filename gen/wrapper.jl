@@ -39,55 +39,60 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
   return nothing
 end
 
+function hsl_headers(include::String, library::String, precisions::String)
+  headers = [joinpath(include, library) * precision * ".h" for precision in precisions]
+  return headers
+end
+
 function main(name::String="all"; optimized::Bool=false)
   hsl = joinpath(@__DIR__, "..", "deps", "usr", "include")
 
   if name == "all" || name == "hsl_ma48"
-    wrapper("hsl_ma48", ["$hsl/hsl_ma48s.h", "$hsl/hsl_ma48d.h"], optimized)
+    wrapper("hsl_ma48", hsl_headers(hsl, "hsl_ma48", "sd"), optimized)
   end
 
   if name == "all" || name == "hsl_ma57"
-    wrapper("hsl_ma57", ["$hsl/hsl_ma57s.h", "$hsl/hsl_ma57d.h"], optimized)
+    wrapper("hsl_ma57", hsl_headers(hsl, "hsl_ma57", "sd"), optimized)
   end
 
   if name == "all" || name == "hsl_ma77"
-    wrapper("hsl_ma77", ["$hsl/hsl_ma77s.h", "$hsl/hsl_ma77d.h"], optimized)
+    wrapper("hsl_ma77", hsl_headers(hsl, "hsl_ma77", "sd"), optimized)
   end
 
   if name == "all" || name == "hsl_ma86"
-    wrapper("hsl_ma86", ["$hsl/hsl_ma86s.h", "$hsl/hsl_ma86d.h", "$hsl/hsl_ma86c.h", "$hsl/hsl_ma86z.h"], optimized)
+    wrapper("hsl_ma86", hsl_headers(hsl, "hsl_ma86", "sdcz"), optimized)
   end
 
   if name == "all" || name == "hsl_ma87"
-    wrapper("hsl_ma87", ["$hsl/hsl_ma87s.h", "$hsl/hsl_ma87d.h", "$hsl/hsl_ma87c.h", "$hsl/hsl_ma87z.h"], optimized)
+    wrapper("hsl_ma87", hsl_headers(hsl, "hsl_ma87", "sdcz"), optimized)
   end
 
   if name == "all" || name == "hsl_ma97"
-    wrapper("hsl_ma97", ["$hsl/hsl_ma97s.h", "$hsl/hsl_ma97d.h", "$hsl/hsl_ma97c.h", "$hsl/hsl_ma97z.h"], optimized)
+    wrapper("hsl_ma97", hsl_headers(hsl, "hsl_ma97", "sdcz"), optimized)
   end
 
   if name == "all" || name == "hsl_mc64"
-    wrapper("hsl_mc64", ["$hsl/hsl_mc64s.h", "$hsl/hsl_mc64d.h", "$hsl/hsl_mc64c.h", "$hsl/hsl_mc64z.h"], optimized)
+    wrapper("hsl_mc64", hsl_headers(hsl, "hsl_mc64", "sdcz"), optimized)
   end
 
   if name == "all" || name == "hsl_mc68"
-    wrapper("hsl_mc68", ["$hsl/hsl_mc68i.h"], optimized)
+    wrapper("hsl_mc68", hsl_headers(hsl, "hsl_mc68", "i"), optimized)
   end
 
   if name == "all" || name == "hsl_mc69"
-    wrapper("hsl_mc69", ["$hsl/hsl_mc69s.h", "$hsl/hsl_mc69d.h", "$hsl/hsl_mc69c.h", "$hsl/hsl_mc69z.h"], optimized)
+    wrapper("hsl_mc69", hsl_headers(hsl, "hsl_mc69", "sdcz"), optimized)
   end
 
   if name == "all" || name == "hsl_mc78"
-    wrapper("hsl_mc78", ["$hsl/hsl_mc78i.h", "$hsl/hsl_mc78l.h"], optimized)
+    wrapper("hsl_mc78", hsl_headers(hsl, "hsl_mc78", "il"), optimized)
   end
 
   if name == "all" || name == "hsl_mc79"
-    wrapper("hsl_mc79", ["$hsl/hsl_mc79i.h"], optimized)
+    wrapper("hsl_mc79", hsl_headers(hsl, "hsl_mc79", "i"), optimized)
   end
 
   if name == "all" || name == "hsl_mi20"
-    wrapper("hsl_mi20", ["$hsl/hsl_mi20s.h", "$hsl/hsl_mi20d.h"], optimized)
+    wrapper("hsl_mi20", hsl_headers(hsl, "hsl_mi20", "sd"), optimized)
   end
 end
 
