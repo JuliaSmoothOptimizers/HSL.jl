@@ -50,6 +50,7 @@ function rewrite!(path::String, name::String, optimized::Bool)
     for structure in ("control", "info", "solve_control", "ainfo", "sinfo", "finfo")
       updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_s" => "mutable struct $(solver)_$(structure){T}")
       updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_i" => "mutable struct $(solver)_$(structure){T}")
+      updated_text = replace(updated_text, "Ptr{$(solver)_$(structure)" => "Ref{$(solver)_$(structure)")
     end
     updated_text = replace(updated_text, "::Float32\n" => "::T\n")
     updated_text = replace(updated_text, "Float32}\n" => "T}\n")  # NTuple{N, Float32} → NTuple{N, T}
