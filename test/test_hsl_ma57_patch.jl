@@ -22,12 +22,26 @@ function test_ma57_patch(A, M, b, xexact)
   x3 = ma57_solve(M, b, job = :LPS)
   @test norm(x3 - b3) ≤ ϵ * norm(b3)
 
-  # alter the D factor
-  d1 = abs.(diag(D))
-  d2 = [diag(D, 1); 0][:]
+  # Test ma57_alter_d
+  B = inv(Tridiagonal(D))
+  d1 = diag(B)
+  d2 = [diag(B, 1); 0][:]
   ma57_alter_d(M, [Vector(d1)'; Vector(d2)'])
   x4 = ma57_solve(M, b)
   @test norm(x4 - xexact) ≤ ϵ * norm(xexact)
+
+  (L2, D2, s2, p2) = ma57_get_factors(M)
+  @test norm(D - D2) ≤ ϵ
+
+  # alter the D factor
+  Dabs = abs.(D)
+  Babs = inv(Tridiagonal(Dabs))
+  d1 = diag(Babs)
+  d2 = [diag(Babs, 1); 0][:]
+  ma57_alter_d(M, [Vector(d1)'; Vector(d2)'])
+
+  (L3, D3, s3, p3) = ma57_get_factors(M)
+  @test norm(Dabs - D3) ≤ ϵ
 end
 
 @testset "hsl_ma57_patch" begin
