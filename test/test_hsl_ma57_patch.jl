@@ -26,6 +26,8 @@ function test_ma57_patch(A, M, b, xexact)
   d1 = abs.(diag(D))
   d2 = [diag(D, 1); 0][:]
   ma57_alter_d(M, [Vector(d1)'; Vector(d2)'])
+  x4 = ma57_solve(M, b)
+  @test norm(x4 - xexact) ≤ ϵ * norm(xexact)
 end
 
 @testset "hsl_ma57_patch" begin
