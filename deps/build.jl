@@ -111,11 +111,11 @@ function build_hsl(software::String)
                    FCFLAGS="-O3 -fPIC -fopenmp"
                    --with-blas="-L$libblas_dir $libblas"
                    --with-lapack="-L$libblas_dir $libblas"
-                   --with-metis="-L$libmetis_dir -lmetis"`)
+                   --with-metis="-L$libmetis_dir -lmetis4"`)
   run(`make install`)
   if software != "hsl_ma97"
     run(`$(split(HSL_FC)) -fPIC -shared -Wl,$all_load $libdir/lib$(software).a
-                                        -L$libblas_dir $libblas -L$libmetis_dir -lmetis -lgomp
+                                        -L$libblas_dir $libblas -L$libmetis_dir -lmetis4 -lgomp
                                         -Wl,$noall_load -o $libdir/lib$(software).$dlext`)
   end
   cd(@__DIR__)
