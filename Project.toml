@@ -12,7 +12,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 libblastrampoline_jll = "8e850b90-86db-534c-a0d3-1478176c7d93"
 
 [compat]
-METIS4_jll = "400.0.300"
+METIS4_jll = "=400.0.301"
 OpenBLAS32_jll = "0.3.9"
 julia = "^1.6.0"
 
