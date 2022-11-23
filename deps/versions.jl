@@ -102,8 +102,8 @@ hsl_collection["hsl_ma97"] = [
   HSLVersion("2.6.0", "be5fe822674be93e3d2e1a7d7ed6c5ad831b91cf8ca5150beb473f67af5fcb66", ".tar.gz"),
   # HSLVersion("2.7.0", "ac3a081d3a28e9ecb8871ce769f4ced2a5ffa5a9c36defbd2c844ae3493ccb37", ".tar.gz"),
   # HSLVersion("2.7.0", "8221b607d96554d7a57cc60483c7305ef43a8785dc4171ac2e8da087900a1100", ".zip"),
-  # HSLVersion("2.7.2", "a81e4eef63cc52cee2df00061d7d9f915b03e29598d73f6017f12104b6321053", ".tar.gz"),
-  # HSLVersion("2.7.2", "15fbd570a7ccc1c0c31d9dd0c4fb01196f3c2fd2cbc348f549941dacde909fde", ".zip"),
+  HSLVersion("2.7.2", "a81e4eef63cc52cee2df00061d7d9f915b03e29598d73f6017f12104b6321053", ".tar.gz"),
+  HSLVersion("2.7.2", "15fbd570a7ccc1c0c31d9dd0c4fb01196f3c2fd2cbc348f549941dacde909fde", ".zip"),
 ]
 
 ## MC: Computations with real matrices and vectors
