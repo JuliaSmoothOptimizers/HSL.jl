@@ -67,8 +67,8 @@ hsl_collection["ma57"] = []
 hsl_collection["hsl_ma57"] = [
   HSLVersion("5.2.0", "aedc5a3e22a7b86779efccaa89a7c82b6949768dbab35fceb85a347e326cf584", ".tar.gz"),
   HSLVersion("5.2.0", "caa11e4b5534886fc63f30a8d68302833146352a936aeab89392c35ccc24bf4a", ".zip"),
-  # HSLVersion("5.3.2", "98f38fa583e67c3e00a2897dc2b5d9940fb5b2b94eff1855cb2fe329c02317c7", ".tar.gz"),
-  # HSLVersion("5.3.2", "2d406ef8eaf4a876160324b7487e9abc5916ec1446b0a04c5846fc06eec2608a", ".zip"),
+  HSLVersion("5.3.2", "98f38fa583e67c3e00a2897dc2b5d9940fb5b2b94eff1855cb2fe329c02317c7", ".tar.gz"),
+  HSLVersion("5.3.2", "2d406ef8eaf4a876160324b7487e9abc5916ec1446b0a04c5846fc06eec2608a", ".zip"),
 ]
 hsl_collection["ma60"] = []
 hsl_collection["ma61"] = []
