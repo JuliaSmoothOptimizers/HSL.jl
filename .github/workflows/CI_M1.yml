@@ -30,6 +30,9 @@ jobs:
           using InteractiveUtils
           versioninfo()
       - uses: julia-actions/julia-buildpkg@v1
+        env:
+          HSL_FC: "/usr/local/bin/gfortran-7 -arch x86_64"
+          HSL_CC: "/usr/local/bin/gcc-7 -arch x86_64"
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v3
