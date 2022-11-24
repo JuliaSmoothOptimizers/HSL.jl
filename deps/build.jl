@@ -124,7 +124,7 @@ function build_hsl(software::String)
                    --with-lapack="-L$libblas_dir $libblas"
                    --with-metis="-L$libmetis_dir -lmetis4"`)
   run(`make install`)
-  if software != "hsl_ma97"
+  if software != "hsl_ma97" && software != "hsl_ma57"
     run(`$(split(HSL_FC)) -fPIC -shared $all_load $libdir/lib$(software).a $noall_load
                                         -L$libblas_dir $libblas -L$libmetis_dir -lmetis4 -lgomp
                                         -o $libdir/lib$(software).$dlext`)
