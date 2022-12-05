@@ -13,36 +13,46 @@ In all cases, users are responsible for obtaining HSL packages.
 
 ## Installing
 
-```JULIA
-julia> ]
-pkg> add HSL
+There are two parts to installing HSL.jl:
+
+First, we need to install the Julia package:
+```julia
+import Pkg
+Pkg.add("HSL")
 ```
 
-At this point, make sure that there isn't a stray METIS library on your library
-path. You especially want to make sure that METIS 5 is not accessible because
-the HSL library currently interfaced only supports METIS 4. If you have such
-library accessible, it is important to remove it from the library path, at
-least temporarily. For example, if you are on OSX and are using Homebrew, you
-can hide METIS 5 with `brew unlink metis`. After the install procedure is
-complete, it is fine to link `metis` again with `brew link metis`.
+Second, we need to install the various HSL linear solvers.
 
-Set the environment variable `HSL_ARCHIVES_PATH` to specify where the source archives `tar.gz` and `zip` are stored.
-You can use the `zip` archives as long as `unzip` is installed on your system.
-If archives are stored in different folders, you can also set the environment variable `<ALGNAME>_PATH`, e.g. `HSL_MA57_PATH` or `MC21_PATH`.
-The `HSL` Julia module will take care of compilation.
-Once the source archives have been placed in the locations indicated by the environment variables, run
+As a first step, download the appropriate source archives from [HSL](http://www.hsl.rl.ac.uk).
+Store these in a directory such as `~/Downloads/hsl`. Next, set the
+`HSL_ARCHIVES_PATH` environment variable, and call `Pkg.build`:
 
-```JULIA
-julia> ]
-pkg> build HSL
-pkg> test HSL
+```julia
+# Replace the path as appropriate
+ENV["HSL_ARCHIVES_PATH"] = "~/Downloads/hsl"
+import Pkg
+Pkg.build("HSL")
+Pkg.test("HSL")  # If needed
 ```
 
-Note that a C and Fortran compilers are required.
-Should it be necessary, you can set the compilers to use by setting the environment variables
-* `HSL_FC`: the Fortran 90/95 compiler (default: `gfortran`)
-* `HSL_F77`: the Fortran 77 compiler (default: the same as `FC`)
-* `HSL_CC`: the C compiler (default: `gcc`).
+### Notes
+
+ * Make sure that there isn't a stray METIS library on your library path. You
+   especially want to make sure that METIS 5 is not accessible because the HSL
+   libraries support only METIS 4. If you have such library accessible, it is
+   important to remove it from the library path, at least temporarily. For
+   example, if you are on OSX and are using Homebrew, you can hide METIS 5 with
+   `brew unlink metis`. After the install procedure is complete, it is fine to
+   link `metis` again with `brew link metis`.
+ * C and Fortran compilers are required. Should it be necessary, you can set the
+   compilers to use by setting the environment variables
+    * `HSL_FC`: the Fortran 90/95 compiler (default: `gfortran`)
+    * `HSL_F77`: the Fortran 77 compiler (default: the same as `FC`)
+    * `HSL_CC`: the C compiler (default: `gcc`).
+ * If archives are stored in different folders, you can also set the environment
+   variable `<ALGNAME>_PATH`, e.g. `HSL_MA57_PATH` or `MC21_PATH`, instead of a
+   single `HSL_ARCHIVES_PATH`.
+ * You can use the `zip` archives as long as `unzip` is installed on your system.
 
 ## Supported Packages
 
