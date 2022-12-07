@@ -176,8 +176,8 @@ hsl_collection["hsl_mc78"] = [
   # HSLVersion("1.5.0", "7558656f8878f85d2cfd75af0f33cb172b3b0ab190c18a3f8ba008fa01e5d84f", ".zip"),
 ]
 hsl_collection["hsl_mc79"] = [
-  # HSLVersion("1.1.0", "605e10370f319fce1463bbfc6e4b8345dcf8f30d4316a581f1d454e30f8e152c", ".tar.gz"),
-  # HSLVersion("1.1.0", "2adcc8bfc9c7f55a36babf8530de46740b3c7d52ef3030387438e1f4f8b1484f", ".zip"),
+  # HSLVersion("1.1.1", "7b5af8182efe68780f885197c1adc80693cb7a3bc1eb77628d0b9422c5732fdc", ".tar.gz"),
+  # HSLVersion("1.1.1", "12e89133dcc93b38860d1b067cc3c8651ac6f5351d65b87ce1cca3736f9db078", ".zip"),
 ]
 hsl_collection["hsl_mc80"] = []
 hsl_collection["hsl_mc81"] = []
