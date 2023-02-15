@@ -268,4 +268,6 @@ hsl_collection["hsl_zd11"] = []
 hsl_collection["coinhsl"] = [
   HSLVersion("2021.05.05", "f4fa0eee24a181fbc88e8fe5a1c49443c34bb32b93b9f5b3a9c482324f87fa1d", ".tar.gz"),
   HSLVersion("2021.05.05", "80a38ddca1bbedc8eb03a941d9a39478a3fd7b1bddbd2ae8220214a4ef59e4f9", ".zip"),
+  HSLVersion("2022.11.09", "d6d9089bb9cf3eb0e4af195f1a2f10cd61da42eddf8da73a12b8c62902bceee3", ".tar.gz"),
+  HSLVersion("2022.11.09", "863acaf8e82001ff515fbf41e4056880e1f62185ffac02aa50907c9a82bcb1ca", ".zip"),
 ]
