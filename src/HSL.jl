@@ -44,10 +44,14 @@ end
 # package-specific definitions
 if @isdefined available_hsl_algorithms
   for package in keys(available_hsl_algorithms)
-    package == "coinhsl" && continue
-    include("$(package).jl")
-    if package == "hsl_ma57" && hsl_ma57_patched
-      include("hsl_ma57_patch.jl")
+    if package == "coinhsl"
+      !("hsl_ma57" in keys(available_hsl_algorithms)) && include("hsl_ma57.jl")
+      !("hsl_ma97" in keys(available_hsl_algorithms)) && include("hsl_ma97.jl")
+    else
+      include("$(package).jl")
+      if package == "hsl_ma57" && hsl_ma57_patched
+        include("hsl_ma57_patch.jl")
+      end
     end
   end
 end

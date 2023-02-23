@@ -177,6 +177,18 @@ if !isempty(hsl_archives)
     end
   end
 
+  # Use the path of libcoinhsl if we don't have libhsl_ma57 or libhsl_ma97
+  for software in ("hsl_ma57", "hsl_ma97")
+    if !haskey(hsl_archives, software) && haskey(hsl_archives, "coinhsl")
+      open(path_deps, "a") do io
+        write(io, "const lib$(software) = libcoinhsl\n")
+        if software == "hsl_ma57"
+          write(io, "const $(software)_patched = false\n")
+        end
+      end
+    end
+  end
+
   # write the constant `available_hsl_algorithms`
   open(path_deps, "a") do io
     write(io, "\n")
@@ -197,7 +209,7 @@ if !isempty(hsl_archives)
     write(io, "\n")
     write(io, "  global available_hsl_algorithms\n")
     for software in keys(hsl_collection)
-      if haskey(hsl_archives, software)
+      if haskey(hsl_archives, software) || (haskey(hsl_archives, "coinhsl") && software in ("hsl_ma57", "hsl_ma97"))
         write(io, "\n")
         write(io, "  global lib$(software)\n")
         if software == "hsl_ma57"

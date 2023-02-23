@@ -10,7 +10,12 @@ function getallocs(A)
 end
 
 @testset "hsl_ma97" begin
-  @testset "Data Type: $T" for T in (Float32, Float64, ComplexF32, ComplexF64)
+  if "coinhsl" in keys(available_hsl_algorithms) && libcoinhsl == libhsl_ma97
+    precisions = (Float32, Float64)
+  else
+    precisions = (Float32, Float64, ComplexF32, ComplexF64)
+  end
+  @testset "Data Type: $T" for T in precisions
     matrix_type = T in (ComplexF32, ComplexF64) ? :herm_indef : :real_indef
 
     ϵ = sqrt(eps(real(T)))
