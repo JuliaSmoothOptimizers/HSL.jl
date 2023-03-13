@@ -1,55 +1,40 @@
 module HSL
 
+using Libdl
 using LinearAlgebra
 using SparseArrays
 
-using SHA
-using METIS4_jll
-using OpenBLAS32_jll
-using libblastrampoline_jll
-
-if isfile(joinpath(@__DIR__, "..", "deps", "deps.jl"))
-  include("../deps/deps.jl")
+if haskey(ENV, "JULIA_HSL_LIBRARY_PATH")
+  const libsmumps = joinpath(ENV["JULIA_HSL_LIBRARY_PATH"], "libhsl.$dlext")
+  const HSL_INSTALLATION = "CUSTOM"
 else
-  @error("HSL library not properly installed. Please run Pkg.build(\"HSL\")")
+  using OpenBLAS32_jll
+  using HSL_jll
+  const HSL_INSTALLATION = "ARTIFACT"
 end
 
 function __init__()
-  if VERSION ≥ v"1.7"
+  if HSL_INSTALLATION == "ARTIFACT"
     config = LinearAlgebra.BLAS.lbt_get_config()
     if !any(lib -> lib.interface == :lp64, config.loaded_libs)
       LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
     end
   end
-  if @isdefined available_hsl_algorithms
-    check_deps()
-  end
 end
 
-# definitions applicable to all packages
-const data_map = Dict{Type, Type}(
-  Float32 => Cfloat,
-  Float64 => Cdouble,
-  ComplexF32 => Cfloat,
-  ComplexF64 => Cdouble,
-)
-
-function getsha(archivepath::String)
-  !isfile(archivepath) && error("$archivepath is not a file!")
-  open(archivepath) do f
-    return bytes2hex(sha256(f))
-  end
-end
-
-# package-specific definitions
-if @isdefined available_hsl_algorithms
-  for package in keys(available_hsl_algorithms)
-    package == "coinhsl" && continue
-    include("$(package).jl")
-    if package == "hsl_ma57" && hsl_ma57_patched
-      include("hsl_ma57_patch.jl")
-    end
-  end
-end
+# Wrappers
+include("wrappers/juliahsl.jl")
+include("wrappers/hsl_ma48.jl")
+include("wrappers/hsl_ma57.jl")
+include("wrappers/hsl_ma77.jl")
+include("wrappers/hsl_ma86.jl")
+include("wrappers/hsl_ma87.jl")
+include("wrappers/hsl_ma97.jl")
+include("wrappers/hsl_mc64.jl")
+include("wrappers/hsl_mc68.jl")
+include("wrappers/hsl_mc69.jl")
+include("wrappers/hsl_mc78.jl")
+include("wrappers/hsl_mc79.jl")
+include("wrappers/hsl_mi20.jl")
 
 end
