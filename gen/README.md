@@ -11,6 +11,7 @@ The `main` function supports the boolean keyword argument `optimized` to clear t
 You can also call `main(library)` if you want to generate the wrapper for a specific HSL `library`.
 The possible values for `library` are:
 - `"all"` (default);
+- ``juliahsl`;
 - `"hsl_ma48"`;
 - `"hsl_ma57"`;
 - `"hsl_ma77"`;
@@ -23,3 +24,8 @@ The possible values for `library` are:
 - `"hsl_mc78"`;
 - `"hsl_mc79"`;
 - `"hsl_mi20"`.
+
+# Maintenance
+
+If a new C interface is available, add an entry for it in the `main` function of `wrapper.jl`.
+If HSL packages are deleted or added in the future, please update `epilogue.jl`.

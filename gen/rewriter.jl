@@ -37,43 +37,49 @@ structure_modifications = Dict("_control_s}"       => "_control{Float32}}",
                                "_sinfo_d}"         => "_sinfo{Float64}}")
 
 function rewrite!(path::String, name::String, optimized::Bool)
-  solver = split(name, "_")[2]
   text = read(path, String)
-  updated_text = replace(text, "struct $solver" => "mutable struct $solver")
-  if optimized
-    for (keys, vals) in type_modifications
-      updated_text = replace(updated_text, solver * keys => vals)
-    end
-    for (keys, vals) in structure_modifications
-      updated_text = replace(updated_text, solver * keys => solver * vals)
-    end
-    for structure in ("control", "info", "solve_control", "ainfo", "sinfo", "finfo")
-      updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_s" => "mutable struct $(solver)_$(structure){T}")
-      updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_i" => "mutable struct $(solver)_$(structure){T}")
-    end
-    updated_text = replace(updated_text, "::Float32\n" => "::T\n")
-    updated_text = replace(updated_text, "Float32}\n" => "T}\n")  # NTuple{N, Float32} → NTuple{N, T}
+  if name == "juliahsl"
+    updated_text = replace(text, r"_MAJOR([^\n]+)\n\n" => s"_MAJOR\1\n")
+    updated_text = replace(updated_text, r"_MINOR([^\n]+)\n\n" => s"_MINOR\1\n")
+    updated_text = replace(updated_text, "\n\n\n" => "\n")
+  else
+    solver = split(name, "_")[2]
+    updated_text = replace(text, "struct $solver" => "mutable struct $solver")
+    if optimized
+      for (keys, vals) in type_modifications
+        updated_text = replace(updated_text, solver * keys => vals)
+      end
+      for (keys, vals) in structure_modifications
+        updated_text = replace(updated_text, solver * keys => solver * vals)
+      end
+      for structure in ("control", "info", "solve_control", "ainfo", "sinfo", "finfo")
+        updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_s" => "mutable struct $(solver)_$(structure){T}")
+        updated_text = replace(updated_text, "mutable struct $(solver)_$(structure)_i" => "mutable struct $(solver)_$(structure){T}")
+      end
+      updated_text = replace(updated_text, "::Float32\n" => "::T\n")
+      updated_text = replace(updated_text, "Float32}\n" => "T}\n")  # NTuple{N, Float32} → NTuple{N, T}
 
-    # Special cases where the structures are not parameterized.
-    if name == "hsl_ma48"
-      for type in ("T", "Float32", "Float64")
-        updated_text = replace(updated_text, "$(solver)_sinfo{$type}" => "$(solver)_sinfo")
+      # Special cases where the structures are not parameterized.
+      if name == "hsl_ma48"
+        for type in ("T", "Float32", "Float64")
+          updated_text = replace(updated_text, "$(solver)_sinfo{$type}" => "$(solver)_sinfo")
+        end
+      end
+
+      if name == "hsl_mc64"
+        for type in ("T", "Float32", "Float64")
+          updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
+          updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
+        end
+      end
+
+      if name == "hsl_mc68" || name == "hsl_mc78" || name == "hsl_mc79"
+        for type in ("T", "Cint", "Clong")
+          updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
+          updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
+        end
       end
     end
-
-    if name == "hsl_mc64"
-      for type in ("T", "Float32", "Float64")
-        updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
-        updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
-      end
-    end
-
-    if name == "hsl_mc68" || name == "hsl_mc78" || name == "hsl_mc79"
-      for type in ("T", "Cint", "Clong")
-        updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
-        updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
-      end
-    end
-  end 
+  end
   write(path, updated_text)
 end
