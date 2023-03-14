@@ -7,3 +7,6 @@ library_name = "libhsl"
 use_julia_bool = true
 always_NUL_terminated_string = true
 use_ccall_macro = true
+
+[codegen.macro]
+macro_mode = "disable"

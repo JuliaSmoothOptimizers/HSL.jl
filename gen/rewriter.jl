@@ -39,9 +39,9 @@ structure_modifications = Dict("_control_s}"       => "_control{Float32}}",
 function rewrite!(path::String, name::String, optimized::Bool)
   text = read(path, String)
   if name == "juliahsl"
-    updated_text = replace(text, r"_MAJOR([^\n]+)\n\n" => s"_MAJOR\1\n")
-    updated_text = replace(updated_text, r"_MINOR([^\n]+)\n\n" => s"_MINOR\1\n")
-    updated_text = replace(updated_text, "\n\n\n" => "\n")
+    updated_text = replace(text, "major, minor, patch)\n" => ")\n    major = Ref{Cint}(0)\n    minor = Ref{Cint}(0)\n    patch = Ref{Cint}(0)\n")
+    updated_text = replace(updated_text, "Ptr{Cint}" => "Ref{Cint}")
+    updated_text = replace(updated_text, "Cvoid\n" => "Cvoid\n    VersionNumber(major[], minor[], patch[])\n")
   else
     solver = split(name, "_")[2]
     updated_text = replace(text, "struct $solver" => "mutable struct $solver")

@@ -1,717 +1,1144 @@
-const JULIASHL_VER_MAJOR = 2023
-const JULIAHSL_VER_MINOR = 3
-const JULIAHSL_VER_PATCH = 13
-
-const EA16_VER_MAJOR = 1
-const EA16_VER_MINOR = 4
-const EA16_VER_PATCH = 1
-
-const EA22_VER_MAJOR = 1
-const EA22_VER_MINOR = 2
-const EA22_VER_PATCH = 0
-
-const EA25_VER_MAJOR = 1
-const EA25_VER_MINOR = 1
-const EA25_VER_PATCH = 0
-
-const EB13_VER_MAJOR = 1
-const EB13_VER_MINOR = 1
-const EB13_VER_PATCH = 2
-
-const EB22_VER_MAJOR = 1
-const EB22_VER_MINOR = 2
-const EB22_VER_PATCH = 2
-
-const EP25_VER_MAJOR = 1
-const EP25_VER_MINOR = 2
-const EP25_VER_PATCH = 0
-
-const FA14_VER_MAJOR = 1
-const FA14_VER_MINOR = 0
-const FA14_VER_PATCH = 1
-
-const FD15_VER_MAJOR = 1
-const FD15_VER_MINOR = 0
-const FD15_VER_PATCH = 0
-
-const HSL_EA19_VER_MAJOR = 1
-const HSL_EA19_VER_MINOR = 4
-const HSL_EA19_VER_PATCH = 2
-
-const HSL_EA20_VER_MAJOR = 1
-const HSL_EA20_VER_MINOR = 1
-const HSL_EA20_VER_PATCH = 0
-
-const HSL_FA14_VER_MAJOR = 1
-const HSL_FA14_VER_MINOR = 1
-const HSL_FA14_VER_PATCH = 0
-
-const HSL_KB22_VER_MAJOR = 1
-const HSL_KB22_VER_MINOR = 0
-const HSL_KB22_VER_PATCH = 0
-
-const HSL_MA42_VER_MAJOR = 1
-const HSL_MA42_VER_MINOR = 3
-const HSL_MA42_VER_PATCH = 0
-
-const HSL_MA42_ELEMENT_VER_MAJOR = 3
-const HSL_MA42_ELEMENT_VER_MINOR = 0
-const HSL_MA42_ELEMENT_VER_PATCH = 0
-
-const HSL_MA48_VER_MAJOR = 3
-const HSL_MA48_VER_MINOR = 4
-const HSL_MA48_VER_PATCH = 1
-
-const HSL_MA54_VER_MAJOR = 1
-const HSL_MA54_VER_MINOR = 4
-const HSL_MA54_VER_PATCH = 2
-
-const HSL_MA55_VER_MAJOR = 1
-const HSL_MA55_VER_MINOR = 2
-const HSL_MA55_VER_PATCH = 0
-
-const HSL_MA57_VER_MAJOR = 5
-const HSL_MA57_VER_MINOR = 3
-const HSL_MA57_VER_PATCH = 2
-
-const HSL_MA64_VER_MAJOR = 6
-const HSL_MA64_VER_MINOR = 3
-const HSL_MA64_VER_PATCH = 1
-
-const HSL_MA69_VER_MAJOR = 1
-const HSL_MA69_VER_MINOR = 0
-const HSL_MA69_VER_PATCH = 0
-
-const HSL_MA74_VER_MAJOR = 1
-const HSL_MA74_VER_MINOR = 5
-const HSL_MA74_VER_PATCH = 0
-
-const HSL_MA77_VER_MAJOR = 6
-const HSL_MA77_VER_MINOR = 3
-const HSL_MA77_VER_PATCH = 1
-
-const HSL_MA78_VER_MAJOR = 3
-const HSL_MA78_VER_MINOR = 5
-const HSL_MA78_VER_PATCH = 1
-
-const HSL_MA79_VER_MAJOR = 1
-const HSL_MA79_VER_MINOR = 2
-const HSL_MA79_VER_PATCH = 0
-
-const HSL_MA85_VER_MAJOR = 1
-const HSL_MA85_VER_MINOR = 1
-const HSL_MA85_VER_PATCH = 0
-
-const HSL_MA86_VER_MAJOR = 1
-const HSL_MA86_VER_MINOR = 7
-const HSL_MA86_VER_PATCH = 3
-
-const HSL_MA87_VER_MAJOR = 2
-const HSL_MA87_VER_MINOR = 6
-const HSL_MA87_VER_PATCH = 4
-
-const HSL_MA97_VER_MAJOR = 2
-const HSL_MA97_VER_MINOR = 8
-const HSL_MA97_VER_PATCH = 0
-
-const HSL_MC34_VER_MAJOR = 1
-const HSL_MC34_VER_MINOR = 1
-const HSL_MC34_VER_PATCH = 0
-
-const HSL_MC56_VER_MAJOR = 1
-const HSL_MC56_VER_MINOR = 1
-const HSL_MC56_VER_PATCH = 0
-
-const HSL_MC64_VER_MAJOR = 2
-const HSL_MC64_VER_MINOR = 4
-const HSL_MC64_VER_PATCH = 1
-
-const HSL_MC65_VER_MAJOR = 2
-const HSL_MC65_VER_MINOR = 3
-const HSL_MC65_VER_PATCH = 0
-
-const HSL_MC66_VER_MAJOR = 2
-const HSL_MC66_VER_MINOR = 2
-const HSL_MC66_VER_PATCH = 1
-
-const HSL_MC68_VER_MAJOR = 3
-const HSL_MC68_VER_MINOR = 3
-const HSL_MC68_VER_PATCH = 2
-
-const HSL_MC69_VER_MAJOR = 1
-const HSL_MC69_VER_MINOR = 4
-const HSL_MC69_VER_PATCH = 2
-
-const HSL_MC73_VER_MAJOR = 2
-const HSL_MC73_VER_MINOR = 8
-const HSL_MC73_VER_PATCH = 1
-
-const HSL_MC78_VER_MAJOR = 1
-const HSL_MC78_VER_MINOR = 5
-const HSL_MC78_VER_PATCH = 0
-
-const HSL_MC79_VER_MAJOR = 1
-const HSL_MC79_VER_MINOR = 1
-const HSL_MC79_VER_PATCH = 1
-
-const HSL_MC80_VER_MAJOR = 1
-const HSL_MC80_VER_MINOR = 1
-const HSL_MC80_VER_PATCH = 3
-
-const HSL_MC81_VER_MAJOR = 1
-const HSL_MC81_VER_MINOR = 0
-const HSL_MC81_VER_PATCH = 0
-
-const HSL_ME57_VER_MAJOR = 1
-const HSL_ME57_VER_MINOR = 1
-const HSL_ME57_VER_PATCH = 2
-
-const HSL_MI02_VER_MAJOR = 1
-const HSL_MI02_VER_MINOR = 0
-const HSL_MI02_VER_PATCH = 0
-
-const HSL_MI13_VER_MAJOR = 1
-const HSL_MI13_VER_MINOR = 2
-const HSL_MI13_VER_PATCH = 0
-
-const HSL_MI20_VER_MAJOR = 2
-const HSL_MI20_VER_MINOR = 0
-const HSL_MI20_VER_PATCH = 0
-
-const HSL_MI27_VER_MAJOR = 1
-const HSL_MI27_VER_MINOR = 0
-const HSL_MI27_VER_PATCH = 1
-
-const HSL_MI28_VER_MAJOR = 2
-const HSL_MI28_VER_MINOR = 2
-const HSL_MI28_VER_PATCH = 4
-
-const HSL_MI29_VER_MAJOR = 1
-const HSL_MI29_VER_MINOR = 1
-const HSL_MI29_VER_PATCH = 0
-
-const HSL_MI30_VER_MAJOR = 1
-const HSL_MI30_VER_MINOR = 3
-const HSL_MI30_VER_PATCH = 2
-
-const HSL_MI31_VER_MAJOR = 1
-const HSL_MI31_VER_MINOR = 2
-const HSL_MI31_VER_PATCH = 0
-
-const HSL_MI32_VER_MAJOR = 1
-const HSL_MI32_VER_MINOR = 0
-const HSL_MI32_VER_PATCH = 0
-
-const HSL_MI35_VER_MAJOR = 2
-const HSL_MI35_VER_MINOR = 0
-const HSL_MI35_VER_PATCH = 1
-
-const HSL_MP01_VER_MAJOR = 1
-const HSL_MP01_VER_MINOR = 1
-const HSL_MP01_VER_PATCH = 0
-
-const HSL_MP42_VER_MAJOR = 2
-const HSL_MP42_VER_MINOR = 0
-const HSL_MP42_VER_PATCH = 0
-
-const HSL_MP43_VER_MAJOR = 2
-const HSL_MP43_VER_MINOR = 0
-const HSL_MP43_VER_PATCH = 0
-
-const HSL_MP48_VER_MAJOR = 2
-const HSL_MP48_VER_MINOR = 1
-const HSL_MP48_VER_PATCH = 0
-
-const HSL_MP54_VER_MAJOR = 1
-const HSL_MP54_VER_MINOR = 2
-const HSL_MP54_VER_PATCH = 0
-
-const HSL_MP62_VER_MAJOR = 2
-const HSL_MP62_VER_MINOR = 1
-const HSL_MP62_VER_PATCH = 0
-
-const HSL_MP82_VER_MAJOR = 1
-const HSL_MP82_VER_MINOR = 0
-const HSL_MP82_VER_PATCH = 0
-
-const HSL_OF01_VER_MAJOR = 3
-const HSL_OF01_VER_MINOR = 3
-const HSL_OF01_VER_PATCH = 0
-
-const HSL_ZB01_VER_MAJOR = 2
-const HSL_ZB01_VER_MINOR = 0
-const HSL_ZB01_VER_PATCH = 0
-
-const HSL_ZD11_VER_MAJOR = 1
-const HSL_ZD11_VER_MINOR = 1
-const HSL_ZD11_VER_PATCH = 0
-
-const KB05_VER_MAJOR = 1
-const KB05_VER_MINOR = 0
-const KB05_VER_PATCH = 0
-
-const KB06_VER_MAJOR = 1
-const KB06_VER_MINOR = 0
-const KB06_VER_PATCH = 0
-
-const KB07_VER_MAJOR = 1
-const KB07_VER_MINOR = 0
-const KB07_VER_PATCH = 0
-
-const KB08_VER_MAJOR = 1
-const KB08_VER_MINOR = 0
-const KB08_VER_PATCH = 0
-
-const LA04_VER_MAJOR = 1
-const LA04_VER_MINOR = 2
-const LA04_VER_PATCH = 0
-
-const LA15_VER_MAJOR = 1
-const LA15_VER_MINOR = 3
-const LA15_VER_PATCH = 0
-
-const MA38_VER_MAJOR = 1
-const MA38_VER_MINOR = 2
-const MA38_VER_PATCH = 0
-
-const MA41_VER_MAJOR = 1
-const MA41_VER_MINOR = 2
-const MA41_VER_PATCH = 0
-
-const MA42_VER_MAJOR = 1
-const MA42_VER_MINOR = 3
-const MA42_VER_PATCH = 0
-
-const MA43_VER_MAJOR = 1
-const MA43_VER_MINOR = 0
-const MA43_VER_PATCH = 1
-
-const MA44_VER_MAJOR = 1
-const MA44_VER_MINOR = 0
-const MA44_VER_PATCH = 0
-
-const MA46_VER_MAJOR = 1
-const MA46_VER_MINOR = 0
-const MA46_VER_PATCH = 0
-
-const MA48_VER_MAJOR = 2
-const MA48_VER_MINOR = 2
-const MA48_VER_PATCH = 0
-
-const MA49_VER_MAJOR = 2
-const MA49_VER_MINOR = 0
-const MA49_VER_PATCH = 0
-
-const MA50_VER_MAJOR = 2
-const MA50_VER_MINOR = 0
-const MA50_VER_PATCH = 0
-
-const MA51_VER_MAJOR = 1
-const MA51_VER_MINOR = 0
-const MA51_VER_PATCH = 0
-
-const MA52_VER_MAJOR = 1
-const MA52_VER_MINOR = 0
-const MA52_VER_PATCH = 1
-
-const MA57_VER_MAJOR = 3
-const MA57_VER_MINOR = 11
-const MA57_VER_PATCH = 2
-
-const MA60_VER_MAJOR = 1
-const MA60_VER_MINOR = 2
-const MA60_VER_PATCH = 0
-
-const MA61_VER_MAJOR = 1
-const MA61_VER_MINOR = 1
-const MA61_VER_PATCH = 0
-
-const MA62_VER_MAJOR = 1
-const MA62_VER_MINOR = 0
-const MA62_VER_PATCH = 0
-
-const MA65_VER_MAJOR = 1
-const MA65_VER_MINOR = 0
-const MA65_VER_PATCH = 2
-
-const MA67_VER_MAJOR = 1
-const MA67_VER_MINOR = 0
-const MA67_VER_PATCH = 2
-
-const MA69_VER_MAJOR = 1
-const MA69_VER_MINOR = 0
-const MA69_VER_PATCH = 0
-
-const MA72_VER_MAJOR = 1
-const MA72_VER_MINOR = 0
-const MA72_VER_PATCH = 0
-
-const MA75_VER_MAJOR = 1
-const MA75_VER_MINOR = 1
-const MA75_VER_PATCH = 1
-
-const MC13_VER_MAJOR = 1
-const MC13_VER_MINOR = 0
-const MC13_VER_PATCH = 0
-
-const MC21_VER_MAJOR = 1
-const MC21_VER_MINOR = 0
-const MC21_VER_PATCH = 0
-
-const MC22_VER_MAJOR = 1
-const MC22_VER_MINOR = 0
-const MC22_VER_PATCH = 0
-
-const MC25_VER_MAJOR = 1
-const MC25_VER_MINOR = 0
-const MC25_VER_PATCH = 0
-
-const MC26_VER_MAJOR = 1
-const MC26_VER_MINOR = 0
-const MC26_VER_PATCH = 0
-
-const MC29_VER_MAJOR = 1
-const MC29_VER_MINOR = 0
-const MC29_VER_PATCH = 0
-
-const MC30_VER_MAJOR = 1
-const MC30_VER_MINOR = 0
-const MC30_VER_PATCH = 0
-
-const MC33_VER_MAJOR = 1
-const MC33_VER_MINOR = 0
-const MC33_VER_PATCH = 0
-
-const MC34_VER_MAJOR = 1
-const MC34_VER_MINOR = 0
-const MC34_VER_PATCH = 0
-
-const MC37_VER_MAJOR = 1
-const MC37_VER_MINOR = 0
-const MC37_VER_PATCH = 0
-
-const MC38_VER_MAJOR = 1
-const MC38_VER_MINOR = 0
-const MC38_VER_PATCH = 0
-
-const MC44_VER_MAJOR = 1
-const MC44_VER_MINOR = 0
-const MC44_VER_PATCH = 0
-
-const MC46_VER_MAJOR = 1
-const MC46_VER_MINOR = 0
-const MC46_VER_PATCH = 0
-
-const MC47_VER_MAJOR = 2
-const MC47_VER_MINOR = 1
-const MC47_VER_PATCH = 0
-
-const MC53_VER_MAJOR = 1
-const MC53_VER_MINOR = 1
-const MC53_VER_PATCH = 0
-
-const MC54_VER_MAJOR = 1
-const MC54_VER_MINOR = 0
-const MC54_VER_PATCH = 1
-
-const MC55_VER_MAJOR = 1
-const MC55_VER_MINOR = 0
-const MC55_VER_PATCH = 0
-
-const MC56_VER_MAJOR = 1
-const MC56_VER_MINOR = 1
-const MC56_VER_PATCH = 1
-
-const MC57_VER_MAJOR = 1
-const MC57_VER_MINOR = 1
-const MC57_VER_PATCH = 0
-
-const MC58_VER_MAJOR = 1
-const MC58_VER_MINOR = 0
-const MC58_VER_PATCH = 0
-
-const MC59_VER_MAJOR = 1
-const MC59_VER_MINOR = 0
-const MC59_VER_PATCH = 2
-
-const MC60_VER_MAJOR = 1
-const MC60_VER_MINOR = 1
-const MC60_VER_PATCH = 0
-
-const MC61_VER_MAJOR = 1
-const MC61_VER_MINOR = 1
-const MC61_VER_PATCH = 0
-
-const MC62_VER_MAJOR = 1
-const MC62_VER_MINOR = 0
-const MC62_VER_PATCH = 0
-
-const MC63_VER_MAJOR = 1
-const MC63_VER_MINOR = 0
-const MC63_VER_PATCH = 0
-
-const MC64_VER_MAJOR = 1
-const MC64_VER_MINOR = 6
-const MC64_VER_PATCH = 0
-
-const MC67_VER_MAJOR = 1
-const MC67_VER_MINOR = 0
-const MC67_VER_PATCH = 0
-
-const MC71_VER_MAJOR = 1
-const MC71_VER_MINOR = 0
-const MC71_VER_PATCH = 0
-
-const MC72_VER_MAJOR = 1
-const MC72_VER_MINOR = 0
-const MC72_VER_PATCH = 0
-
-const MC75_VER_MAJOR = 1
-const MC75_VER_MINOR = 1
-const MC75_VER_PATCH = 0
-
-const MC77_VER_MAJOR = 1
-const MC77_VER_MINOR = 0
-const MC77_VER_PATCH = 1
-
-const ME22_VER_MAJOR = 1
-const ME22_VER_MINOR = 0
-const ME22_VER_PATCH = 0
-
-const ME38_VER_MAJOR = 1
-const ME38_VER_MINOR = 2
-const ME38_VER_PATCH = 1
-
-const ME42_VER_MAJOR = 1
-const ME42_VER_MINOR = 2
-const ME42_VER_PATCH = 0
-
-const ME43_VER_MAJOR = 1
-const ME43_VER_MINOR = 0
-const ME43_VER_PATCH = 0
-
-const ME48_VER_MAJOR = 1
-const ME48_VER_MINOR = 1
-const ME48_VER_PATCH = 0
-
-const ME50_VER_MAJOR = 1
-const ME50_VER_MINOR = 1
-const ME50_VER_PATCH = 0
-
-const ME57_VER_MAJOR = 2
-const ME57_VER_MINOR = 4
-const ME57_VER_PATCH = 2
-
-const ME62_VER_MAJOR = 1
-const ME62_VER_MINOR = 0
-const ME62_VER_PATCH = 1
-
-const MF29_VER_MAJOR = 1
-const MF29_VER_MINOR = 0
-const MF29_VER_PATCH = 0
-
-const MF30_VER_MAJOR = 1
-const MF30_VER_MINOR = 0
-const MF30_VER_PATCH = 0
-
-const MF64_VER_MAJOR = 1
-const MF64_VER_MINOR = 1
-const MF64_VER_PATCH = 0
-
-const MF71_VER_MAJOR = 1
-const MF71_VER_MINOR = 1
-const MF71_VER_PATCH = 0
-
-const MI11_VER_MAJOR = 1
-const MI11_VER_MINOR = 2
-const MI11_VER_PATCH = 0
-
-const MI12_VER_MAJOR = 1
-const MI12_VER_MINOR = 1
-const MI12_VER_PATCH = 0
-
-const MI15_VER_MAJOR = 1
-const MI15_VER_MINOR = 3
-const MI15_VER_PATCH = 0
-
-const MI21_VER_MAJOR = 1
-const MI21_VER_MINOR = 3
-const MI21_VER_PATCH = 0
-
-const MI23_VER_MAJOR = 1
-const MI23_VER_MINOR = 1
-const MI23_VER_PATCH = 0
-
-const MI24_VER_MAJOR = 1
-const MI24_VER_MINOR = 3
-const MI24_VER_PATCH = 1
-
-const MI25_VER_MAJOR = 1
-const MI25_VER_MINOR = 1
-const MI25_VER_PATCH = 0
-
-const MI26_VER_MAJOR = 1
-const MI26_VER_MINOR = 1
-const MI26_VER_PATCH = 0
-
-const NS23_VER_MAJOR = 2
-const NS23_VER_MINOR = 0
-const NS23_VER_PATCH = 0
-
-const PA16_VER_MAJOR = 1
-const PA16_VER_MINOR = 1
-const PA16_VER_PATCH = 0
-
-const PA17_VER_MAJOR = 1
-const PA17_VER_MINOR = 1
-const PA17_VER_PATCH = 0
-
-const YM11_VER_MAJOR = 1
-const YM11_VER_MINOR = 1
-const YM11_VER_PATCH = 0
-
-const HSL_VERSIONS = Dict{String, VersionNumber}(
-  "juliahsl" => VersionNumber(JULIASHL_VER_MAJOR, JULIAHSL_VER_MINOR, JULIAHSL_VER_PATCH),
-  "ea16" => VersionNumber(EA16_VER_MAJOR, EA16_VER_MINOR, EA16_VER_PATCH),
-  "ea22" => VersionNumber(EA22_VER_MAJOR, EA22_VER_MINOR, EA22_VER_PATCH),
-  "ea25" => VersionNumber(EA25_VER_MAJOR, EA25_VER_MINOR, EA25_VER_PATCH),
-  "eb13" => VersionNumber(EB13_VER_MAJOR, EB13_VER_MINOR, EB13_VER_PATCH),
-  "eb22" => VersionNumber(EB22_VER_MAJOR, EB22_VER_MINOR, EB22_VER_PATCH),
-  "ep25" => VersionNumber(EP25_VER_MAJOR, EP25_VER_MINOR, EP25_VER_PATCH),
-  "fa14" => VersionNumber(FA14_VER_MAJOR, FA14_VER_MINOR, FA14_VER_PATCH),
-  "fd15" => VersionNumber(FD15_VER_MAJOR, FD15_VER_MINOR, FD15_VER_PATCH),
-  "hsl_ea19" => VersionNumber(HSL_EA19_VER_MAJOR, HSL_EA19_VER_MINOR, HSL_EA19_VER_PATCH),
-  "hsl_ea20" => VersionNumber(HSL_EA20_VER_MAJOR, HSL_EA20_VER_MINOR, HSL_EA20_VER_PATCH),
-  "hsl_fa14" => VersionNumber(HSL_FA14_VER_MAJOR, HSL_FA14_VER_MINOR, HSL_FA14_VER_PATCH),
-  "hsl_kb22" => VersionNumber(HSL_KB22_VER_MAJOR, HSL_KB22_VER_MINOR, HSL_KB22_VER_PATCH),
-  "hsl_ma42" => VersionNumber(HSL_MA42_VER_MAJOR, HSL_MA42_VER_MINOR, HSL_MA42_VER_PATCH),
-  "hsl_ma42_element" => VersionNumber(HSL_MA42_ELEMENT_VER_MAJOR, HSL_MA42_ELEMENT_VER_MINOR, HSL_MA42_ELEMENT_VER_PATCH),
-  "hsl_ma48" => VersionNumber(HSL_MA48_VER_MAJOR, HSL_MA48_VER_MINOR, HSL_MA48_VER_PATCH),
-  "hsl_ma54" => VersionNumber(HSL_MA54_VER_MAJOR, HSL_MA54_VER_MINOR, HSL_MA54_VER_PATCH),
-  "hsl_ma55" => VersionNumber(HSL_MA55_VER_MAJOR, HSL_MA55_VER_MINOR, HSL_MA55_VER_PATCH),
-  "hsl_ma57" => VersionNumber(HSL_MA57_VER_MAJOR, HSL_MA57_VER_MINOR, HSL_MA57_VER_PATCH),
-  "hsl_ma64" => VersionNumber(HSL_MA64_VER_MAJOR, HSL_MA64_VER_MINOR, HSL_MA64_VER_PATCH),
-  "hsl_ma69" => VersionNumber(HSL_MA69_VER_MAJOR, HSL_MA69_VER_MINOR, HSL_MA69_VER_PATCH),
-  "hsl_ma74" => VersionNumber(HSL_MA74_VER_MAJOR, HSL_MA74_VER_MINOR, HSL_MA74_VER_PATCH),
-  "hsl_ma77" => VersionNumber(HSL_MA77_VER_MAJOR, HSL_MA77_VER_MINOR, HSL_MA77_VER_PATCH),
-  "hsl_ma78" => VersionNumber(HSL_MA78_VER_MAJOR, HSL_MA78_VER_MINOR, HSL_MA78_VER_PATCH),
-  "hsl_ma79" => VersionNumber(HSL_MA79_VER_MAJOR, HSL_MA79_VER_MINOR, HSL_MA79_VER_PATCH),
-  "hsl_ma85" => VersionNumber(HSL_MA85_VER_MAJOR, HSL_MA85_VER_MINOR, HSL_MA85_VER_PATCH),
-  "hsl_ma86" => VersionNumber(HSL_MA86_VER_MAJOR, HSL_MA86_VER_MINOR, HSL_MA86_VER_PATCH),
-  "hsl_ma87" => VersionNumber(HSL_MA87_VER_MAJOR, HSL_MA87_VER_MINOR, HSL_MA87_VER_PATCH),
-  "hsl_ma97" => VersionNumber(HSL_MA97_VER_MAJOR, HSL_MA97_VER_MINOR, HSL_MA97_VER_PATCH),
-  "hsl_mc34" => VersionNumber(HSL_MC34_VER_MAJOR, HSL_MC34_VER_MINOR, HSL_MC34_VER_PATCH),
-  "hsl_mc56" => VersionNumber(HSL_MC56_VER_MAJOR, HSL_MC56_VER_MINOR, HSL_MC56_VER_PATCH),
-  "hsl_mc64" => VersionNumber(HSL_MC64_VER_MAJOR, HSL_MC64_VER_MINOR, HSL_MC64_VER_PATCH),
-  "hsl_mc65" => VersionNumber(HSL_MC65_VER_MAJOR, HSL_MC65_VER_MINOR, HSL_MC65_VER_PATCH),
-  "hsl_mc66" => VersionNumber(HSL_MC66_VER_MAJOR, HSL_MC66_VER_MINOR, HSL_MC66_VER_PATCH),
-  "hsl_mc68" => VersionNumber(HSL_MC68_VER_MAJOR, HSL_MC68_VER_MINOR, HSL_MC68_VER_PATCH),
-  "hsl_mc69" => VersionNumber(HSL_MC69_VER_MAJOR, HSL_MC69_VER_MINOR, HSL_MC69_VER_PATCH),
-  "hsl_mc73" => VersionNumber(HSL_MC73_VER_MAJOR, HSL_MC73_VER_MINOR, HSL_MC73_VER_PATCH),
-  "hsl_mc78" => VersionNumber(HSL_MC78_VER_MAJOR, HSL_MC78_VER_MINOR, HSL_MC78_VER_PATCH),
-  "hsl_mc79" => VersionNumber(HSL_MC79_VER_MAJOR, HSL_MC79_VER_MINOR, HSL_MC79_VER_PATCH),
-  "hsl_mc80" => VersionNumber(HSL_MC80_VER_MAJOR, HSL_MC80_VER_MINOR, HSL_MC80_VER_PATCH),
-  "hsl_mc81" => VersionNumber(HSL_MC81_VER_MAJOR, HSL_MC81_VER_MINOR, HSL_MC81_VER_PATCH),
-  "hsl_me57" => VersionNumber(HSL_ME57_VER_MAJOR, HSL_ME57_VER_MINOR, HSL_ME57_VER_PATCH),
-  "hsl_mi02" => VersionNumber(HSL_MI02_VER_MAJOR, HSL_MI02_VER_MINOR, HSL_MI02_VER_PATCH),
-  "hsl_mi13" => VersionNumber(HSL_MI13_VER_MAJOR, HSL_MI13_VER_MINOR, HSL_MI13_VER_PATCH),
-  "hsl_mi20" => VersionNumber(HSL_MI20_VER_MAJOR, HSL_MI20_VER_MINOR, HSL_MI20_VER_PATCH),
-  "hsl_mi27" => VersionNumber(HSL_MI27_VER_MAJOR, HSL_MI27_VER_MINOR, HSL_MI27_VER_PATCH),
-  "hsl_mi28" => VersionNumber(HSL_MI28_VER_MAJOR, HSL_MI28_VER_MINOR, HSL_MI28_VER_PATCH),
-  "hsl_mi29" => VersionNumber(HSL_MI29_VER_MAJOR, HSL_MI29_VER_MINOR, HSL_MI29_VER_PATCH),
-  "hsl_mi30" => VersionNumber(HSL_MI30_VER_MAJOR, HSL_MI30_VER_MINOR, HSL_MI30_VER_PATCH),
-  "hsl_mi31" => VersionNumber(HSL_MI31_VER_MAJOR, HSL_MI31_VER_MINOR, HSL_MI31_VER_PATCH),
-  "hsl_mi32" => VersionNumber(HSL_MI32_VER_MAJOR, HSL_MI32_VER_MINOR, HSL_MI32_VER_PATCH),
-  "hsl_mi35" => VersionNumber(HSL_MI35_VER_MAJOR, HSL_MI35_VER_MINOR, HSL_MI35_VER_PATCH),
-  "hsl_mp01" => VersionNumber(HSL_MP01_VER_MAJOR, HSL_MP01_VER_MINOR, HSL_MP01_VER_PATCH),
-  "hsl_mp42" => VersionNumber(HSL_MP42_VER_MAJOR, HSL_MP42_VER_MINOR, HSL_MP42_VER_PATCH),
-  "hsl_mp43" => VersionNumber(HSL_MP43_VER_MAJOR, HSL_MP43_VER_MINOR, HSL_MP43_VER_PATCH),
-  "hsl_mp48" => VersionNumber(HSL_MP48_VER_MAJOR, HSL_MP48_VER_MINOR, HSL_MP48_VER_PATCH),
-  "hsl_mp54" => VersionNumber(HSL_MP54_VER_MAJOR, HSL_MP54_VER_MINOR, HSL_MP54_VER_PATCH),
-  "hsl_mp62" => VersionNumber(HSL_MP62_VER_MAJOR, HSL_MP62_VER_MINOR, HSL_MP62_VER_PATCH),
-  "hsl_mp82" => VersionNumber(HSL_MP82_VER_MAJOR, HSL_MP82_VER_MINOR, HSL_MP82_VER_PATCH),
-  "hsl_of01" => VersionNumber(HSL_OF01_VER_MAJOR, HSL_OF01_VER_MINOR, HSL_OF01_VER_PATCH),
-  "hsl_zb01" => VersionNumber(HSL_ZB01_VER_MAJOR, HSL_ZB01_VER_MINOR, HSL_ZB01_VER_PATCH),
-  "hsl_zd11" => VersionNumber(HSL_ZD11_VER_MAJOR, HSL_ZD11_VER_MINOR, HSL_ZD11_VER_PATCH),
-  "kb05" => VersionNumber(KB05_VER_MAJOR, KB05_VER_MINOR, KB05_VER_PATCH),
-  "kb06" => VersionNumber(KB06_VER_MAJOR, KB06_VER_MINOR, KB06_VER_PATCH),
-  "kb07" => VersionNumber(KB07_VER_MAJOR, KB07_VER_MINOR, KB07_VER_PATCH),
-  "kb08" => VersionNumber(KB08_VER_MAJOR, KB08_VER_MINOR, KB08_VER_PATCH),
-  "la04" => VersionNumber(LA04_VER_MAJOR, LA04_VER_MINOR, LA04_VER_PATCH),
-  "la15" => VersionNumber(LA15_VER_MAJOR, LA15_VER_MINOR, LA15_VER_PATCH),
-  "ma38" => VersionNumber(MA38_VER_MAJOR, MA38_VER_MINOR, MA38_VER_PATCH),
-  "ma41" => VersionNumber(MA41_VER_MAJOR, MA41_VER_MINOR, MA41_VER_PATCH),
-  "ma42" => VersionNumber(MA42_VER_MAJOR, MA42_VER_MINOR, MA42_VER_PATCH),
-  "ma43" => VersionNumber(MA43_VER_MAJOR, MA43_VER_MINOR, MA43_VER_PATCH),
-  "ma44" => VersionNumber(MA44_VER_MAJOR, MA44_VER_MINOR, MA44_VER_PATCH),
-  "ma46" => VersionNumber(MA46_VER_MAJOR, MA46_VER_MINOR, MA46_VER_PATCH),
-  "ma48" => VersionNumber(MA48_VER_MAJOR, MA48_VER_MINOR, MA48_VER_PATCH),
-  "ma49" => VersionNumber(MA49_VER_MAJOR, MA49_VER_MINOR, MA49_VER_PATCH),
-  "ma50" => VersionNumber(MA50_VER_MAJOR, MA50_VER_MINOR, MA50_VER_PATCH),
-  "ma51" => VersionNumber(MA51_VER_MAJOR, MA51_VER_MINOR, MA51_VER_PATCH),
-  "ma52" => VersionNumber(MA52_VER_MAJOR, MA52_VER_MINOR, MA52_VER_PATCH),
-  "ma57" => VersionNumber(MA57_VER_MAJOR, MA57_VER_MINOR, MA57_VER_PATCH),
-  "ma60" => VersionNumber(MA60_VER_MAJOR, MA60_VER_MINOR, MA60_VER_PATCH),
-  "ma61" => VersionNumber(MA61_VER_MAJOR, MA61_VER_MINOR, MA61_VER_PATCH),
-  "ma62" => VersionNumber(MA62_VER_MAJOR, MA62_VER_MINOR, MA62_VER_PATCH),
-  "ma65" => VersionNumber(MA65_VER_MAJOR, MA65_VER_MINOR, MA65_VER_PATCH),
-  "ma67" => VersionNumber(MA67_VER_MAJOR, MA67_VER_MINOR, MA67_VER_PATCH),
-  "ma69" => VersionNumber(MA69_VER_MAJOR, MA69_VER_MINOR, MA69_VER_PATCH),
-  "ma72" => VersionNumber(MA72_VER_MAJOR, MA72_VER_MINOR, MA72_VER_PATCH),
-  "ma75" => VersionNumber(MA75_VER_MAJOR, MA75_VER_MINOR, MA75_VER_PATCH),
-  "mc13" => VersionNumber(MC13_VER_MAJOR, MC13_VER_MINOR, MC13_VER_PATCH),
-  "mc21" => VersionNumber(MC21_VER_MAJOR, MC21_VER_MINOR, MC21_VER_PATCH),
-  "mc22" => VersionNumber(MC22_VER_MAJOR, MC22_VER_MINOR, MC22_VER_PATCH),
-  "mc25" => VersionNumber(MC25_VER_MAJOR, MC25_VER_MINOR, MC25_VER_PATCH),
-  "mc26" => VersionNumber(MC26_VER_MAJOR, MC26_VER_MINOR, MC26_VER_PATCH),
-  "mc29" => VersionNumber(MC29_VER_MAJOR, MC29_VER_MINOR, MC29_VER_PATCH),
-  "mc30" => VersionNumber(MC30_VER_MAJOR, MC30_VER_MINOR, MC30_VER_PATCH),
-  "mc33" => VersionNumber(MC33_VER_MAJOR, MC33_VER_MINOR, MC33_VER_PATCH),
-  "mc34" => VersionNumber(MC34_VER_MAJOR, MC34_VER_MINOR, MC34_VER_PATCH),
-  "mc37" => VersionNumber(MC37_VER_MAJOR, MC37_VER_MINOR, MC37_VER_PATCH),
-  "mc38" => VersionNumber(MC38_VER_MAJOR, MC38_VER_MINOR, MC38_VER_PATCH),
-  "mc44" => VersionNumber(MC44_VER_MAJOR, MC44_VER_MINOR, MC44_VER_PATCH),
-  "mc46" => VersionNumber(MC46_VER_MAJOR, MC46_VER_MINOR, MC46_VER_PATCH),
-  "mc47" => VersionNumber(MC47_VER_MAJOR, MC47_VER_MINOR, MC47_VER_PATCH),
-  "mc53" => VersionNumber(MC53_VER_MAJOR, MC53_VER_MINOR, MC53_VER_PATCH),
-  "mc54" => VersionNumber(MC54_VER_MAJOR, MC54_VER_MINOR, MC54_VER_PATCH),
-  "mc55" => VersionNumber(MC55_VER_MAJOR, MC55_VER_MINOR, MC55_VER_PATCH),
-  "mc56" => VersionNumber(MC56_VER_MAJOR, MC56_VER_MINOR, MC56_VER_PATCH),
-  "mc57" => VersionNumber(MC57_VER_MAJOR, MC57_VER_MINOR, MC57_VER_PATCH),
-  "mc58" => VersionNumber(MC58_VER_MAJOR, MC58_VER_MINOR, MC58_VER_PATCH),
-  "mc59" => VersionNumber(MC59_VER_MAJOR, MC59_VER_MINOR, MC59_VER_PATCH),
-  "mc60" => VersionNumber(MC60_VER_MAJOR, MC60_VER_MINOR, MC60_VER_PATCH),
-  "mc61" => VersionNumber(MC61_VER_MAJOR, MC61_VER_MINOR, MC61_VER_PATCH),
-  "mc62" => VersionNumber(MC62_VER_MAJOR, MC62_VER_MINOR, MC62_VER_PATCH),
-  "mc63" => VersionNumber(MC63_VER_MAJOR, MC63_VER_MINOR, MC63_VER_PATCH),
-  "mc64" => VersionNumber(MC64_VER_MAJOR, MC64_VER_MINOR, MC64_VER_PATCH),
-  "mc67" => VersionNumber(MC67_VER_MAJOR, MC67_VER_MINOR, MC67_VER_PATCH),
-  "mc71" => VersionNumber(MC71_VER_MAJOR, MC71_VER_MINOR, MC71_VER_PATCH),
-  "mc72" => VersionNumber(MC72_VER_MAJOR, MC72_VER_MINOR, MC72_VER_PATCH),
-  "mc75" => VersionNumber(MC75_VER_MAJOR, MC75_VER_MINOR, MC75_VER_PATCH),
-  "mc77" => VersionNumber(MC77_VER_MAJOR, MC77_VER_MINOR, MC77_VER_PATCH),
-  "me22" => VersionNumber(ME22_VER_MAJOR, ME22_VER_MINOR, ME22_VER_PATCH),
-  "me38" => VersionNumber(ME38_VER_MAJOR, ME38_VER_MINOR, ME38_VER_PATCH),
-  "me42" => VersionNumber(ME42_VER_MAJOR, ME42_VER_MINOR, ME42_VER_PATCH),
-  "me43" => VersionNumber(ME43_VER_MAJOR, ME43_VER_MINOR, ME43_VER_PATCH),
-  "me48" => VersionNumber(ME48_VER_MAJOR, ME48_VER_MINOR, ME48_VER_PATCH),
-  "me50" => VersionNumber(ME50_VER_MAJOR, ME50_VER_MINOR, ME50_VER_PATCH),
-  "me57" => VersionNumber(ME57_VER_MAJOR, ME57_VER_MINOR, ME57_VER_PATCH),
-  "me62" => VersionNumber(ME62_VER_MAJOR, ME62_VER_MINOR, ME62_VER_PATCH),
-  "mf29" => VersionNumber(MF29_VER_MAJOR, MF29_VER_MINOR, MF29_VER_PATCH),
-  "mf30" => VersionNumber(MF30_VER_MAJOR, MF30_VER_MINOR, MF30_VER_PATCH),
-  "mf64" => VersionNumber(MF64_VER_MAJOR, MF64_VER_MINOR, MF64_VER_PATCH),
-  "mf71" => VersionNumber(MF71_VER_MAJOR, MF71_VER_MINOR, MF71_VER_PATCH),
-  "mi11" => VersionNumber(MI11_VER_MAJOR, MI11_VER_MINOR, MI11_VER_PATCH),
-  "mi12" => VersionNumber(MI12_VER_MAJOR, MI12_VER_MINOR, MI12_VER_PATCH),
-  "mi15" => VersionNumber(MI15_VER_MAJOR, MI15_VER_MINOR, MI15_VER_PATCH),
-  "mi21" => VersionNumber(MI21_VER_MAJOR, MI21_VER_MINOR, MI21_VER_PATCH),
-  "mi23" => VersionNumber(MI23_VER_MAJOR, MI23_VER_MINOR, MI23_VER_PATCH),
-  "mi24" => VersionNumber(MI24_VER_MAJOR, MI24_VER_MINOR, MI24_VER_PATCH),
-  "mi25" => VersionNumber(MI25_VER_MAJOR, MI25_VER_MINOR, MI25_VER_PATCH),
-  "mi26" => VersionNumber(MI26_VER_MAJOR, MI26_VER_MINOR, MI26_VER_PATCH),
-  "ns23" => VersionNumber(NS23_VER_MAJOR, NS23_VER_MINOR, NS23_VER_PATCH),
-  "pa16" => VersionNumber(PA16_VER_MAJOR, PA16_VER_MINOR, PA16_VER_PATCH),
-  "pa17" => VersionNumber(PA17_VER_MAJOR, PA17_VER_MINOR, PA17_VER_PATCH),
-  "ym11" => VersionNumber(YM11_VER_MAJOR, YM11_VER_MINOR, YM11_VER_PATCH),
-)
+function JULIAHSL_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.JULIAHSL_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function EA16_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.EA16_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function EA22_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.EA22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function EA25_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.EA25_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function EB13_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.EB13_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function EB22_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.EB22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function EP25_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.EP25_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function FA14_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.FA14_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function FD15_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.FD15_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_EA19_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_EA19_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_EA20_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_EA20_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_FA14_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_FA14_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_KB22_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_KB22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA42_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA42_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA42_ELEMENT_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA42_ELEMENT_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA48_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA48_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA54_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA54_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA55_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA55_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA57_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA57_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA64_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA64_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA69_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA69_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA74_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA74_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA77_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA77_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA78_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA78_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA79_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA79_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA85_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA85_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA86_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA86_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA87_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA87_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MA97_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MA97_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC34_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC34_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC56_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC56_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC64_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC64_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC65_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC65_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC66_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC66_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC68_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC68_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC69_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC69_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC73_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC73_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC78_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC78_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC79_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC79_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC80_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC80_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MC81_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MC81_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_ME57_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_ME57_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI02_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI02_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI13_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI13_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI20_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI20_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI27_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI27_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI28_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI28_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI29_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI29_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI30_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI30_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI31_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI31_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI32_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI32_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MI35_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MI35_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP01_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP01_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP42_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP42_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP43_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP43_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP48_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP48_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP54_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP54_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP62_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP62_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_MP82_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_MP82_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_OF01_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_OF01_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_ZB01_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_ZB01_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_ZD11_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_ZD11_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function KB05_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.KB05_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function KB06_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.KB06_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function KB07_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.KB07_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function KB08_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.KB08_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function LA04_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.LA04_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function LA15_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.LA15_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA38_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA38_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA41_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA41_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA42_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA42_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA43_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA43_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA44_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA44_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA46_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA46_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA48_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA48_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA49_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA49_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA50_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA50_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA51_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA51_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA52_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA52_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA57_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA57_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA60_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA60_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA61_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA61_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA62_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA62_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA65_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA65_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA67_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA67_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA69_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA69_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA72_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA72_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA75_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA75_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC13_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC13_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC21_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC21_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC22_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC25_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC25_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC26_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC26_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC29_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC29_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC30_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC30_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC33_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC33_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC34_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC34_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC37_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC37_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC38_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC38_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC44_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC44_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC46_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC46_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC47_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC47_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC53_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC53_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC54_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC54_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC55_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC55_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC56_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC56_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC57_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC57_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC58_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC58_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC59_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC59_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC60_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC60_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC61_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC61_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC62_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC62_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC63_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC63_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC64_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC64_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC67_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC67_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC71_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC71_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC72_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC72_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC75_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC75_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC77_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC77_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME22_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME38_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME38_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME42_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME42_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME43_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME43_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME48_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME48_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME50_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME50_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME57_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME57_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function ME62_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.ME62_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MF29_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MF29_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MF30_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MF30_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MF64_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MF64_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MF71_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MF71_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI11_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI11_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI12_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI12_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI15_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI15_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI21_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI21_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI23_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI23_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI24_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI24_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI25_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI25_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MI26_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MI26_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function NS23_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.NS23_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function PA16_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.PA16_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function PA17_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.PA17_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function YM11_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.YM11_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+

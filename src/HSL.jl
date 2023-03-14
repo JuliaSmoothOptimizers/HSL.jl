@@ -5,7 +5,7 @@ using LinearAlgebra
 using SparseArrays
 
 if haskey(ENV, "JULIA_HSL_LIBRARY_PATH")
-  const libsmumps = joinpath(ENV["JULIA_HSL_LIBRARY_PATH"], "libhsl.$dlext")
+  const libhsl = joinpath(ENV["JULIA_HSL_LIBRARY_PATH"], "libhsl.$dlext")
   const HSL_INSTALLATION = "CUSTOM"
 else
   using OpenBLAS32_jll

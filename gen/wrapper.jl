@@ -17,7 +17,6 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
 
   if name != "juliahsl"
     solver = split(name, "_")[2]
-    options["codegen"]["macro"] = Dict{String, Any}("macro_mode" => "disable")
     optimized && (options["general"]["output_ignorelist"] = ["$(solver)realtype_[sdcz]_\$",
                                                              "$(solver)pkgtype_[sdcz]_\$",
                                                              "$(solver)pkgtype_[il]_\$",
@@ -27,8 +26,6 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
                                                              "$(solver)_info_[dczl]\$",
                                                              "$(solver)_[afs]info_d\$",
                                                              "$(solver)_solve_control_d\$"])
-  else
-    options["general"]["epilogue_file_path"] = "./epilogue.jl"
   end
 
   args = get_default_args()
