@@ -1,3 +1,7 @@
+function JULIAHSL_isfunctional()
+    @ccall libhsl.JULIAHSL_isfunctional()::Bool
+end
+
 function JULIAHSL_version()
     major = Ref{Cint}(0)
     minor = Ref{Cint}(0)
