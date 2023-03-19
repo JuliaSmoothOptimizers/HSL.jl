@@ -22,6 +22,14 @@ function __init__()
   end
 end
 
+# definitions applicable to all packages
+const data_map = Dict{Type, Type}(
+  Float32 => Cfloat,
+  Float64 => Cdouble,
+  ComplexF32 => Cfloat,
+  ComplexF64 => Cdouble,
+)
+
 # Wrappers
 include("wrappers/juliahsl.jl")
 include("wrappers/hsl_ma48.jl")
@@ -36,5 +44,12 @@ include("wrappers/hsl_mc69.jl")
 include("wrappers/hsl_mc78.jl")
 include("wrappers/hsl_mc79.jl")
 include("wrappers/hsl_mi20.jl")
+
+# Interfaces
+include("hsl_ma57.jl")
+include("hsl_ma97.jl")
+include("kb07.jl")
+include("mc21.jl")
+include("mc77.jl")
 
 end

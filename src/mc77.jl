@@ -28,7 +28,7 @@ for (fname, subty) in ((:mc77i_ , :Float32),
                        (:mc77id_, :Float64))
   @eval begin
     function mc77i(icntl, cntl::Vector{$subty})
-      @ccall libmc77.$fname(icntl::Ptr{Int32}, cntl::Ptr{$subty})::Cvoid
+      @ccall libhsl.$fname(icntl::Ptr{Int32}, cntl::Ptr{$subty})::Cvoid
     end
   end
 end
@@ -40,8 +40,8 @@ for (fname, elty, subty) in ((:mc77a_ , :Float32   , :Float32),
                              (:mc77az_, :ComplexF64, :Float64))
   @eval begin
     function mc77a(job, m, n, nnz, jcst, irn, a::Vector{$elty}, iw, liw, dw, ldw, icntl, cntl, info, rinfo)
-      @ccall libmc77.$fname(job::Ref{Int32}, m::Ref{Int32}, n::Ref{Int32}, nnz::Ref{Int32}, jcst::Ptr{Int32}, irn::Ptr{Int32}, a::Ptr{$elty}, iw::Ptr{Int32},
-                            liw::Ref{Int32}, dw::Ptr{Int32}, ldw::Ref{Int32}, icntl::Ptr{Int32}, cntl::Ptr{$subty}, info::Ptr{Int32}, rinfo::Ptr{$subty})::Cvoid
+      @ccall libhsl.$fname(job::Ref{Int32}, m::Ref{Int32}, n::Ref{Int32}, nnz::Ref{Int32}, jcst::Ptr{Int32}, irn::Ptr{Int32}, a::Ptr{$elty}, iw::Ptr{Int32},
+                           liw::Ref{Int32}, dw::Ptr{Int32}, ldw::Ref{Int32}, icntl::Ptr{Int32}, cntl::Ptr{$subty}, info::Ptr{Int32}, rinfo::Ptr{$subty})::Cvoid
     end
   end
 end
@@ -53,8 +53,8 @@ for (fname, elty, subty) in ((:mc77b_ , :Float32   , :Float32),
                              (:mc77bz_, :ComplexF64, :Float64))
   @eval begin
     function mc77b(job, m, n, nnz, irn, jcn, a::Vector{$elty}, iw, liw, dw, ldw, icntl, cntl, info, rinfo)
-      @ccall libmc77.$fname(job::Ref{Int32}, m::Ref{Int32}, n::Ref{Int32}, nnz::Ref{Int32}, irn::Ptr{Int32}, jcn::Ptr{Int32}, a::Ptr{$elty}, iw::Ptr{Int32},
-                            liw::Ref{Int32}, dw::Ptr{Int32}, ldw::Ref{Int32}, icntl::Ptr{Int32}, cntl::Ptr{$subty}, info::Ptr{Int32}, rinfo::Ptr{$subty})::Cvoid
+      @ccall libhsl.$fname(job::Ref{Int32}, m::Ref{Int32}, n::Ref{Int32}, nnz::Ref{Int32}, irn::Ptr{Int32}, jcn::Ptr{Int32}, a::Ptr{$elty}, iw::Ptr{Int32},
+                           liw::Ref{Int32}, dw::Ptr{Int32}, ldw::Ref{Int32}, icntl::Ptr{Int32}, cntl::Ptr{$subty}, info::Ptr{Int32}, rinfo::Ptr{$subty})::Cvoid
     end
   end
 end
@@ -66,8 +66,8 @@ for (fname, elty, subty) in ((:mc77c_ , :Float32   , :Float32),
                              (:mc77cz_, :ComplexF64, :Float64))
   @eval begin
     function mc77c(job, m, n, a::Matrix{$elty}, lda, iw, liw, dw, ldw, icntl, cntl, info, rinfo)
-      @ccall libmc77.$fname(job::Ref{Int32}, m::Ref{Int32}, n::Ref{Int32}, a::Ptr{$elty}, lda::Ref{Int32}, iw::Ptr{Int32}, liw::Ref{Int32},
-                            dw::Ptr{Int32}, ldw::Ref{Int32}, icntl::Ptr{Int32}, cntl::Ptr{$subty}, info::Ptr{Int32}, rinfo::Ptr{$subty})::Cvoid
+      @ccall libhsl.$fname(job::Ref{Int32}, m::Ref{Int32}, n::Ref{Int32}, a::Ptr{$elty}, lda::Ref{Int32}, iw::Ptr{Int32}, liw::Ref{Int32},
+                           dw::Ptr{Int32}, ldw::Ref{Int32}, icntl::Ptr{Int32}, cntl::Ptr{$subty}, info::Ptr{Int32}, rinfo::Ptr{$subty})::Cvoid
     end
   end
 end

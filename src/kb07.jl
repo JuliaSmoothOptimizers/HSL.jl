@@ -15,7 +15,7 @@ for (fname, elty) in ((:kb07a_ , :Float32),
     function kb07(v::Vector{$elty})
       n = length(v)
       perm = zeros(Cint, n)
-      @ccall libkb07.$fname(v::Ptr{$elty}, n::Ref{Cint}, perm::Ptr{Cint})::Cvoid
+      @ccall libhsl.$fname(v::Ptr{$elty}, n::Ref{Cint}, perm::Ptr{Cint})::Cvoid
       return v, perm
     end
   end

@@ -2,7 +2,7 @@ export mc21
 
 # mc21a and mc21ad routines are identical.
 function mc21ad(n, icn, licn, ip, lenr, iperm, numnz, iw)
-  @ccall libmc21.mc21ad_(n::Ref{Cint}, icn::Ptr{Cint}, licn::Ref{Cint}, ip::Ptr{Cint}, lenr::Ptr{Cint}, iperm::Ptr{Cint}, numnz::Ref{Cint}, iw::Ptr{Cint})::Cvoid
+  @ccall libhsl.mc21ad_(n::Ref{Cint}, icn::Ptr{Cint}, licn::Ref{Cint}, ip::Ptr{Cint}, lenr::Ptr{Cint}, iperm::Ptr{Cint}, numnz::Ref{Cint}, iw::Ptr{Cint})::Cvoid
 end
 
 """
