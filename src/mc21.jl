@@ -1,19 +1,8 @@
 export mc21
 
 # mc21a and mc21ad routines are identical.
-#
-# function mc21a(n, icn, licn, ip, lenr, iperm, numnz, iw)
-#   ccall(("mc21a_", libmc21),
-#          Cvoid,
-#         (Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}),
-#          n        , icn      , licn     , ip       , lenr     , iperm    , numnz    , iw       )
-# end
-
 function mc21ad(n, icn, licn, ip, lenr, iperm, numnz, iw)
-  ccall(("mc21ad_", libmc21),
-         Cvoid,
-        (Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}),
-         n        , icn      , licn     , ip       , lenr     , iperm    , numnz    , iw       )
+  @ccall libmc21.mc21ad_(n::Ref{Cint}, icn::Ptr{Cint}, licn::Ref{Cint}, ip::Ptr{Cint}, lenr::Ptr{Cint}, iperm::Ptr{Cint}, numnz::Ref{Cint}, iw::Ptr{Cint})::Cvoid
 end
 
 """
