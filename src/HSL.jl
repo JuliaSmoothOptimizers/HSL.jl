@@ -45,7 +45,10 @@ include("wrappers/C/hsl_mc78.jl")
 include("wrappers/C/hsl_mc79.jl")
 include("wrappers/C/hsl_mi20.jl")
 
-# Wrappers written by hand
+# Wrappers for Fortran subroutines and functions
+include("wrappers/Fortran/kb07.jl")
+include("wrappers/Fortran/mc21.jl")
+include("wrappers/Fortran/mc77.jl")
 
 # Interfaces
 include("hsl_ma57.jl")
