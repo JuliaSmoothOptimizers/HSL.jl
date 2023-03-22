@@ -1,12 +1,13 @@
 # Wrapping headers
 
-This directory contains scripts that can be used to automatically generate wrappers for C headers by HSL libraries.
+This directory contains a script that can be used to automatically generate wrappers from C headers provided by the HSL libraries.
 This is done using Clang.jl.
+We also have a script to generate the skeleton of wrappers for Fortran functions and subroutines.
 
 # Usage
 
 Either run `julia wrapper.jl` directly, or include it and call the `main()` function.
-Be sure to activate the project environment in this folder, which will install `Clang.jl` and `JuliaFormatter.jl`.
+Be sure to activate the project environment in this folder (`julia --project`), which will install `Clang.jl` and `JuliaFormatter.jl`.
 The `main` function supports the boolean keyword argument `optimized` to clear the generated wrappers.
 You can also call `main(library)` if you want to generate the wrapper for a specific HSL `library`.
 The possible values for `library` are:
@@ -24,6 +25,11 @@ The possible values for `library` are:
 - `"hsl_mc78"`;
 - `"hsl_mc79"`;
 - `"hsl_mi20"`.
+
+If a package doesn't have a C interface, we are still able to use it in Julia but we need to call Fortran functions and subroutines.
+The wrappers for Fortran functions and subroutines can't be easily generated and are generally written by hand but the file `analyzer.jl` helps to partially generate the wrappers.
+You just need to provide the path of the `JuliaHSL` on your computer (`julihsl` variable) and call `main(library)`.
+`library` can be any HSL package available in the `JuliaHSL` folder.
 
 # Maintenance
 
