@@ -12,7 +12,7 @@ mutable struct mc68_control
 end
 
 function mc68_default_control_i(control)
-    @ccall libhsl.mc68_default_control_i(control::Ptr{mc68_control})::Cvoid
+    @ccall libhsl.mc68_default_control_i(control::Ref{mc68_control})::Cvoid
 end
 
 mutable struct mc68_info
@@ -30,6 +30,6 @@ end
 
 function mc68_order_i(ord, n, ptr, row, perm, control, info)
     @ccall libhsl.mc68_order_i(ord::Cint, n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
-                               perm::Ptr{Cint}, control::Ptr{mc68_control},
-                               info::Ptr{mc68_info})::Cvoid
+                               perm::Ptr{Cint}, control::Ref{mc68_control},
+                               info::Ref{mc68_info})::Cvoid
 end

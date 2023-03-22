@@ -10,6 +10,86 @@ function JULIAHSL_version()
     VersionNumber(major[], minor[], patch[])
 end
 
+function HSL_AD02_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_AD02_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function HSL_ZD13_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.HSL_ZD13_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA27_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA27_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA28_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA28_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA30_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA30_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MA33_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MA33_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC19_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC19_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC20_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC20_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function MC24_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC24_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function TD22_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.TD22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
 function EA16_version()
     major = Ref{Cint}(0)
     minor = Ref{Cint}(0)

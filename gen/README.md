@@ -28,4 +28,3 @@ The possible values for `library` are:
 # Maintenance
 
 If a new C interface is available, add an entry for it in the `main` function of `wrapper.jl`.
-If HSL packages are deleted or added in the future, please update `epilogue.jl`.

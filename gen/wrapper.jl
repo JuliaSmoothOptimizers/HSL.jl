@@ -13,7 +13,7 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
   cd(@__DIR__)
   include_dir = joinpath(HSL_jll.artifact_dir, "include")
   options = load_options(joinpath(@__DIR__, "hsl.toml"))
-  options["general"]["output_file_path"] = joinpath("..", "src", "wrappers", "$(name).jl")
+  options["general"]["output_file_path"] = joinpath("..", "src", "wrappers", "C", "$(name).jl")
 
   if name != "juliahsl"
     solver = split(name, "_")[2]

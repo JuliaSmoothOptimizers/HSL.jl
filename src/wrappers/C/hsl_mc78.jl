@@ -13,7 +13,7 @@ mutable struct mc78_control
 end
 
 function mc78_default_control_i(control)
-    @ccall libhsl.mc78_default_control_i(control::Ptr{mc78_control})::Cvoid
+    @ccall libhsl.mc78_default_control_i(control::Ref{mc78_control})::Cvoid
 end
 
 function mc78_analyse_asm_i(n, ptr, row, perm, nnodes, sptr, sparent, rptr, rlist, control,
@@ -22,7 +22,7 @@ function mc78_analyse_asm_i(n, ptr, row, perm, nnodes, sptr, sparent, rptr, rlis
                                      perm::Ptr{Cint}, nnodes::Ptr{Cint},
                                      sptr::Ptr{Ptr{Cint}}, sparent::Ptr{Ptr{Cint}},
                                      rptr::Ptr{Ptr{Clong}}, rlist::Ptr{Ptr{Cint}},
-                                     control::Ptr{mc78_control}, stat::Ptr{Cint},
+                                     control::Ref{mc78_control}, stat::Ptr{Cint},
                                      nfact::Ptr{Clong}, nflops::Ptr{Clong},
                                      piv_size::Ptr{Cint})::Cint
 end
@@ -33,7 +33,7 @@ function mc78_analyse_elt_i(n, nelt, starts, vars, perm, eparent, nnodes, sptr, 
                                      vars::Ptr{Cint}, perm::Ptr{Cint}, eparent::Ptr{Cint},
                                      nnodes::Ptr{Cint}, sptr::Ptr{Ptr{Cint}},
                                      sparent::Ptr{Ptr{Cint}}, rptr::Ptr{Ptr{Clong}},
-                                     rlist::Ptr{Ptr{Cint}}, control::Ptr{mc78_control},
+                                     rlist::Ptr{Ptr{Cint}}, control::Ref{mc78_control},
                                      stat::Ptr{Cint}, nfact::Ptr{Clong}, nflops::Ptr{Clong},
                                      piv_size::Ptr{Cint})::Cint
 end
@@ -84,7 +84,7 @@ function mc78_supernodes_i(n, realn, parent, cc, sperm, nnodes, sptr, sparent, s
     @ccall libhsl.mc78_supernodes_i(n::Cint, realn::Cint, parent::Ptr{Cint}, cc::Ptr{Cint},
                                     sperm::Ptr{Cint}, nnodes::Ptr{Cint}, sptr::Ptr{Cint},
                                     sparent::Ptr{Cint}, scc::Ptr{Cint}, invp::Ptr{Cint},
-                                    control::Ptr{mc78_control}, st::Ptr{Cint},
+                                    control::Ref{mc78_control}, st::Ptr{Cint},
                                     wt::Ptr{Cint}, block_pivots::Ptr{Cint})::Cint
 end
 
@@ -108,11 +108,11 @@ function mc78_row_lists_i(nsvar, svar, n, ptr, row, perm, invp, nnodes, sptr, sp
                                    perm::Ptr{Cint}, invp::Ptr{Cint}, nnodes::Cint,
                                    sptr::Ptr{Cint}, sparent::Ptr{Cint}, scc::Ptr{Cint},
                                    rptr::Ptr{Clong}, rlist::Ptr{Cint},
-                                   control::Ptr{mc78_control}, st::Ptr{Cint})::Cint
+                                   control::Ref{mc78_control}, st::Ptr{Cint})::Cint
 end
 
 function mc78_default_control_l(control)
-    @ccall libhsl.mc78_default_control_l(control::Ptr{mc78_control})::Cvoid
+    @ccall libhsl.mc78_default_control_l(control::Ref{mc78_control})::Cvoid
 end
 
 function mc78_analyse_asm_l(n, ptr, row, perm, nnodes, sptr, sparent, rptr, rlist, control,
@@ -121,7 +121,7 @@ function mc78_analyse_asm_l(n, ptr, row, perm, nnodes, sptr, sparent, rptr, rlis
                                      perm::Ptr{Cint}, nnodes::Ptr{Cint},
                                      sptr::Ptr{Ptr{Cint}}, sparent::Ptr{Ptr{Cint}},
                                      rptr::Ptr{Ptr{Clong}}, rlist::Ptr{Ptr{Cint}},
-                                     control::Ptr{mc78_control}, stat::Ptr{Cint},
+                                     control::Ref{mc78_control}, stat::Ptr{Cint},
                                      nfact::Ptr{Clong}, nflops::Ptr{Clong},
                                      piv_size::Ptr{Cint})::Cint
 end
@@ -132,7 +132,7 @@ function mc78_analyse_elt_l(n, nelt, starts, vars, perm, eparent, nnodes, sptr, 
                                      vars::Ptr{Cint}, perm::Ptr{Cint}, eparent::Ptr{Cint},
                                      nnodes::Ptr{Cint}, sptr::Ptr{Ptr{Cint}},
                                      sparent::Ptr{Ptr{Cint}}, rptr::Ptr{Ptr{Clong}},
-                                     rlist::Ptr{Ptr{Cint}}, control::Ptr{mc78_control},
+                                     rlist::Ptr{Ptr{Cint}}, control::Ref{mc78_control},
                                      stat::Ptr{Cint}, nfact::Ptr{Clong}, nflops::Ptr{Clong},
                                      piv_size::Ptr{Cint})::Cint
 end
@@ -183,7 +183,7 @@ function mc78_supernodes_l(n, realn, parent, cc, sperm, nnodes, sptr, sparent, s
     @ccall libhsl.mc78_supernodes_l(n::Cint, realn::Cint, parent::Ptr{Cint}, cc::Ptr{Cint},
                                     sperm::Ptr{Cint}, nnodes::Ptr{Cint}, sptr::Ptr{Cint},
                                     sparent::Ptr{Cint}, scc::Ptr{Cint}, invp::Ptr{Cint},
-                                    control::Ptr{mc78_control}, st::Ptr{Cint},
+                                    control::Ref{mc78_control}, st::Ptr{Cint},
                                     wt::Ptr{Cint}, block_pivots::Ptr{Cint})::Cint
 end
 
@@ -207,5 +207,5 @@ function mc78_row_lists_l(nsvar, svar, n, ptr, row, perm, invp, nnodes, sptr, sp
                                    perm::Ptr{Cint}, invp::Ptr{Cint}, nnodes::Cint,
                                    sptr::Ptr{Cint}, sparent::Ptr{Cint}, scc::Ptr{Cint},
                                    rptr::Ptr{Clong}, rlist::Ptr{Cint},
-                                   control::Ptr{mc78_control}, st::Ptr{Cint})::Cint
+                                   control::Ref{mc78_control}, st::Ptr{Cint})::Cint
 end

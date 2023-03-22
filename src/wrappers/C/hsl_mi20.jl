@@ -25,7 +25,7 @@ mutable struct mi20_control{T}
 end
 
 function mi20_default_control_s(control)
-    @ccall libhsl.mi20_default_control_s(control::Ptr{mi20_control{Float32}})::Cvoid
+    @ccall libhsl.mi20_default_control_s(control::Ref{mi20_control{Float32}})::Cvoid
 end
 
 mutable struct mi20_solve_control{T}
@@ -40,7 +40,7 @@ mutable struct mi20_solve_control{T}
 end
 
 function mi20_default_solve_control_s(solve_control)
-    @ccall libhsl.mi20_default_solve_control_s(solve_control::Ptr{mi20_solve_control{Float32}})::Cvoid
+    @ccall libhsl.mi20_default_solve_control_s(solve_control::Ref{mi20_solve_control{Float32}})::Cvoid
 end
 
 mutable struct mi20_info{T}
@@ -57,99 +57,99 @@ end
 function mi20_setup_s(n, ptr, col, val, keep, control, info)
     @ccall libhsl.mi20_setup_s(n::Cint, ptr::Ptr{Cint}, col::Ptr{Cint},
                                val::Ptr{Float32}, keep::Ptr{Ptr{Cvoid}},
-                               control::Ptr{mi20_control{Float32}}, info::Ptr{mi20_info{Float32}})::Cvoid
+                               control::Ref{mi20_control{Float32}}, info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_setup_csr_s(n, ptr, col, val, keep, control, info)
     @ccall libhsl.mi20_setup_csr_s(n::Cint, ptr::Ptr{Cint}, col::Ptr{Cint},
                                    val::Ptr{Float32}, keep::Ptr{Ptr{Cvoid}},
-                                   control::Ptr{mi20_control{Float32}},
-                                   info::Ptr{mi20_info{Float32}})::Cvoid
+                                   control::Ref{mi20_control{Float32}},
+                                   info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_setup_csc_s(n, ptr, row, val, keep, control, info)
     @ccall libhsl.mi20_setup_csc_s(n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                    val::Ptr{Float32}, keep::Ptr{Ptr{Cvoid}},
-                                   control::Ptr{mi20_control{Float32}},
-                                   info::Ptr{mi20_info{Float32}})::Cvoid
+                                   control::Ref{mi20_control{Float32}},
+                                   info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_setup_coord_s(n, ne, row, col, val, keep, control, info)
     @ccall libhsl.mi20_setup_coord_s(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                      val::Ptr{Float32}, keep::Ptr{Ptr{Cvoid}},
-                                     control::Ptr{mi20_control{Float32}},
-                                     info::Ptr{mi20_info{Float32}})::Cvoid
+                                     control::Ref{mi20_control{Float32}},
+                                     info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_finalize_s(keep, control, info)
-    @ccall libhsl.mi20_finalize_s(keep::Ptr{Ptr{Cvoid}}, control::Ptr{mi20_control{Float32}},
-                                  info::Ptr{mi20_info{Float32}})::Cvoid
+    @ccall libhsl.mi20_finalize_s(keep::Ptr{Ptr{Cvoid}}, control::Ref{mi20_control{Float32}},
+                                  info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_precondition_s(rhs, solution, keep, control, info)
     @ccall libhsl.mi20_precondition_s(rhs::Ptr{Float32},
                                       solution::Ptr{Float32}, keep::Ptr{Ptr{Cvoid}},
-                                      control::Ptr{mi20_control{Float32}},
-                                      info::Ptr{mi20_info{Float32}})::Cvoid
+                                      control::Ref{mi20_control{Float32}},
+                                      info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_solve_s(rhs, solution, keep, control, solve_control, info)
     @ccall libhsl.mi20_solve_s(rhs::Ptr{Float32}, solution::Ptr{Float32},
-                               keep::Ptr{Ptr{Cvoid}}, control::Ptr{mi20_control{Float32}},
-                               solve_control::Ptr{mi20_solve_control{Float32}},
-                               info::Ptr{mi20_info{Float32}})::Cvoid
+                               keep::Ptr{Ptr{Cvoid}}, control::Ref{mi20_control{Float32}},
+                               solve_control::Ref{mi20_solve_control{Float32}},
+                               info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_default_control_d(control)
-    @ccall libhsl.mi20_default_control_d(control::Ptr{mi20_control{Float64}})::Cvoid
+    @ccall libhsl.mi20_default_control_d(control::Ref{mi20_control{Float64}})::Cvoid
 end
 
 function mi20_default_solve_control_d(solve_control)
-    @ccall libhsl.mi20_default_solve_control_d(solve_control::Ptr{mi20_solve_control{Float64}})::Cvoid
+    @ccall libhsl.mi20_default_solve_control_d(solve_control::Ref{mi20_solve_control{Float64}})::Cvoid
 end
 
 function mi20_setup_d(n, ptr, col, val, keep, control, info)
     @ccall libhsl.mi20_setup_d(n::Cint, ptr::Ptr{Cint}, col::Ptr{Cint},
                                val::Ptr{Float64}, keep::Ptr{Ptr{Cvoid}},
-                               control::Ptr{mi20_control{Float64}}, info::Ptr{mi20_info{Float64}})::Cvoid
+                               control::Ref{mi20_control{Float64}}, info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_setup_csr_d(n, ptr, col, val, keep, control, info)
     @ccall libhsl.mi20_setup_csr_d(n::Cint, ptr::Ptr{Cint}, col::Ptr{Cint},
                                    val::Ptr{Float64}, keep::Ptr{Ptr{Cvoid}},
-                                   control::Ptr{mi20_control{Float64}},
-                                   info::Ptr{mi20_info{Float64}})::Cvoid
+                                   control::Ref{mi20_control{Float64}},
+                                   info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_setup_csc_d(n, ptr, row, val, keep, control, info)
     @ccall libhsl.mi20_setup_csc_d(n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                    val::Ptr{Float64}, keep::Ptr{Ptr{Cvoid}},
-                                   control::Ptr{mi20_control{Float64}},
-                                   info::Ptr{mi20_info{Float64}})::Cvoid
+                                   control::Ref{mi20_control{Float64}},
+                                   info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_setup_coord_d(n, ne, row, col, val, keep, control, info)
     @ccall libhsl.mi20_setup_coord_d(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                      val::Ptr{Float64}, keep::Ptr{Ptr{Cvoid}},
-                                     control::Ptr{mi20_control{Float64}},
-                                     info::Ptr{mi20_info{Float64}})::Cvoid
+                                     control::Ref{mi20_control{Float64}},
+                                     info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_finalize_d(keep, control, info)
-    @ccall libhsl.mi20_finalize_d(keep::Ptr{Ptr{Cvoid}}, control::Ptr{mi20_control{Float64}},
-                                  info::Ptr{mi20_info{Float64}})::Cvoid
+    @ccall libhsl.mi20_finalize_d(keep::Ptr{Ptr{Cvoid}}, control::Ref{mi20_control{Float64}},
+                                  info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_precondition_d(rhs, solution, keep, control, info)
     @ccall libhsl.mi20_precondition_d(rhs::Ptr{Float64},
                                       solution::Ptr{Float64}, keep::Ptr{Ptr{Cvoid}},
-                                      control::Ptr{mi20_control{Float64}},
-                                      info::Ptr{mi20_info{Float64}})::Cvoid
+                                      control::Ref{mi20_control{Float64}},
+                                      info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_solve_d(rhs, solution, keep, control, solve_control, info)
     @ccall libhsl.mi20_solve_d(rhs::Ptr{Float64}, solution::Ptr{Float64},
-                               keep::Ptr{Ptr{Cvoid}}, control::Ptr{mi20_control{Float64}},
-                               solve_control::Ptr{mi20_solve_control{Float64}},
-                               info::Ptr{mi20_info{Float64}})::Cvoid
+                               keep::Ptr{Ptr{Cvoid}}, control::Ref{mi20_control{Float64}},
+                               solve_control::Ref{mi20_solve_control{Float64}},
+                               info::Ref{mi20_info{Float64}})::Cvoid
 end

@@ -7,7 +7,7 @@ mutable struct mc79_control
 end
 
 function mc79_default_control_i(control)
-    @ccall libhsl.mc79_default_control_i(control::Ptr{mc79_control})::Cvoid
+    @ccall libhsl.mc79_default_control_i(control::Ref{mc79_control})::Cvoid
 end
 
 mutable struct mc79_info
@@ -29,19 +29,19 @@ end
 function mc79_matching_i(m, n, ptr, row, rowmatch, colmatch, control, info)
     @ccall libhsl.mc79_matching_i(m::Cint, n::Cint, ptr::Ptr{Cint},
                                   row::Ptr{Cint}, rowmatch::Ptr{Cint}, colmatch::Ptr{Cint},
-                                  control::Ptr{mc79_control},
-                                  info::Ptr{mc79_info})::Cvoid
+                                  control::Ref{mc79_control},
+                                  info::Ref{mc79_info})::Cvoid
 end
 
 function mc79_coarse_i(m, n, ptr, row, rowperm, colperm, control, info)
     @ccall libhsl.mc79_coarse_i(m::Cint, n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                 rowperm::Ptr{Cint}, colperm::Ptr{Cint},
-                                control::Ptr{mc79_control}, info::Ptr{mc79_info})::Cvoid
+                                control::Ref{mc79_control}, info::Ref{mc79_info})::Cvoid
 end
 
 function mc79_fine_i(m, n, ptr, row, rowperm, colperm, rowcomp, colcomp, control, info)
     @ccall libhsl.mc79_fine_i(m::Cint, n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                               rowperm::Ptr{Cint}, colperm::Ptr{Cint}, rowcomp::Ptr{Cint},
-                              colcomp::Ptr{Cint}, control::Ptr{mc79_control},
-                              info::Ptr{mc79_info})::Cvoid
+                              colcomp::Ptr{Cint}, control::Ref{mc79_control},
+                              info::Ref{mc79_info})::Cvoid
 end
