@@ -53,17 +53,22 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
   types = ["" for i=1:narguments]
   lines = split(code, "\n")
   nlines = length(lines)
-  for i = 1:nlines
+  for i = nlines:-1:1
+    lines[i] = replace(lines[i], "\t" => "")
     lines[i] = replace(lines[i], "\r" => "")
     lines[i] = replace(lines[i], " " => "")
-    if (i ≥ 2) && (length(lines[i]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*'])
-      lines[i-1] = lines[i-1] * "," * lines[i][2:end]
+    if (i ≥ 4) && (length(lines[i]) ≥ 1) && (length(lines[i-1]) ≥ 1) && (length(lines[i-2]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-1][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-2][1], |, ['+', '$', '*'])
+      lines[i-3] = lines[i-3] * "," * lines[i][2:end] * ","
+      lines[i] = ""
     end
     if (i ≥ 3) && (length(lines[i]) ≥ 1) && (length(lines[i-1]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-1][1], |, ['+', '$', '*'])
-      lines[i-2] = lines[i-2] * "," * lines[i][2:end]
+      lines[i-2] = lines[i-2] * "," * lines[i][2:end] * ","
+      lines[i] = ""
+      println(lines[i-2])
     end
-    if (i ≥ 4) && (length(lines[i]) ≥ 1) && (length(lines[i-1]) ≥ 1) && (length(lines[i-2]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-1][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-2][1], |, ['+', '$', '*'])
-      lines[i-3] = lines[i-3] * "," * lines[i][2:end]
+    if (i ≥ 2) && (length(lines[i]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*'])
+      lines[i-1] = lines[i-1] * "," * lines[i][2:end] * ","
+      lines[i] = ""
     end
   end
   for line in lines
@@ -71,6 +76,7 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
 
     if (taille ≥ 7) && (line[1:7] == "INTEGER" || line[1:7] == "integer")
       variables = split(line[8:end], ',')
+      display(variables)
       for variable in variables
         ref, variable = reference_type(variable)
         for (i, argument) in enumerate(arguments)
@@ -194,11 +200,15 @@ function fortran_analyzer(str::String)
   str = replace(str, "by subroutine" => "")
   str = replace(str, "of subroutine" => "")
   str = replace(str, "see subroutine" => "")
+  str = replace(str, "THIS SUBROUTINE" => "")
+
   str = replace(str, "compression subroutine" => "")
   str = replace(str, "A subroutine" => "")
   str = replace(str, "This subroutine" => "")
+  str = replace(str, "Factorization subroutine" => "")
   str = replace(str, "END FUNCTION" => "")
   str = replace(str, "end function" => "")
+  str = replace(str, "THE FUNCTION" => "")
 
   for case in ["SUBROUTINE", "subroutine", "FUNCTION", "function"]
     v = split(str, case)
@@ -286,8 +296,8 @@ function main(name::String)
           if occursin(hsl_name, signature)
             println()
             display(fname[1:end-1])
-            display(types)
-            display(output_type)
+            # display(types)
+            # display(output_type)
             write(file_wrapper, "function $signature\n")
             write(file_wrapper, "  @ccall libhsl.$fname(")
             for k = 1:narguments
