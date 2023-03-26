@@ -11,7 +11,7 @@ function me62jd(nvar, ivar, ndf, last, icntl, isave, info, rinfo)
 end
 
 function me62pd(istrm, filnam, lenbuf, icntl, isave, info)
-  @ccall libhsl.me62pd_(istrm::Ptr{Cint}, filnam::Ptr{UInt8}, lenbuf::Ptr{Cint}, icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint})::Cvoid
+  @ccall libhsl.me62pd_(istrm::Ptr{Cint}, filnam::Ref{UInt8}, lenbuf::Ptr{Cint}, icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint})::Cvoid
 end
 
 function me62bd(kind, nvar, ivar, ndf, last, lavar, avar, nrhsb, rhs, lx, x, lenbuf, lw, w, liw, iw, icntl, cntl, isave, info, rinfo)
@@ -71,7 +71,7 @@ function me62j(nvar, ivar, ndf, last, icntl, isave, info, rinfo)
 end
 
 function me62p(istrm, filnam, lenbuf, icntl, isave, info)
-  @ccall libhsl.me62p_(istrm::Ptr{Cint}, filnam::Ptr{UInt8}, lenbuf::Ptr{Cint}, icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint})::Cvoid
+  @ccall libhsl.me62p_(istrm::Ptr{Cint}, filnam::Ref{UInt8}, lenbuf::Ptr{Cint}, icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint})::Cvoid
 end
 
 function me62b(kind, nvar, ivar, ndf, last, lavar, avar, nrhsb, rhs, lx, x, lenbuf, lw, w, liw, iw, icntl, cntl, isave, info, rinfo)

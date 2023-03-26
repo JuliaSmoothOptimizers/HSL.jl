@@ -25,4 +25,3 @@ end
 function ep25hd(sum, mpi_comm)
   @ccall libhsl.ep25hd_(sum::Ref{Float64}, mpi_comm::Ref{Cint})::Cvoid
 end
-
