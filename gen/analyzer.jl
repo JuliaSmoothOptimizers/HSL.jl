@@ -73,6 +73,7 @@ function type_mapping(type::String)
   (type == "INTEGER") && (julia_type = "Cint")
   (type == "LOGICAL") && (julia_type = "Cint")
   (type == "REAL") && (julia_type = "Float32")
+  (type == "real(wp)") && (julia_type = "Float64")
   (type == "DOUBLEPRECISION") && (julia_type = "Float64")
   (type == "COMPLEX") && (julia_type = "ComplexF32")
   (type == "DOUBLECOMPLEX") && (julia_type = "ComplexF64")
@@ -109,6 +110,26 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
     lines[i] = replace(lines[i], "\r" => "")
     lines[i] = replace(lines[i], " " => "")
 
+    # For code written in FORTRAN 90
+    lines[i] = replace(lines[i], "::" => "")
+    lines[i] = replace(lines[i], ",intent(in)" => "")
+    lines[i] = replace(lines[i], ",intent(out)" => "")
+    lines[i] = replace(lines[i], ",intent(inout)" => "")
+    lines[i] = replace(lines[i], ",INTENT(IN)" => "")
+    lines[i] = replace(lines[i], ",INTENT(OUT)" => "")
+    lines[i] = replace(lines[i], ",INTENT(INOUT)" => "")
+    lines[i] = replace(lines[i], ",allocatable" => "")
+
+    if occursin("!", lines[i])
+      find = false
+      for (k, value) in enumerate(lines[i])
+        if value == '!' && !find
+          find = true
+          lines[i] = lines[i][1:k-1]
+        end
+      end
+    end
+
     # The variables of the same type inside a function or a subroutine are sometimes split across multiple lines
     for p = 5:-1:2
       if (i ≥ p) && mapreduce(index -> length(lines[index]) ≥ 1, &, i-p+2:i) && mapreduce(index -> (lines[index][1] == '+') || (lines[index][1] == '$') || (lines[index][1] == '*') || (lines[index][1] == '&'), &, i-p+2:i)
@@ -125,6 +146,7 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
     type_detector(types, arguments, line, "INTEGER")
     type_detector(types, arguments, line, "LOGICAL")
     type_detector(types, arguments, line, "REAL")
+    type_detector(types, arguments, line, "real(wp)")
     type_detector(types, arguments, line, "DOUBLEPRECISION")
     type_detector(types, arguments, line, "COMPLEX")
     type_detector(types, arguments, line, "DOUBLECOMPLEX")
@@ -269,9 +291,9 @@ function main(name::String)
           # Only define functions directly related to the HSL package
           if occursin(hsl_name, signature)
             index = index + 1
-            # println()
-            # display(fname[1:end-1])
-            # display(types)
+            println()
+            display(fname[1:end-1])
+            display(types)
             # display(output_type)
             (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl"
             write(file_wrapper, "function $signature\n")
