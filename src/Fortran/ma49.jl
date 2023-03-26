@@ -205,4 +205,3 @@ end
 function ma49z(m, n, ne, jcn, iptr, keep, is, maxis, s, maxs, ipr, ir, r, lr, rows, icntl, info)
   @ccall libhsl.ma49z_(m::Ref{Cint}, n::Ref{Cint}, ne::Ref{Cint}, jcn::Ptr{Cint}, iptr::Ptr{Cint}, keep::Ptr{Cint}, is::Ptr{Cint}, maxis::Ref{Cint}, s::Ptr{Float32}, maxs::Ref{Cint}, ipr::Ptr{Cint}, ir::Ptr{Cint}, r::Ptr{Float32}, lr::Ref{Cint}, rows::Ptr{Cint}, icntl::Ptr{Cint}, info::Ptr{Cint})::Cvoid
 end
-

@@ -181,4 +181,3 @@ end
 function ma41z(n, nz, nsteps, a, la, iw, liw, na, ne, nstk, maxfrt, iflag, ierror, nd, fils, frere, ptrarw, ptraiw, ptrast, ptrist, ptlust, tlkj, permw, nprocs, itloc, nirbdu, ipta, ipool, lpool, ipoolb, uuloc, icntl, info, rinfo, keep)
   @ccall libhsl.ma41z_(n::Ref{Cint}, nz::Ref{Cint}, nsteps::Ref{Cint}, a::Ptr{Float32}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint}, na::Ptr{Cint}, ne::Ptr{Cint}, nstk::Ptr{Cint}, maxfrt::Ref{Cint}, iflag::Ref{Cint}, ierror::Ref{Cint}, nd::Ptr{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint}, ptrarw::Ptr{Cint}, ptraiw::Ptr{Cint}, ptrast::Ptr{Cint}, ptrist::Ptr{Cint}, ptlust::Ptr{Cint}, tlkj::Ptr{Cint}, permw::Ptr{Cint}, nprocs::Ref{Cint}, itloc::Ptr{Cint}, nirbdu::Ref{Cint}, ipta::Ptr{Cint}, ipool::Ptr{Cint}, lpool::Ref{Cint}, ipoolb::Ptr{Cint}, uuloc::Ref{Float32}, icntl::Ptr{Cint}, info::Ptr{Cint}, rinfo::Ptr{Float32}, keep::Ptr{Cint})::Cvoid
 end
-

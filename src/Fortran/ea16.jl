@@ -189,4 +189,3 @@ end
 function ea16z(ierr, warn)
   @ccall libhsl.ea16z_(ierr::Ref{Cint}, warn::Ref{Cint})::Cvoid
 end
-

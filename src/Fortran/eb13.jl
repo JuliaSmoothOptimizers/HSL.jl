@@ -109,4 +109,3 @@ end
 function eb13r(n, numcol, numeig, er, ei, y, x, w, ln, tw)
   @ccall libhsl.eb13r_(n::Ref{Cint}, numcol::Ref{Cint}, numeig::Ref{Cint}, er::Ptr{Float32}, ei::Ptr{Float32}, y::Ptr{Float32}, x::Ptr{Float32}, w::Ptr{Float32}, ln::Ref{Cint}, tw::Ptr{Float32})::Cvoid
 end
-
