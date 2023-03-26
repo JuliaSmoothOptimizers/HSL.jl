@@ -1,5 +1,11 @@
 # Script to partially generate wrappers from Fortran files
+using HSL_jll
+using JuliaFormatter
 juliahsl = "/home/alexis/Bureau/git/hsl/juliahsl/"
+
+# Symbols of the shared library libhsl
+symbols_path = "symbols.txt"
+run(pipeline(`nm -D $(HSL_jll.libhsl_path)`, stdout=symbols_path))
 
 # Function to easily get the extension of a file
 function file_extension(file::String)
@@ -214,6 +220,11 @@ function fortran_analyzer(str::String)
 end
 
 function main(name::String)
+  # Create a vector with all symbols exported by the shared library libhsl
+  symbols = read(symbols_path, String)
+  symbols = split(symbols, "\n", keepempty=false)
+  symbols = [symbol[20:end] for symbol in symbols]
+
   for (root, dirs, files) in walkdir(juliahsl)
 
     # We don't want to go inside "metis" and "juliahsl" folders
@@ -247,19 +258,22 @@ function main(name::String)
 
         # Remove duplicates
         fnames_package = unique(fnames_package)
-        num_fnames = length(fnames_package)
-        
-        for (index, fun) in enumerate(fnames_package)
+        hsl_name = occursin("hsl_", package) ? package[5:end] : package
+        num_fnames = count(i -> occursin(hsl_name, i[1]), fnames_package)
+
+        index = 0
+        for fun in fnames_package
           signature, fname, arguments, types, output_type = fun
           narguments = length(arguments)
 
           # Only define functions directly related to the HSL package
-          hsl_name = occursin("hsl_", package) ? package[5:end] : package
           if occursin(hsl_name, signature)
-            println()
-            display(fname[1:end-1])
+            index = index + 1
+            # println()
+            # display(fname[1:end-1])
             # display(types)
             # display(output_type)
+            (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl"
             write(file_wrapper, "function $signature\n")
             write(file_wrapper, "  @ccall libhsl.$fname(")
             for k = 1:narguments
@@ -274,6 +288,7 @@ function main(name::String)
           end
         end
         close(file_wrapper)
+        format_file(path_wrapper, YASStyle())
       end
     end
   end
