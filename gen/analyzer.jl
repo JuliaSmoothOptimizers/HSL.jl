@@ -30,6 +30,9 @@ function fortran_output(case::String, text::AbstractString)
   end
 end
 
+"""
+Return the name and the arguments of a Fortran function or subroutine.
+"""
 function fortran_name_arguments(signature::String)
   v = split(signature, "(")
   fname = v[1]
@@ -37,10 +40,18 @@ function fortran_name_arguments(signature::String)
   return fname, arguments
 end
 
-function reference_type(variable::AbstractString)
+"""
+Determine if a Fortran variable is an array or not.
+If it's an array, we remove the size at the end of the variable name.
+We will also know if `Ref` or `Ptr` should be use within the @ccall.
+"""
+function reference_type(variable::AbstractString, type::String)
   if occursin('(', variable)
     ref = "Ptr"
     var = split(variable, '(')[1]
+  elseif occursin('*', variable) && type == "CHARACTER"
+    ref = "Ptr"
+    var = split(variable, '*')[1]
   else
     ref = "Ref"
     var = variable
@@ -48,7 +59,41 @@ function reference_type(variable::AbstractString)
   return ref, var
 end
 
-function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString})
+"""
+Mapping between Fortran and Julia types.
+"""
+function type_mapping(type::String)
+  julia_type = ""
+  (type == "INTEGER") && (julia_type = "Cint")
+  (type == "LOGICAL") && (julia_type = "Cint")
+  (type == "REAL") && (julia_type = "Float32")
+  (type == "DOUBLEPRECISION") && (julia_type = "Float64")
+  (type == "COMPLEX") && (julia_type = "ComplexF32")
+  (type == "DOUBLECOMPLEX") && (julia_type = "ComplexF64")
+  (type == "COMPLEX*16") && (julia_type = "ComplexF64")
+  (type == "CHARACTER") && (julia_type = "UInt8")
+  return julia_type
+end
+
+function type_detector(types::Vector{String}, arguments::Vector{<:AbstractString}, line::AbstractString, type::String)
+  taille = length(line)
+  len = length(type)
+  julia_type = type_mapping(type)
+  if (taille ≥ len) && (line[1:len] == type || line[1:len] == lowercase(type))
+    variables = split(line[len+1:end], ',')
+    for variable in variables
+      ref, variable = reference_type(variable, type)
+      for (i, argument) in enumerate(arguments)
+        if (argument == variable) || (uppercase(argument) == variable)
+          types[i] = "$ref{$(julia_type)}"
+        end
+      end
+    end
+  end
+  return types
+end
+
+function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}; verbose::Bool=false)
   narguments = length(arguments)
   types = ["" for i=1:narguments]
   lines = split(code, "\n")
@@ -57,129 +102,41 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
     lines[i] = replace(lines[i], "\t" => "")
     lines[i] = replace(lines[i], "\r" => "")
     lines[i] = replace(lines[i], " " => "")
-    if (i ≥ 4) && (length(lines[i]) ≥ 1) && (length(lines[i-1]) ≥ 1) && (length(lines[i-2]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-1][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-2][1], |, ['+', '$', '*'])
-      lines[i-3] = lines[i-3] * "," * lines[i][2:end] * ","
-      lines[i] = ""
-    end
-    if (i ≥ 3) && (length(lines[i]) ≥ 1) && (length(lines[i-1]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*']) && mapreduce(x -> x == lines[i-1][1], |, ['+', '$', '*'])
-      lines[i-2] = lines[i-2] * "," * lines[i][2:end] * ","
-      lines[i] = ""
-      println(lines[i-2])
-    end
-    if (i ≥ 2) && (length(lines[i]) ≥ 1) && mapreduce(x -> x == lines[i][1], |, ['+', '$', '*'])
-      lines[i-1] = lines[i-1] * "," * lines[i][2:end] * ","
-      lines[i] = ""
+
+    # The variables of the same type inside a function or a subroutine are sometimes split across multiple lines
+    for p = 5:-1:2
+      if (i ≥ p) && mapreduce(index -> length(lines[index]) ≥ 1, &, i-p+2:i) && mapreduce(index -> (lines[index][1] == '+') || (lines[index][1] == '$') || (lines[index][1] == '*') || (lines[index][1] == '&'), &, i-p+2:i)
+        lines[i-p+1] = lines[i-p+1] * "," * lines[i][2:end] * ","
+        lines[i] = ""
+      end
     end
   end
+
   for line in lines
     taille = length(line)
+    verbose && println(line)
 
-    if (taille ≥ 7) && (line[1:7] == "INTEGER" || line[1:7] == "integer")
-      variables = split(line[8:end], ',')
-      display(variables)
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{Cint}"
-          end
-        end
-      end
+    type_detector(types, arguments, line, "INTEGER")
+    type_detector(types, arguments, line, "LOGICAL")
+    type_detector(types, arguments, line, "REAL")
+    type_detector(types, arguments, line, "DOUBLEPRECISION")
+    type_detector(types, arguments, line, "COMPLEX")
+    type_detector(types, arguments, line, "DOUBLECOMPLEX")
+    type_detector(types, arguments, line, "COMPLEX*16")
+    type_detector(types, arguments, line, "CHARACTER")
 
-    elseif (taille ≥ 9) && (line[1:9] == "CHARACTER" || line[1:9] == "character")
-      variables = split(line[10:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          # *N at the end of the variable, N requires one or two characters
-          if (argument == variable[1:end-2]) || (uppercase(argument) == variable[1:end-2]) || (argument == variable[1:end-3]) || (uppercase(argument) == variable[1:end-3])
-            types[i] = "Ptr{UInt8}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 10) && (line[1:10] == "CHARACTER*" || line[1:10] == "character*")
-      variables = split(line[12:end], ',')  # CHARACTER*N with N < 10
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "Ptr{UInt8}"
-          end
-        end
-      end
-      variables = split(line[13:end], ',')  # CHARACTER*N with N ≥ 10 and N < 100
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "Ptr{UInt8}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 7) && (line[1:7] == "LOGICAL" || line[1:7] == "logical")
-      variables = split(line[8:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{Cint}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 4) && (line[1:4] == "REAL" || line[1:4] == "real")
-      variables = split(line[5:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{Float32}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 15) && (line[1:15] == "DOUBLEPRECISION" || line[1:15] == "doubleprecision")
-      variables = split(line[16:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{Float64}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 13) && (line[1:13] == "DOUBLECOMPLEX" || line[1:13] == "doublecomplex")
-      variables = split(line[14:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{ComplexF64}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 10) && (line[1:10] == "COMPLEX*16" || line[1:10] == "complex*16")
-      variables = split(line[11:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{ComplexF64}"
-          end
-        end
-      end
-
-    elseif (taille ≥ 7) && (line[1:7] == "COMPLEX" || line[1:7] == "complex")
-      variables = split(line[8:end], ',')
-      for variable in variables
-        ref, variable = reference_type(variable)
-        for (i, argument) in enumerate(arguments)
-          if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "$ref{ComplexF32}"
+    if (taille ≥ 10) && (line[1:10] == "CHARACTER*" || line[1:10] == "character*")
+      # start=12 -> CHARACTER*N with N < 10
+      # start=13 -> CHARACTER*N with N ≥ 10 and N < 100
+      # start=14 -> CHARACTER*N with N ≥ 100 and N < 1000
+      for start in (12, 13, 14)
+        length(line) ≥ start || continue
+        variables = split(line[start:end], ',')
+        for variable in variables
+          for (i, argument) in enumerate(arguments)
+            if (argument == variable) || (uppercase(argument) == variable)
+              types[i] = "Ptr{UInt8}"
+            end
           end
         end
       end
@@ -191,24 +148,26 @@ end
 function fortran_analyzer(str::String)
   functions = []
 
-  # We only want the signature of the subroutines and functions
-  str = replace(str, "END SUBROUTINE" => "")
-  str = replace(str, "end subroutine" => "")
-  str = replace(str, "subroutine." => "")
-  str = replace(str, "subroutines" => "")
-  str = replace(str, "SUBROUTINES" => "")
-  str = replace(str, "by subroutine" => "")
-  str = replace(str, "of subroutine" => "")
-  str = replace(str, "see subroutine" => "")
-  str = replace(str, "THIS SUBROUTINE" => "")
+  # Remove the comments
+  lines = split(str, "\n")
+  str = ""
+  for line in lines
+    if (length(line) ≥ 1) && (line[1] != 'C' && line[1] != 'c' && line[1] != '*')
+      str = str * line * "\n"
+    end
+  end
 
-  str = replace(str, "compression subroutine" => "")
-  str = replace(str, "A subroutine" => "")
-  str = replace(str, "This subroutine" => "")
-  str = replace(str, "Factorization subroutine" => "")
-  str = replace(str, "END FUNCTION" => "")
-  str = replace(str, "end function" => "")
-  str = replace(str, "THE FUNCTION" => "")
+  # We only want the signature of the subroutines and functions
+  patterns = ["END SUBROUTINE", "end subroutine", "subroutine.", "SUBROUTINES.",
+              "subroutines", "SUBROUTINES", "by subroutine", "of subroutine",
+              "see subroutine", "SUBROUTINE.", "the subroutine", "THE SUBROUTINE",
+              "THIS SUBROUTINE", "TO SUBROUTINE", "HARWELL SUBROUTINE", "ANALYSIS SUBROUTINE",
+              "compression subroutine", "A subroutine", "A SUBROUTINE", "This subroutine",
+              "Factorization subroutine", "END FUNCTION", "end function", "THE FUNCTION",
+              "THIS FUNCTION", "Subroutines", "Functions"]
+  for pattern in patterns
+    str = replace(str, pattern => "")
+  end
 
   for case in ["SUBROUTINE", "subroutine", "FUNCTION", "function"]
     v = split(str, case)
@@ -236,7 +195,9 @@ function fortran_analyzer(str::String)
         fname, arguments = fortran_name_arguments(signature)
 
         # Determine the type of the arguments
-        types = fortran_types(code, arguments)
+        verbose = false
+        (fname == "unknown") && (verbose = true)
+        types = fortran_types(code, arguments, verbose=verbose)
 
         # Determine the type of the ouput
         output_type = fortran_output(case, v[index])
@@ -262,6 +223,7 @@ function main(name::String)
     if root != juliahsl
       package = split(root, juliahsl, keepempty=false)[1]
       # We are in the main folder of an HSL package
+      # if '/' ∉ package && package != "ma46" && !occursin("hsl", package) # generate the wrappers for all packages
       if package == name
         path_wrapper = joinpath("..", "src", "Fortran", "$(package).jl")
         file_wrapper = open(path_wrapper, "w")
