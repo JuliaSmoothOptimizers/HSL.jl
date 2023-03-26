@@ -43,7 +43,7 @@ function ma49kd(m, n, nz, a, icn, iptr, r, lr, ir, lir, istack, awork, la, nstep
 end
 
 function ma49ld(mat, trans, m, n, ifact, lft, r, lr, istack, q, lq, qstack, awork, la, qwork, lqw, b, x, ides, nsteps, maxfrt, nproc, nstk, pool, maxlea, nbrad, fils, frere, iflag, ierror)
-  @ccall libhsl.ma49ld_(mat::Ref{UInt8}, trans::Ref{UInt8}, m::Ptr{UInt8}, n::Ref{Cint}, ifact::Ptr{Cint}, lft::Ref{Cint}, r::Ptr{Float64}, lr::Ref{Cint}, istack::Ptr{Cint}, q::Ptr{Float64}, lq::Ref{Cint}, qstack::Ptr{Float64}, awork::Ptr{Float64}, la::Ref{Cint}, qwork::Ptr{Float64}, lqw::Ref{Cint}, b::Ptr{Float64}, x::Ptr{Float64}, ides::Ref{Cint}, nsteps::Ref{Cint}, maxfrt::Ref{Cint}, nproc::Ref{Cint}, nstk::Ptr{Cint}, pool::Ptr{Cint}, maxlea::Ref{Cint}, nbrad::Ref{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint}, iflag::Ref{Cint}, ierror::Ref{Cint})::Cvoid
+  @ccall libhsl.ma49ld_(mat::Ref{UInt8}, trans::Ref{UInt8}, m::Ref{Cint}, n::Ref{Cint}, ifact::Ptr{Cint}, lft::Ref{Cint}, r::Ptr{Float64}, lr::Ref{Cint}, istack::Ptr{Cint}, q::Ptr{Float64}, lq::Ref{Cint}, qstack::Ptr{Float64}, awork::Ptr{Float64}, la::Ref{Cint}, qwork::Ptr{Float64}, lqw::Ref{Cint}, b::Ptr{Float64}, x::Ptr{Float64}, ides::Ref{Cint}, nsteps::Ref{Cint}, maxfrt::Ref{Cint}, nproc::Ref{Cint}, nstk::Ptr{Cint}, pool::Ptr{Cint}, maxlea::Ref{Cint}, nbrad::Ref{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint}, iflag::Ref{Cint}, ierror::Ref{Cint})::Cvoid
 end
 
 function ma49md(n, rwblk, nstk, ndd, lerow, ma59cd, fils, frere, mstk, ncstk, nelim, nsteps, info, keep)
@@ -147,7 +147,7 @@ function ma49k(m, n, nz, a, icn, iptr, r, lr, ir, lir, istack, awork, la, nsteps
 end
 
 function ma49l(mat, trans, m, n, ifact, lft, r, lr, istack, q, lq, qstack, awork, la, qwork, lqw, b, x, ides, nsteps, maxfrt, nproc, nstk, pool, maxlea, nbrad, fils, frere, iflag, ierror)
-  @ccall libhsl.ma49l_(mat::Ref{UInt8}, trans::Ref{UInt8}, m::Ptr{UInt8}, n::Ref{Cint}, ifact::Ptr{Cint}, lft::Ref{Cint}, r::Ptr{Float32}, lr::Ref{Cint}, istack::Ptr{Cint}, q::Ptr{Float32}, lq::Ref{Cint}, qstack::Ptr{Float32}, awork::Ptr{Float32}, la::Ref{Cint}, qwork::Ptr{Float32}, lqw::Ref{Cint}, b::Ptr{Float32}, x::Ptr{Float32}, ides::Ref{Cint}, nsteps::Ref{Cint}, maxfrt::Ref{Cint}, nproc::Ref{Cint}, nstk::Ptr{Cint}, pool::Ptr{Cint}, maxlea::Ref{Cint}, nbrad::Ref{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint}, iflag::Ref{Cint}, ierror::Ref{Cint})::Cvoid
+  @ccall libhsl.ma49l_(mat::Ref{UInt8}, trans::Ref{UInt8}, m::Ref{Cint}, n::Ref{Cint}, ifact::Ptr{Cint}, lft::Ref{Cint}, r::Ptr{Float32}, lr::Ref{Cint}, istack::Ptr{Cint}, q::Ptr{Float32}, lq::Ref{Cint}, qstack::Ptr{Float32}, awork::Ptr{Float32}, la::Ref{Cint}, qwork::Ptr{Float32}, lqw::Ref{Cint}, b::Ptr{Float32}, x::Ptr{Float32}, ides::Ref{Cint}, nsteps::Ref{Cint}, maxfrt::Ref{Cint}, nproc::Ref{Cint}, nstk::Ptr{Cint}, pool::Ptr{Cint}, maxlea::Ref{Cint}, nbrad::Ref{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint}, iflag::Ref{Cint}, ierror::Ref{Cint})::Cvoid
 end
 
 function ma49m(n, rwblk, nstk, ndd, lerow, ma59c, fils, frere, mstk, ncstk, nelim, nsteps, info, keep)
