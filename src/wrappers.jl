@@ -93,7 +93,7 @@ include("Fortran/ma41.jl")
 include("Fortran/ma42.jl")
 include("Fortran/ma43.jl")
 include("Fortran/ma44.jl")
-# include("Fortran/ma46.jl")  # We need to provide other subroutines as input arguments...
+include("Fortran/ma46.jl")
 include("Fortran/ma48.jl")
 include("Fortran/ma49.jl")
 include("Fortran/ma50.jl")

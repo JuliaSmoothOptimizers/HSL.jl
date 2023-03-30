@@ -222,6 +222,9 @@ function fortran_analyzer(str::String)
         # Determine the name of the function / subroutine and its arguments
         fname, arguments = fortran_name_arguments(signature)
 
+        # Subroutines in ma46 that we can't handle in Julia
+        fname ∈ ("ma46u", "ma46ud", "ma46w", "ma46wd") && continue
+
         # Determine the type of the arguments
         verbose = false
         (fname == "unknown") && (verbose = true)
@@ -256,7 +259,7 @@ function main(name::String)
     if root != juliahsl
       package = split(root, juliahsl, keepempty=false)[1]
       # We are in the main folder of an HSL package
-      # if '/' ∉ package && package != "ma46" && !occursin("hsl", package) # generate the wrappers for all packages
+      # if '/' ∉ package && !occursin("hsl", package)  # generate the wrappers for all packages
       if package == name
         path_wrapper = joinpath("..", "src", "Fortran", "$(package).jl")
         file_wrapper = open(path_wrapper, "w")
