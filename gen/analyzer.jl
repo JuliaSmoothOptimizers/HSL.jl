@@ -7,11 +7,20 @@ juliahsl = "/home/alexis/Bureau/git/hsl/juliahsl/"
 symbols_path = "symbols.txt"
 run(pipeline(`nm -D $(HSL_jll.libhsl_path)`, stdout=symbols_path))
 
+# Relation between the hsl precision and the name of the symbols
+hsl_precision = Dict{Char, String}('i' => "integer",
+                                   'l' => "long_integer",
+                                   's' => "single",
+                                   'd' => "double",
+                                   'c' => "complex",
+                                   'z' => "double_complex")
+
 # Function to easily get the extension of a file
 function file_extension(file::String)
   pos_dot = findlast(==('.'), file)
+  basename = pos_dot == nothing ? file : file[1:pos_dot-1]
   extension = pos_dot == nothing ? "" : file[pos_dot+1:end]
-  return extension
+  return basename, extension
 end
 
 function fortran_output(case::String, text::AbstractString)
@@ -173,7 +182,7 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
   return types
 end
 
-function fortran_analyzer(str::String)
+function fortran_analyzer(str::String, basename::String, extension::String)
   functions = []
 
   # Remove the comments
@@ -234,7 +243,13 @@ function fortran_analyzer(str::String)
         output_type = fortran_output(case, v[index])
 
         # Update fname and signature
-        fname = fname * "_"
+        if extension == "f"
+          fname = fname * "_"
+        else
+          package = basename[1:end-1]
+          precision = hsl_precision[basename[end]]
+          fname = "__" * package * "_" * precision * "_MOD_" * fname
+        end
         signature = signature * ")"
 
         push!(functions, (signature, fname, arguments, types, output_type))
@@ -271,12 +286,13 @@ function main(name::String)
         @info "The wrappers of $package will be generated in $path_wrapper"
         fnames_package = String[]
         for file in files
-          if file_extension(file) ∈ ("f", "f90")
+          basename, ext = file_extension(file)
+          if ext ∈ ("f", "f90")
             path_fortran = joinpath(root, file)
             file_fortran = open(path_fortran, "r")
             str = read(file_fortran, String)
             close(file_fortran)
-            fnames = fortran_analyzer(str)
+            fnames = fortran_analyzer(str, basename, ext)
             fnames_package = vcat(fnames_package, fnames)
           end
         end
@@ -286,6 +302,7 @@ function main(name::String)
         hsl_name = occursin("hsl_", package) ? package[5:end] : package
         num_fnames = count(i -> occursin(hsl_name, i[1]), fnames_package)
 
+        format = true
         index = 0
         for fun in fnames_package
           signature, fname, arguments, types, output_type = fun
@@ -295,25 +312,31 @@ function main(name::String)
           if occursin(hsl_name, signature)
             index = index + 1
             println()
-            display(fname[1:end-1])
+            display(signature)
             display(types)
             # display(output_type)
             (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl"
             write(file_wrapper, "function $signature\n")
             write(file_wrapper, "  @ccall libhsl.$fname(")
             for k = 1:narguments
-              types[k] == "" && @info "Unable to determine the type of $(arguments[k])"
+              if types[k] == ""
+                format = false
+                @info "Unable to determine the type of $(arguments[k])"
+              end
               write(file_wrapper, "$(arguments[k])::$(types[k])")
               (k < narguments) && write(file_wrapper, ", ")
             end
-            output_type == "" && @info "Unable to determine the output type"
+            if output_type == ""
+              format = false
+              @info "Unable to determine the output type"
+            end
             write(file_wrapper, ")::$(output_type)\n")
             write(file_wrapper, "end\n")
             index < num_fnames && write(file_wrapper, "\n")
           end
         end
         close(file_wrapper)
-        format_file(path_wrapper, YASStyle())
+        format && format_file(path_wrapper, YASStyle())
       end
     end
   end
