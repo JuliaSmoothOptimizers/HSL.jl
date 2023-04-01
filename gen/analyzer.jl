@@ -61,7 +61,7 @@ If it's an array, we remove the size at the end of the variable name.
 We will also know if `Ref` or `Ptr` should be use within the @ccall.
 """
 function reference_type(variable::AbstractString, type::String)
-  if occursin('(', variable)
+  if occursin('(', variable) && type != "TYPE"
     ref = "Ptr"
     var = split(variable, '(')[1]
   elseif occursin('*', variable) && type == "CHARACTER"
@@ -82,7 +82,6 @@ function type_mapping(type::String)
   (type == "INTEGER") && (julia_type = "Cint")
   (type == "LOGICAL") && (julia_type = "Cint")
   (type == "REAL") && (julia_type = "Float32")
-  (type == "real(wp)") && (julia_type = "Float64")
   (type == "DOUBLEPRECISION") && (julia_type = "Float64")
   (type == "COMPLEX") && (julia_type = "ComplexF32")
   (type == "DOUBLECOMPLEX") && (julia_type = "ComplexF64")
@@ -95,8 +94,15 @@ function type_detector(types::Vector{String}, arguments::Vector{<:AbstractString
   taille = length(line)
   len = length(type)
   julia_type = type_mapping(type)
-  if (taille ≥ len) && (line[1:len] == type || line[1:len] == lowercase(type))
-    variables = split(line[len+1:end], ',')
+
+  if startswith(line, type) || startswith(line, lowercase(type))
+    if type == "TYPE"
+      str = split(line[len+2:end], ')')
+      julia_type = str[1]
+      variables = split(str[2], ',')
+    else
+      variables = split(line[len+1:end], ',')
+    end
     for variable in variables
       ref, variable = reference_type(variable, type)
       for (i, argument) in enumerate(arguments)
@@ -107,6 +113,25 @@ function type_detector(types::Vector{String}, arguments::Vector{<:AbstractString
     end
   end
   return types
+end
+
+"""
+Determine all public symbols of a FORTRAN 90 file.
+"""
+function fortran_public(str::String)
+  str = replace(str, "&\n" => "")
+  str = replace(str, " " => "")
+  lines = split(str, "\n")
+  exported_symbols = String[]
+  for line in lines
+    if startswith(line, "public") || startswith(line, "PUBLIC")
+      symbols = split(line[7:end], ',')
+      for symbol in symbols
+        push!(exported_symbols, symbol)
+      end
+    end
+  end
+  return exported_symbols
 end
 
 function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}; verbose::Bool=false)
@@ -128,6 +153,8 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
     lines[i] = replace(lines[i], ",INTENT(OUT)" => "")
     lines[i] = replace(lines[i], ",INTENT(INOUT)" => "")
     lines[i] = replace(lines[i], ",allocatable" => "")
+    lines[i] = replace(lines[i], ",OPTIONAL" => "")
+    lines[i] = replace(lines[i], "CHARACTER(len=*)" => "CHARACTER(N),")
 
     if occursin("!", lines[i])
       find = false
@@ -141,7 +168,7 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
 
     # The variables of the same type inside a function or a subroutine are sometimes split across multiple lines
     for p = 5:-1:2
-      if (i ≥ p) && mapreduce(index -> length(lines[index]) ≥ 1, &, i-p+2:i) && mapreduce(index -> (lines[index][1] == '+') || (lines[index][1] == '$') || (lines[index][1] == '*') || (lines[index][1] == '&'), &, i-p+2:i)
+      if (i ≥ p) && mapreduce(index -> startswith(lines[index], '+') || startswith(lines[index], '$') || startswith(lines[index], '*') || startswith(lines[index], '&'), &, i-p+2:i)
         lines[i-p+1] = lines[i-p+1] * "," * lines[i][2:end] * ","
         lines[i] = ""
       end
@@ -149,9 +176,6 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
   end
 
   for line in lines
-    taille = length(line)
-    verbose && println(line)
-
     type_detector(types, arguments, line, "INTEGER")
     type_detector(types, arguments, line, "LOGICAL")
     type_detector(types, arguments, line, "REAL")
@@ -161,8 +185,9 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
     type_detector(types, arguments, line, "DOUBLECOMPLEX")
     type_detector(types, arguments, line, "COMPLEX*16")
     type_detector(types, arguments, line, "CHARACTER")
+    type_detector(types, arguments, line, "TYPE")
 
-    if (taille ≥ 10) && (line[1:10] == "CHARACTER*" || line[1:10] == "character*")
+    if startswith(line, "CHARACTER*") || startswith(line, "character*")
       # start=12 -> CHARACTER*N with N < 10
       # start=13 -> CHARACTER*N with N ≥ 10 and N < 100
       # start=14 -> CHARACTER*N with N ≥ 100 and N < 1000
@@ -189,8 +214,17 @@ function fortran_analyzer(str::String, basename::String, extension::String)
   lines = split(str, "\n")
   str = ""
   for line in lines
-    if (length(line) ≥ 1) && (line[1] != 'C' && line[1] != 'c' && line[1] != '*')
-      str = str * line * "\n"
+    if extension == "f"
+      if !startswith(line, 'C') && !startswith(line, 'c') && !startswith(line, '*')
+        str = str * line * "\n"
+      end
+    elseif extension == "f90"
+      modified_line = replace(line, " " => "")
+      if !startswith(modified_line, '!')
+        str = str * line * "\n"
+      end
+    else
+      error("The extension $extension is not supported.")
     end
   end
 
@@ -205,6 +239,10 @@ function fortran_analyzer(str::String, basename::String, extension::String)
   for pattern in patterns
     str = replace(str, pattern => "")
   end
+
+  # For FORTRAN 90 files, not all functions or subroutines are public
+  exported_symbols = fortran_public(str)
+  (extension == "f90") && @info "The exported symbols of $(basename).f90 are $(exported_symbols)."
 
   for case in ["SUBROUTINE", "subroutine", "FUNCTION", "function"]
     v = split(str, case)
@@ -233,6 +271,9 @@ function fortran_analyzer(str::String, basename::String, extension::String)
 
         # Subroutines in ma46 that we can't handle in Julia
         fname ∈ ("ma46u", "ma46ud", "ma46w", "ma46wd") && continue
+
+        # The function or the subroutine is private
+        (extension == "f90") && !isempty(exported_symbols) && !(fname ∈ exported_symbols) && continue
 
         # Determine the type of the arguments
         verbose = false
