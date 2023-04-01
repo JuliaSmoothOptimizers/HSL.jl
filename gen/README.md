@@ -12,7 +12,7 @@ The `main` function supports the boolean keyword argument `optimized` to clear t
 You can also call `main(library)` if you want to generate the wrapper for a specific HSL `library`.
 The possible values for `library` are:
 - `"all"` (default);
-- ``juliahsl`;
+- `"juliahsl"`;
 - `"hsl_ma48"`;
 - `"hsl_ma57"`;
 - `"hsl_ma77"`;
@@ -24,7 +24,8 @@ The possible values for `library` are:
 - `"hsl_mc69"`;
 - `"hsl_mc78"`;
 - `"hsl_mc79"`;
-- `"hsl_mi20"`.
+- `"hsl_mi20"`;
+- `"hsl_mi28"`.
 
 If a package doesn't have a C interface, we are still able to use it in Julia but we need to call the Fortran functions and subroutines.
 The wrappers for Fortran functions and subroutines can't be easily generated and are generally written by hand but the file `analyzer.jl` helps to partially generate the wrappers.

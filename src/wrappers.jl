@@ -12,6 +12,7 @@ include("C/hsl_mc69.jl")
 include("C/hsl_mc78.jl")
 include("C/hsl_mc79.jl")
 include("C/hsl_mi20.jl")
+include("C/hsl_mi28.jl")
 
 # Wrappers for Fortran subroutines and functions
 include("Fortran/btf.jl")

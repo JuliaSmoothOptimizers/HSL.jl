@@ -112,6 +112,11 @@ function main(name::String="all"; optimized::Bool=false)
     precisions = ['s', 'd']
     wrapper("hsl_mi20", hsl_headers(include, "hsl_mi20", precisions), optimized)
   end
+
+  if name == "all" || name == "hsl_mi28"
+    precisions = ['s', 'd']
+    wrapper("hsl_mi28", hsl_headers(include, "hsl_mi28", precisions), optimized)
+  end
 end
 
 # If we want to use the file as a script with `julia wrapper.jl`
