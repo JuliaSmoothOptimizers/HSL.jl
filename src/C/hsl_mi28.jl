@@ -34,7 +34,7 @@ mutable struct mi28_info{T}
     oor::Cint
     profile_before::T
     profile_after::T
-    size_r::Clong
+    size_r::Int64
     stat::Cint
     alpha::T
 end
