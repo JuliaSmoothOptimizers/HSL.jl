@@ -21,9 +21,9 @@ function mc78_analyse_asm_i(n, ptr, row, perm, nnodes, sptr, sparent, rptr, rlis
     @ccall libhsl.mc78_analyse_asm_i(n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                      perm::Ptr{Cint}, nnodes::Ptr{Cint},
                                      sptr::Ptr{Ptr{Cint}}, sparent::Ptr{Ptr{Cint}},
-                                     rptr::Ptr{Ptr{Cint}}, rlist::Ptr{Ptr{Cint}},
+                                     rptr::Ptr{Ptr{Int64}}, rlist::Ptr{Ptr{Cint}},
                                      control::Ref{mc78_control}, stat::Ptr{Cint},
-                                     nfact::Ptr{Cint}, nflops::Ptr{Cint},
+                                     nfact::Ptr{Int64}, nflops::Ptr{Int64},
                                      piv_size::Ptr{Cint})::Cint
 end
 
@@ -32,9 +32,9 @@ function mc78_analyse_elt_i(n, nelt, starts, vars, perm, eparent, nnodes, sptr, 
     @ccall libhsl.mc78_analyse_elt_i(n::Cint, nelt::Cint, starts::Ptr{Cint},
                                      vars::Ptr{Cint}, perm::Ptr{Cint}, eparent::Ptr{Cint},
                                      nnodes::Ptr{Cint}, sptr::Ptr{Ptr{Cint}},
-                                     sparent::Ptr{Ptr{Cint}}, rptr::Ptr{Ptr{Cint}},
+                                     sparent::Ptr{Ptr{Cint}}, rptr::Ptr{Ptr{Int64}},
                                      rlist::Ptr{Ptr{Cint}}, control::Ref{mc78_control},
-                                     stat::Ptr{Cint}, nfact::Ptr{Cint}, nflops::Ptr{Cint},
+                                     stat::Ptr{Cint}, nfact::Ptr{Int64}, nflops::Ptr{Int64},
                                      piv_size::Ptr{Cint})::Cint
 end
 
@@ -90,14 +90,14 @@ end
 
 function mc78_stats_i(nnodes, sptr, scc, nfact, nflops)
     @ccall libhsl.mc78_stats_i(nnodes::Cint, sptr::Ptr{Cint}, scc::Ptr{Cint},
-                               nfact::Ptr{Cint}, nflops::Ptr{Cint})::Cvoid
+                               nfact::Ptr{Int64}, nflops::Ptr{Int64})::Cvoid
 end
 
 function mc78_optimize_locality_i(n, realn, perm, invp, nnodes, sptr, sparent, rptr, rlist,
                                   sort)
     @ccall libhsl.mc78_optimize_locality_i(n::Cint, realn::Cint, perm::Ptr{Cint},
                                            invp::Ptr{Cint}, nnodes::Cint, sptr::Ptr{Cint},
-                                           sparent::Ptr{Cint}, rptr::Ptr{Cint},
+                                           sparent::Ptr{Cint}, rptr::Ptr{Int64},
                                            rlist::Ptr{Cint}, sort::Cint)::Cint
 end
 
@@ -107,7 +107,7 @@ function mc78_row_lists_i(nsvar, svar, n, ptr, row, perm, invp, nnodes, sptr, sp
                                    ptr::Ptr{Cint}, row::Ptr{Cint},
                                    perm::Ptr{Cint}, invp::Ptr{Cint}, nnodes::Cint,
                                    sptr::Ptr{Cint}, sparent::Ptr{Cint}, scc::Ptr{Cint},
-                                   rptr::Ptr{Cint}, rlist::Ptr{Cint},
+                                   rptr::Ptr{Int64}, rlist::Ptr{Cint},
                                    control::Ref{mc78_control}, st::Ptr{Cint})::Cint
 end
 
@@ -120,9 +120,9 @@ function mc78_analyse_asm_l(n, ptr, row, perm, nnodes, sptr, sparent, rptr, rlis
     @ccall libhsl.mc78_analyse_asm_l(n::Cint, ptr::Ptr{Clong}, row::Ptr{Cint},
                                      perm::Ptr{Cint}, nnodes::Ptr{Cint},
                                      sptr::Ptr{Ptr{Cint}}, sparent::Ptr{Ptr{Cint}},
-                                     rptr::Ptr{Ptr{Cint}}, rlist::Ptr{Ptr{Cint}},
+                                     rptr::Ptr{Ptr{Int64}}, rlist::Ptr{Ptr{Cint}},
                                      control::Ref{mc78_control}, stat::Ptr{Cint},
-                                     nfact::Ptr{Cint}, nflops::Ptr{Cint},
+                                     nfact::Ptr{Int64}, nflops::Ptr{Int64},
                                      piv_size::Ptr{Cint})::Cint
 end
 
@@ -131,9 +131,9 @@ function mc78_analyse_elt_l(n, nelt, starts, vars, perm, eparent, nnodes, sptr, 
     @ccall libhsl.mc78_analyse_elt_l(n::Cint, nelt::Cint, starts::Ptr{Clong},
                                      vars::Ptr{Cint}, perm::Ptr{Cint}, eparent::Ptr{Cint},
                                      nnodes::Ptr{Cint}, sptr::Ptr{Ptr{Cint}},
-                                     sparent::Ptr{Ptr{Cint}}, rptr::Ptr{Ptr{Cint}},
+                                     sparent::Ptr{Ptr{Cint}}, rptr::Ptr{Ptr{Int64}},
                                      rlist::Ptr{Ptr{Cint}}, control::Ref{mc78_control},
-                                     stat::Ptr{Cint}, nfact::Ptr{Cint}, nflops::Ptr{Cint},
+                                     stat::Ptr{Cint}, nfact::Ptr{Int64}, nflops::Ptr{Int64},
                                      piv_size::Ptr{Cint})::Cint
 end
 
@@ -189,14 +189,14 @@ end
 
 function mc78_stats_l(nnodes, sptr, scc, nfact, nflops)
     @ccall libhsl.mc78_stats_l(nnodes::Cint, sptr::Ptr{Cint}, scc::Ptr{Cint},
-                               nfact::Ptr{Cint}, nflops::Ptr{Cint})::Cvoid
+                               nfact::Ptr{Int64}, nflops::Ptr{Int64})::Cvoid
 end
 
 function mc78_optimize_locality_l(n, realn, perm, invp, nnodes, sptr, sparent, rptr, rlist,
                                   sort)
     @ccall libhsl.mc78_optimize_locality_l(n::Cint, realn::Cint, perm::Ptr{Cint},
                                            invp::Ptr{Cint}, nnodes::Cint, sptr::Ptr{Cint},
-                                           sparent::Ptr{Cint}, rptr::Ptr{Cint},
+                                           sparent::Ptr{Cint}, rptr::Ptr{Int64},
                                            rlist::Ptr{Cint}, sort::Cint)::Cint
 end
 
@@ -206,6 +206,6 @@ function mc78_row_lists_l(nsvar, svar, n, ptr, row, perm, invp, nnodes, sptr, sp
                                    ptr::Ptr{Clong}, row::Ptr{Cint},
                                    perm::Ptr{Cint}, invp::Ptr{Cint}, nnodes::Cint,
                                    sptr::Ptr{Cint}, sparent::Ptr{Cint}, scc::Ptr{Cint},
-                                   rptr::Ptr{Cint}, rlist::Ptr{Cint},
+                                   rptr::Ptr{Int64}, rlist::Ptr{Cint},
                                    control::Ref{mc78_control}, st::Ptr{Cint})::Cint
 end

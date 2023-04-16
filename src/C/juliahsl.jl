@@ -74,6 +74,14 @@ function MC20_version()
     VersionNumber(major[], minor[], patch[])
 end
 
+function MC23_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.MC23_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
 function MC24_version()
     major = Ref{Cint}(0)
     minor = Ref{Cint}(0)
@@ -87,6 +95,14 @@ function TD22_version()
     minor = Ref{Cint}(0)
     patch = Ref{Cint}(0)
     @ccall libhsl.TD22_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
+    VersionNumber(major[], minor[], patch[])
+end
+
+function BTF_version()
+    major = Ref{Cint}(0)
+    minor = Ref{Cint}(0)
+    patch = Ref{Cint}(0)
+    @ccall libhsl.BTF_version(major::Ref{Cint}, minor::Ref{Cint}, patch::Ref{Cint})::Cvoid
     VersionNumber(major[], minor[], patch[])
 end
 
