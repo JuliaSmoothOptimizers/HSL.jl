@@ -14,7 +14,7 @@ else
 end
 
 function __init__()
-  if HSL_INSTALLATION == "ARTIFACT"
+  if HSL_INSTALLATION == "ARTIFACT" && VERSION ≥ v"1.7"
     config = LinearAlgebra.BLAS.lbt_get_config()
     if !any(lib -> lib.interface == :lp64, config.loaded_libs)
       LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
