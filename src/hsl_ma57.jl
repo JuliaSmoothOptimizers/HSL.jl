@@ -62,9 +62,9 @@ function Ma57_Control{T}(;
   icntl = zeros(Cint, 20)
   cntl = zeros(T, 5)
   if T == Float32
-    ccall((:ma57i_, libhsl_ma57), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
+    ccall((:ma57i_, libhsl), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
   elseif T == Float64
-    ccall((:ma57id_, libhsl_ma57), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
+    ccall((:ma57id_, libhsl), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
   end
   icntl[1] = unit_error
   icntl[2] = unit_warning
@@ -292,7 +292,7 @@ for (fname, typ) in (("ma57a_", Float32),
       iwork = Vector{Cint}(undef, 5 * n)
 
       ## perform symbolic analysis.
-      ccall(($fname, libhsl_ma57),
+      ccall(($fname, libhsl),
              Cvoid,
             (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}      , Ptr{Cint}  , Ptr{$typ}   ),
              M.n      , M.nz     , M.rows   , M.cols   , M.__lkeep, M.__keep , iwork    , M.control.icntl, M.info.info, M.info.rinfo)
@@ -351,7 +351,7 @@ for (fname, typ) in (("ma57b_", Float32),
 
       factorized = false
       while !factorized
-        ccall(($fname, libhsl_ma57),
+        ccall(($fname, libhsl),
                Cvoid,
               (Ref{Cint}, Ref{Cint}, Ptr{$typ}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}   , Ptr{Cint}  , Ptr{Cint}      , Ptr{Cint}         , Ptr{$typ}        , Ptr{Cint}     , Ptr{$typ}      ),
                ma57.n   , ma57.nz  , ma57.vals, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, ma57.__lkeep, ma57.__keep, ma57.iwork_fact, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
@@ -465,7 +465,7 @@ for (fname, typ) in (("ma57c_" , Float32),
       lwork = ma57.n * nrhs
       @assert length(work) == lwork
 
-      ccall(($fname, libhsl_ma57),
+      ccall(($fname, libhsl),
              Cvoid,
             (Ref{Cint}, Ref{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{Cint}       , Ptr{Cint}         , Ptr{Cint}     ),
              j        , ma57.n   , ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nrhs     , b        , ma57.n   , work     , lwork    , ma57.iwork_solve, ma57.control.icntl, ma57.info.info)
@@ -511,7 +511,7 @@ for (fname, typ) in (("ma57d_" , Float32),
       @assert length(work) == lwork
 
       ccall(
-        ($fname, libhsl_ma57),
+        ($fname, libhsl),
          Cvoid,
         (Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}         , Ptr{$typ}        , Ptr{Cint}     , Ptr{$typ}      ),
          job      , ma57.n   , ma57.nz  , ma57.vals, ma57.rows, ma57.cols, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, b        , x        , resid    , work     , iwork    , ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
