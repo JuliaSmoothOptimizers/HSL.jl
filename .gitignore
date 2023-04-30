@@ -7,3 +7,4 @@ deps/src
 deps/build.log
 Manifest.toml
 docs/Manifest.toml
+gen/symbols.txt
