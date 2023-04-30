@@ -22,7 +22,7 @@ for (fname, typ) in (("ma57lf_" , Float32),
 
       status = 0
 
-      ccall(($fname, libhsl_ma57),
+      ccall(($fname, libhsl),
              Cvoid,
             (Ref{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}     , Ref{Cint}),
              ma57.n   , ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nebdu    , nzl      , ipl      , irn      , fl       , nzd      , ipd      , id       , d        , ivp      , iperm    , ma57.info.rank, status   )

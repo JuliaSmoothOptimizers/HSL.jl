@@ -8,14 +8,14 @@ Sort an array of numbers `v` in-place into ascending order maintaining an index 
 """
 function kb07 end
 
-for (fname, elty) in ((:kb07a_ , :Float32),
-                      (:kb07ad_, :Float64),
-                      (:kb07ai_, :Cint))
+for (fname, elty) in ((:kb07a , :Float32),
+                      (:kb07ad, :Float64),
+                      (:kb07ai, :Cint))
   @eval begin
     function kb07(v::Vector{$elty})
       n = length(v)
       perm = zeros(Cint, n)
-      @ccall libkb07.$fname(v::Ptr{$elty}, n::Ref{Cint}, perm::Ptr{Cint})::Cvoid
+      $fname(v, n, perm)
       return v, perm
     end
   end

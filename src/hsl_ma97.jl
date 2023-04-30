@@ -109,10 +109,10 @@ function Ma97_Control{T}(;
     zeros(T, 10),
   )
 
-  T == Float32    && ccall(("ma97_default_control_s", libhsl_ma97), Cvoid, (Ref{Ma97_Control{Float32}},), control)
-  T == Float64    && ccall(("ma97_default_control_d", libhsl_ma97), Cvoid, (Ref{Ma97_Control{Float64}},), control)
-  T == ComplexF32 && ccall(("ma97_default_control_c", libhsl_ma97), Cvoid, (Ref{Ma97_Control{Float32}},), control)
-  T == ComplexF64 && ccall(("ma97_default_control_z", libhsl_ma97), Cvoid, (Ref{Ma97_Control{Float64}},), control)
+  T == Float32    && ccall(("ma97_default_control_s", libhsl), Cvoid, (Ref{Ma97_Control{Float32}},), control)
+  T == Float64    && ccall(("ma97_default_control_d", libhsl), Cvoid, (Ref{Ma97_Control{Float64}},), control)
+  T == ComplexF32 && ccall(("ma97_default_control_c", libhsl), Cvoid, (Ref{Ma97_Control{Float32}},), control)
+  T == ComplexF64 && ccall(("ma97_default_control_z", libhsl), Cvoid, (Ref{Ma97_Control{Float64}},), control)
   control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
   control.print_level = print_level
   control.unit_diagnostics = unit_diagnostics
@@ -291,7 +291,7 @@ for (fname, typ) in (("ma97_finalise_s", Float32),
   S = data_map[typ]
   @eval begin
     function ma97_finalize(ma97::Ma97{$typ, $S})
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}),
              ma97.__akeep   , ma97.__fkeep   )
@@ -326,13 +326,13 @@ for (fname, freename, typ) in (("ma97_analyse_s", "ma97_free_akeep_s", Float32),
       )
 
       # Perform symbolic analysis.
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}, Ptr{Cint}),
              1   , M.n , M.colptr , M.rowval , C_NULL   , M.__akeep      , M.control            , M.info            , C_NULL   )
 
       if M.info.flag < 0
-        ccall(($freename, libhsl_ma97), Cvoid, (Ptr{Ptr{Cvoid}},), M.__akeep)
+        ccall(($freename, libhsl), Cvoid, (Ptr{Ptr{Cvoid}},), M.__akeep)
         throw(Ma97Exception("Ma97: Error during symbolic analysis", M.info.flag))
       end
 
@@ -394,13 +394,13 @@ for (fname, freename, typ) in (("ma97_analyse_coord_s", "ma97_free_akeep_s", Flo
       nz = length(cols)
 
       # Perform symbolic analysis.
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Cint, Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}, Ptr{Cint}),
              M.n , nz  , M.rowval , M.colptr , C_NULL   , M.__akeep      , M.control            , M.info            , C_NULL   )
 
       if M.info.flag < 0
-        ccall(($(string(freename)), libhsl_ma97), Cvoid, (Ptr{Ptr{Cvoid}},), M.__akeep)
+        ccall(($(string(freename)), libhsl), Cvoid, (Ptr{Ptr{Cvoid}},), M.__akeep)
         throw(Ma97Exception("Ma97: Error during symbolic analysis", M.info.flag))
       end
 
@@ -419,7 +419,7 @@ for (fname, typ) in (("ma97_factor_s", Float32),
     function ma97_factorize!(ma97::Ma97{$typ, $S}; matrix_type::Symbol = :real_indef)
       t = matrix_types97[matrix_type]
 
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ} , Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}, Ptr{Float64}),
              t   , C_NULL   , C_NULL   , ma97.nzval, ma97.__akeep   , ma97.__fkeep   , ma97.control         , ma97.info         , C_NULL      )
@@ -462,7 +462,7 @@ for (fname, typ) in (("ma97_solve_s", Float32),
       nrhs = size(b, 2)
 
       j = jobs97[job]
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Cint, Cint, Ptr{$typ}, Cint  , Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}),
              j   , nrhs, b        , ma97.n, ma97.__akeep   , ma97.__fkeep   , ma97.control         , ma97.info         )
@@ -507,7 +507,7 @@ for (fname, typ) in (("ma97_factor_solve_s", Float32),
       M = Ma97(A)
       size(b, 1) == M.n || throw(Ma97Exception("Ma97: rhs size mismatch", 0))
       nrhs = size(b, 2)
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Cint, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Cint, Ptr{$typ}, Cint, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}, Ptr{Float64}),
              t   , M.colptr , M.rowval , M.nzval  , nrhs, b        , M.n , M.__akeep      , M.__fkeep      , M.control            , M.info            , C_NULL      )
@@ -536,7 +536,7 @@ for (indef, posdef, typ) in (("ma97_enquire_indef_s", "ma97_enquire_posdef_s", F
         # Julia stores arrays column-major as Fortran does. Though the C interface
         # documentation says d should be n x 2, we must declare 2 x n.
         d = zeros($typ, 2, ma97.n)
-        ccall(($indef, libhsl_ma97),
+        ccall(($indef, libhsl),
                Cvoid,
               (Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}, Ptr{Cint}, Ptr{$typ}),
                ma97.__akeep   , ma97.__fkeep   , ma97.control         , ma97.info         , piv_order, d        )
@@ -544,7 +544,7 @@ for (indef, posdef, typ) in (("ma97_enquire_indef_s", "ma97_enquire_posdef_s", F
       else
         d = zeros($typ, ma97.n)
         ccall(
-          ($(string(posdef)), libhsl_ma97),
+          ($(string(posdef)), libhsl),
           Cvoid,
           (
             Ptr{Ptr{Cvoid}},
@@ -583,7 +583,7 @@ for (fname, typ) in (("ma97_alter_s", Float32),
     function ma97_alter!(ma97::Ma97{$typ, $S}, d::Array{$typ, 2})
       n, m = size(d)
       (m == ma97.n && n == 2) || throw(Ma97Exception("Ma97: input array d must be n x 2", 0))
-      ccall(($fname, libhsl_ma97),
+      ccall(($fname, libhsl),
              Cvoid,
             (Ptr{$typ}, Ptr{Ptr{Cvoid}}, Ptr{Ptr{Cvoid}}, Ref{Ma97_Control{$S}}, Ref{Ma97_Info{$S}}),
              d        , ma97.__akeep   , ma97.__fkeep   , ma97.control         , ma97.info         )
