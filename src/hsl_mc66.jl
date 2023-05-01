@@ -29,35 +29,29 @@ function mc66_control{T}(; lp=6, wp=6, mp=6, print_level=-1, kl_aggressive=-1, m
   return control
 end
 
-# Thanks to `nm -D libhsl_mc66.so`!
+# Thanks to `nm -D libhsl.so`!
 function mc66s(m, n, nz, irn, jcn, nblocks, control, seed, row_order, info, rowptr, column_order, colptr, netcut, rowdiff, kblocks)
-  ccall((:__hsl_mc66_simple_MOD_monet, libhsl_mc66),
-         Cvoid,
-        (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ref{Int32}, Ref{mc66_control{Float32}}, Ref{fa14_seed}, Ptr{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}  , Ptr{Int32}, Ref{Int32}, Ref{Float32}, Ref{Int32}),
-         m         , n         , nz        , irn       , jcn       , nblocks   , control                   , seed          , row_order , info      , rowptr    , column_order, colptr    , netcut    , rowdiff     , kblocks   )
+  @ccall libhsl.__hsl_mc66_simple_MOD_monet(m::Ref{Int32}, n::Ref{Int32}, nz::Ptr{Int32}, irn::Ptr{Int32}, jcn::Ptr{Int32},
+                                            nblocks::Ref{Int32}, control::Ref{mc66_control{Float32}}, seed::Ref{fa14_seed},
+                                            row_order::Ptr{Int32}, info::Ref{Int32}, rowptr::Ptr{Int32}, column_order::Ptr{Int32},
+                                            colptr::Ptr{Int32}, netcut::Ref{Int32}, rowdiff::Ref{Float32}, kblocks::Ref{Int32})::Cvoid
 end
 
 function mc66s_print_message(info, control)
   context = ""
-  ccall((:__hsl_mc66_single_MOD_monet_print_message, libhsl_mc66),
-         Cvoid,
-        (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{UInt8}),
-         info      , control.lp, control.wp, context   )
+  @ccall libhsl.__hsl_mc66_single_MOD_monet_print_message(info::Ref{Int32}, control.lp::Ref{Int32}, control.wp::Ref{Int32}, context::Ptr{UInt8})::Cvoid
 end
 
 function mc66d(m, n, nz, irn, jcn, nblocks, control, seed, row_order, info, rowptr, column_order, colptr, netcut, rowdiff, kblocks)
-  ccall((:__hsl_mc66_double_MOD_monet, libhsl_mc66),
-         Cvoid,
-        (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}, Ref{Int32}, Ref{mc66_control{Float64}}, Ref{fa14_seed}, Ptr{Int32}, Ref{Int32}, Ptr{Int32}, Ptr{Int32}  , Ptr{Int32}, Ref{Int32}, Ref{Float64}, Ref{Int32}),
-         m         , n         , nz        , irn       , jcn       , nblocks   , control                   , seed          , row_order , info      , rowptr    , column_order, colptr    , netcut    , rowdiff     , kblocks   )
+  @ccall libhsl.__hsl_mc66_double_MOD_monet(m::Ref{Int32}, n::Ref{Int32}, nz::Ptr{Int32}, irn::Ptr{Int32}, jcn::Ptr{Int32},
+                                            nblocks::Ref{Int32}, control::Ref{mc66_control{Float64}}, seed::Ref{fa14_seed},
+                                            row_order::Ptr{Int32}, info::Ref{Int32}, rowptr::Ptr{Int32}, column_order::Ptr{Int32},
+                                            colptr::Ptr{Int32}, netcut::Ref{Int32}, rowdiff::Ref{Float64}, kblocks::Ref{Int32})::Cvoid
 end
 
 function mc66d_print_message(info, control)
   context = ""
-  ccall((:__hsl_mc66_double_MOD_monet_print_message, libhsl_mc66),
-         Cvoid,
-        (Ref{Int32}, Ref{Int32}, Ref{Int32}, Ptr{UInt8}),
-         info      , control.lp, control.wp, context   )
+  @ccall libhsl.__hsl_mc66_double_MOD_monet_print_message(info::Ref{Int32}, control.lp::Ref{Int32}, control.wp::Ref{Int32}, context::Ptr{UInt8})::Cvoid
 end
 
 """
@@ -93,6 +87,6 @@ function mc66(A::SparseMatrixCSC, nblocks::Integer)
   rowdiff = Ref{Float64}()
   kblocks = Ref{Cint}()
   mc66d(m, n, nz, irn, jcn, nblocks, control, seed, row_order, info, rowptr, column_order, colptr, netcut, rowdiff, kblocks)
-  mc66d_print_message(info, control)
+  # mc66d_print_message(info, control)
   return row_order, column_order
 end

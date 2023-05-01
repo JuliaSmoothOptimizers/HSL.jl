@@ -36,6 +36,7 @@ include("wrappers.jl")
 # Interfaces
 include("hsl_ma57.jl")
 include("hsl_ma97.jl")
+include("hsl_mc66.jl")
 include("kb07.jl")
 include("mc21.jl")
 include("mc77.jl")
