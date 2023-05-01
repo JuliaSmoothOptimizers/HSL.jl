@@ -38,6 +38,7 @@ jobs:
         env:
           HSL_FC: "/usr/local/bin/gfortran-7 -arch x86_64"
           HSL_CC: "/usr/local/bin/gcc-7 -arch x86_64"
+      - uses: julia-actions/julia-buildpkg@v1
         if: matrix.arch == 'aarch64'
         env:
           HSL_FC: "/usr/local/bin/gfortran-12"
