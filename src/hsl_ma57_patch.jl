@@ -1,34 +1,34 @@
 ## get factors -----------------------------------------------------------------
-for (fname, typ) in (("ma57lf_" , Float32),
-                     ("ma57lfd_", Float64))
+for (fname, T) in ((:ma57lf_ , :Float32),
+                   (:ma57lfd_, :Float64))
   @eval begin
-    function ma57_get_factors(ma57::Ma57{$typ})
+    function ma57_get_factors(ma57::Ma57{$T})
 
       # make room for L factor
       nebdu = ma57.info.info[14]
       nzl = nebdu
       ipl = Vector{Cint}(undef, ma57.n + 1)
       irn = Vector{Cint}(undef, nzl)
-      fl = Vector{$typ}(undef, nzl)
+      fl = Vector{$T}(undef, nzl)
 
       # make room for D; note that entire 2x2 blocks are stored
       nzd = 2 * ma57.info.num_2x2_pivots + ma57.n
       ipd = Vector{Cint}(undef, ma57.n + 1)
       id = Vector{Cint}(undef, nzd)
-      d = Vector{$typ}(undef, nzd)
+      d = Vector{$T}(undef, nzd)
 
       ivp = Vector{Cint}(undef, ma57.n)
       iperm = Vector{Cint}(undef, ma57.n)
 
       status = 0
 
-      ccall(($fname, libhsl),
-             Cvoid,
-            (Ref{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}     , Ref{Cint}),
-             ma57.n   , ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nebdu    , nzl      , ipl      , irn      , fl       , nzd      , ipd      , id       , d        , ivp      , iperm    , ma57.info.rank, status   )
+      libhsl.$fname(ma57.n::Ref{Cint}, ma57.__fact::Ptr{$T}, ma57.__lfact::Ref{Cint}, ma57.__ifact::Ptr{Cint},
+                    ma57.__lifact::Ref{Cint}, nebdu::Ref{Cint}, nzl::Ref{Cint}, ipl::Ptr{Cint}, irn::Ptr{Cint},
+                    fl::Ptr{$T}, nzd::Ref{Cint}, ipd::Ptr{Cint}, id::Ptr{Cint}, d::Ptr{$T}, ivp::Ptr{Cint},
+                    iperm::Ptr{Cint}, ma57.info.rank::Ref{Cint}, status::Ref{Cint})::Cvoid
 
       status < 0 && throw(Ma57Exception("Ma57: Error while retrieving factors", status))
-      s = ma57.control.icntl[15] == 1 ? ma57.__fact[(end - ma57.n):(end - 1)] : ones($typ, ma57.n)
+      s = ma57.control.icntl[15] == 1 ? ma57.__fact[(end - ma57.n):(end - 1)] : ones($T, ma57.n)
       L = SparseMatrixCSC(ma57.n, ma57.n, ipl, irn, fl)
       D = SparseMatrixCSC(ma57.n, ma57.n, ipd, id, d)
 
@@ -96,7 +96,7 @@ end
 
 ## Example:
 
-```JULIA
+```julia
 
 julia> using HSL
 
@@ -142,7 +142,7 @@ ma57_get_factors
 
 ## Example:
 
-```JULIA
+```julia
 julia> using HSL
 
 julia> T = Float64;
