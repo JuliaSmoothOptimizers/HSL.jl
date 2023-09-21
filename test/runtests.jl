@@ -4,7 +4,7 @@ using Test, Random
 
 Random.seed!(666)  # Random tests are diabolical
 
-if JULIAHSL_isfunctional()
+if LIBHSL_isfunctional()
   include("test_hsl_ma57.jl")
   # include("test_hsl_ma57_patch.jl")
   include("test_hsl_ma97.jl")
