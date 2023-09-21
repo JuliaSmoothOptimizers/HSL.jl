@@ -1,3 +1,7 @@
+function LIBHSL_isfunctional()
+    @ccall libhsl.LIBHSL_isfunctional()::Bool
+end
+
 function JULIAHSL_isfunctional()
     @ccall libhsl.JULIAHSL_isfunctional()::Bool
 end
