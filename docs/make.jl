@@ -4,7 +4,7 @@ using HSL
 makedocs(
   modules = [HSL],
   doctest = false,
-  strict = true,
+  linkcheck = true,
   format = Documenter.HTML(
     assets = ["assets/style.css"],
     ansicolor = true,
