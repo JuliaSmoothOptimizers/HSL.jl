@@ -52,31 +52,32 @@ mutable struct Ma57_Control{T <: Ma57Data}
   cntl::Vector{T}
 end
 
-function Ma57_Control{T}(;
-  sqd::Bool = false,
-  print_level::Int = 0,
-  unit_diagnostics::Int = 6,
-  unit_error::Int = 6,
-  unit_warning::Int = 6,
-) where {T}
-  icntl = zeros(Cint, 20)
-  cntl = zeros(T, 5)
-  if T == Float32
-    ccall((:ma57i_, libhsl), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
-  elseif T == Float64
-    ccall((:ma57id_, libhsl), Cvoid, (Ptr{T}, Ptr{Cint}), cntl, icntl)
+for (fname, T) in ((:ma57i , Float32),
+                   (:ma57id, Float64))
+
+  @eval begin
+    function Ma57_Control{$T}(;
+      sqd::Bool = false,
+      print_level::Int = 0,
+      unit_diagnostics::Int = 6,
+      unit_error::Int = 6,
+      unit_warning::Int = 6)
+      icntl = zeros(Cint, 20)
+      cntl = zeros($T, 5)
+      $fname(cntl, icntl)
+      icntl[1] = unit_error
+      icntl[2] = unit_warning
+      icntl[3] = unit_diagnostics
+      icntl[5] = print_level
+      icntl[10] = 1  # want condition number estimates if performing iterative refinement
+      if sqd
+        cntl[1] = eps($T)
+        icntl[7] = 1
+      end
+      control = Ma57_Control{$T}(icntl, cntl)
+      return control
+    end
   end
-  icntl[1] = unit_error
-  icntl[2] = unit_warning
-  icntl[3] = unit_diagnostics
-  icntl[5] = print_level
-  icntl[10] = 1  # want condition number estimates if performing iterative refinement
-  if sqd
-    cntl[1] = eps(T)
-    icntl[7] = 1
-  end
-  control = Ma57_Control{T}(icntl, cntl)
-  return control
 end
 
 ## diagnostics (2) -------------------------------------------------------------
@@ -252,8 +253,8 @@ end
 
 Ma57(A::Matrix{T}, args...; kwargs...) where {T <: Ma57Data} = Ma57(sparse(A), args...; kwargs...)
 
-for (fname, typ) in (("ma57a_", Float32),
-                     ("ma57ad_", Float64))
+for (fname, T) in ((:ma57a , Float32),
+                   (:ma57ad, Float64))
   @eval begin
 
     ## helper function to instantiate an object of type `Ma57` and perform the
@@ -262,11 +263,11 @@ for (fname, typ) in (("ma57a_", Float32),
       n::Int,
       rows::Vector{Ti},
       cols::Vector{Ti},
-      nzval::Vector{$typ};
+      nzval::Vector{$T};
       kwargs...,
     ) where {Ti <: Integer}
-      control = Ma57_Control{$(data_map[typ])}(; kwargs...)
-      info = Ma57_Info{$(data_map[typ])}()
+      control = Ma57_Control{$(data_map[T])}(; kwargs...)
+      info = Ma57_Info{$(data_map[T])}()
       ma57_coord(n, rows, cols, nzval, control, info)
     end
 
@@ -274,12 +275,12 @@ for (fname, typ) in (("ma57a_", Float32),
       n::Int,
       rows::Vector{Ti},
       cols::Vector{Ti},
-      nzval::Vector{$typ},
-      control::Ma57_Control{$(data_map[typ])},
-      info::Ma57_Info{$(data_map[typ])},
+      nzval::Vector{$T},
+      control::Ma57_Control{$(data_map[T])},
+      info::Ma57_Info{$(data_map[T])},
     ) where {Ti <: Integer}
       nz = length(cols)
-      M = Ma57{$typ}(
+      M = Ma57{$T}(
         convert(Cint, n),
         convert(Cint, nz),
         convert(Vector{Cint}, rows),
@@ -292,10 +293,7 @@ for (fname, typ) in (("ma57a_", Float32),
       iwork = Vector{Cint}(undef, 5 * n)
 
       ## perform symbolic analysis.
-      ccall(($fname, libhsl),
-             Cvoid,
-            (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}      , Ptr{Cint}  , Ptr{$typ}   ),
-             M.n      , M.nz     , M.rows   , M.cols   , M.__lkeep, M.__keep , iwork    , M.control.icntl, M.info.info, M.info.rinfo)
+      $fname(M.n, M.nz, M.rows, M.cols, M.__lkeep, M.__keep , iwork, M.control.icntl, M.info.info, M.info.rinfo)
 
       status = M.info.info[1]
       status > 0 && @warn "Ma57: analyze returns with code $status"
@@ -334,16 +332,16 @@ julia> ma57_factorize!(M)      ## factorize `Ma57` object in place
 """
 function ma57_factorize! end
 
-for (fname, typ) in (("ma57b_", Float32),
-                    ("ma57bd_", Float64))
+for (fname, T) in ((:ma57b , Float32),
+                   (:ma57bd, Float64))
   @eval begin
-    function ma57_factorize!(ma57::Ma57{$typ})
+    function ma57_factorize!(ma57::Ma57{$T})
       if ma57.__lfact <= 0 || ma57.__lifact <= 0
         status = ma57.info.info[1]
         throw(Ma57Exception("Ma57: Symbolic analysis must be performed first", status))
       end
       if length(ma57.__fact) < ma57.__lfact
-        ma57.__fact = Vector{$typ}(undef, ma57.__lfact)
+        ma57.__fact = Vector{$T}(undef, ma57.__lfact)
       end
       if length(ma57.__ifact) < ma57.__lifact
         ma57.__ifact = Vector{Cint}(undef, ma57.__lifact)
@@ -351,10 +349,7 @@ for (fname, typ) in (("ma57b_", Float32),
 
       factorized = false
       while !factorized
-        ccall(($fname, libhsl),
-               Cvoid,
-              (Ref{Cint}, Ref{Cint}, Ptr{$typ}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}   , Ptr{Cint}  , Ptr{Cint}      , Ptr{Cint}         , Ptr{$typ}        , Ptr{Cint}     , Ptr{$typ}      ),
-               ma57.n   , ma57.nz  , ma57.vals, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, ma57.__lkeep, ma57.__keep, ma57.iwork_fact, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
+        $fname(ma57.n, ma57.nz, ma57.vals, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, ma57.__lkeep, ma57.__keep, ma57.iwork_fact, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
         status = ma57.info.info[1]
         status > 0 && @warn "Ma57: factorize returns with code $status"
@@ -455,20 +450,17 @@ The symbolic analysis and numerical factorization must have been performed and m
 """
 function ma57_solve! end
 
-for (fname, typ) in (("ma57c_" , Float32),
-                     ("ma57cd_", Float64))
+for (fname, T) in ((:ma57c , Float32),
+                   (:ma57cd, Float64))
   @eval begin
-    function ma57_solve!(ma57::Ma57{$typ}, b::Array{$typ}, work::Vector{$typ}; job::Symbol = :A)
+    function ma57_solve!(ma57::Ma57{$T}, b::Array{$T}, work::Vector{$T}; job::Symbol = :A)
       size(b, 1) == ma57.n || throw(Ma57Exception("Ma57: rhs size mismatch", 0))
       nrhs = size(b, 2)
       j = jobs57[job]
       lwork = ma57.n * nrhs
       @assert length(work) == lwork
 
-      ccall(($fname, libhsl),
-             Cvoid,
-            (Ref{Cint}, Ref{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ref{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{$typ}, Ref{Cint}, Ptr{Cint}       , Ptr{Cint}         , Ptr{Cint}     ),
-             j        , ma57.n   , ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nrhs     , b        , ma57.n   , work     , lwork    , ma57.iwork_solve, ma57.control.icntl, ma57.info.info)
+      $fname(j, ma57.n, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nrhs, b, ma57.n, work, lwork, ma57.iwork_solve, ma57.control.icntl, ma57.info.info)
 
       status = ma57.info.info[1]
       status > 0 && @warn "Ma57: solve returns with code $status"
@@ -485,15 +477,15 @@ function ma57_solve(ma57::Ma57{T}, b::Vector{T}, nitref::Int) where {T <: Ma57Da
   return x
 end
 
-for (fname, typ) in (("ma57d_" , Float32),
-                     ("ma57dd_", Float64))
+for (fname, T) in ((:ma57d , Float32),
+                   (:ma57dd, Float64))
   @eval begin
     function ma57_solve!(
-      ma57::Ma57{$typ},
-      b::Vector{$typ},
-      x::Vector{$typ},
-      resid::Vector{$typ},
-      work::Vector{$typ},
+      ma57::Ma57{$T},
+      b::Vector{$T},
+      x::Vector{$T},
+      resid::Vector{$T},
+      work::Vector{$T},
       nitref::Int,
     )
       if nitref == 0
@@ -510,11 +502,7 @@ for (fname, typ) in (("ma57d_" , Float32),
       lwork = ma57.control.icntl[9] == 1 ? ma57.n : 4 * ma57.n
       @assert length(work) == lwork
 
-      ccall(
-        ($fname, libhsl),
-         Cvoid,
-        (Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}, Ptr{$typ}  , Ref{Cint}   , Ptr{Cint}   , Ref{Cint}    , Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{$typ}, Ptr{Cint}, Ptr{Cint}         , Ptr{$typ}        , Ptr{Cint}     , Ptr{$typ}      ),
-         job      , ma57.n   , ma57.nz  , ma57.vals, ma57.rows, ma57.cols, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, b        , x        , resid    , work     , iwork    , ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
+      $fname(job, ma57.n, ma57.nz, ma57.vals, ma57.rows, ma57.cols, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, b, x, resid, work, iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
       status = ma57.info.info[1]
       status > 0 && @warn "Ma57: solve returns with code $status"
