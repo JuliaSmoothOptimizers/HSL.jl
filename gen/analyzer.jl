@@ -54,6 +54,7 @@ function fortran_name_arguments(signature::String)
   v = split(signature, "(")
   fname = v[1]
   arguments = split(v[2], ", ")
+  arguments = String.(arguments)
   return fname, arguments
 end
 
@@ -92,7 +93,7 @@ function type_mapping(type::String)
   return julia_type
 end
 
-function type_detector(types::Vector{String}, arguments::Vector{<:AbstractString}, line::AbstractString, type::String)
+function type_detector(types::Vector{String}, arguments::Vector{String}, line::AbstractString, type::String)
   taille = length(line)
   len = length(type)
   julia_type = type_mapping(type)
@@ -136,11 +137,15 @@ function fortran_public(str::String)
   return exported_symbols
 end
 
-function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}; verbose::Bool=false)
+function fortran_types(code::AbstractString, arguments::Vector{String}; verbose::Bool=false)
   narguments = length(arguments)
   types = ["" for i=1:narguments]
   lines = split(code, "\n")
   nlines = length(lines)
+
+  # Number of characters for each string input
+  strlen = Dict{String,Int}()
+
   for i = nlines:-1:1
     lines[i] = replace(lines[i], "\t" => "")
     lines[i] = replace(lines[i], "\r" => "")
@@ -193,20 +198,26 @@ function fortran_types(code::AbstractString, arguments::Vector{<:AbstractString}
       # start=12 -> CHARACTER*N with N < 10
       # start=13 -> CHARACTER*N with N ≥ 10 and N < 100
       # start=14 -> CHARACTER*N with N ≥ 100 and N < 1000
-      for start in (12, 13, 14)
-        length(line) ≥ start || continue
-        variables = split(line[start:end], ',')
-        for variable in variables
-          for (i, argument) in enumerate(arguments)
-            if (argument == variable) || (uppercase(argument) == variable)
-              types[i] = "Ptr{UInt8}"
-            end
+      len = nothing
+      start = 14
+      while (len == nothing) && (start ≥ 12)
+        len = length(line) ≥ start ? tryparse(Int, line[11:start-1]) : nothing
+        (len == nothing) && (start = start - 1)
+      end
+
+      variables = split(line[start:end], ',')
+      variables = [split(variable, '(')[1] for variable in variables]
+      for variable in variables
+        for (i, argument) in enumerate(arguments)
+          if (argument == variable) || (uppercase(argument) == variable)
+            types[i] = "Ptr{UInt8}"
+            strlen[argument] = len
           end
         end
       end
     end
   end
-  return types
+  return types, strlen
 end
 
 function fortran_analyzer(str::String, basename::String, extension::String)
@@ -230,16 +241,35 @@ function fortran_analyzer(str::String, basename::String, extension::String)
     end
   end
 
-  # We only want the signature of the subroutines and functions
-  patterns = ["END SUBROUTINE", "end subroutine", "subroutine.", "SUBROUTINES.",
-              "subroutines", "SUBROUTINES", "by subroutine", "of subroutine",
-              "see subroutine", "SUBROUTINE.", "the subroutine", "THE SUBROUTINE",
-              "THIS SUBROUTINE", "TO SUBROUTINE", "HARWELL SUBROUTINE", "ANALYSIS SUBROUTINE",
-              "compression subroutine", "A subroutine", "A SUBROUTINE", "This subroutine",
-              "Factorization subroutine", "END FUNCTION", "end function", "THE FUNCTION",
-              "THIS FUNCTION", "Subroutines", "Functions"]
-  for pattern in patterns
-    str = replace(str, pattern => "")
+  # Specific patterns
+  if !occursin("hsl", basename) && occursin("eb22", basename)
+    str = replace(str, "CHARACTER WANTRS*1" => "CHARACTER WANTRS")
+  end
+  if !occursin("hsl", basename) && occursin("ma62", basename)
+    str = replace(str, "CHARACTER FILNAM(2)*128" => "CHARACTER*128 FILNAM(2)")
+  end
+  if !occursin("hsl", basename) && occursin("mc36", basename)
+    str = replace(str, "CHARACTER  TITLE*80" => "CHARACTER*80  TITLE")
+    str = replace(str, "CHARACTER           TITLE*80" => "CHARACTER*80 TITLE")
+  end
+  if !occursin("hsl", basename) && occursin("mc54", basename)
+    str = replace(str, "CHARACTER         TITLE*72,KEY*8" => "CHARACTER*72 TITLE\nCHARACTER*8 KEY")
+  end
+  if !occursin("hsl", basename) && occursin("mc55", basename)
+    str = replace(str, "CHARACTER         TITLE*72,KEY*8,DATTYP*3,POSITN*1,ORGNIZ*1," => "CHARACTER*72 TITLE\nCHARACTER*8 KEY\nCHARACTER*3 DATTYP\nCHARACTER POSITN\nCHARACTER ORGNIZ")
+    str = replace(str, "CASEID*8" => "\nCHARACTER*8 CASEID")
+  end
+  if !occursin("hsl", basename) && occursin("mc56", basename)
+    str = replace(str, "CHARACTER        TITLE*72,KEY*8,CASEID*8,DATTYP*3," => "CHARACTER*72 TITLE\nCHARACTER*8 KEY\nCHARACTER*8 CASEID\nCHARACTER*3 DATTYP")
+    str = replace(str, "POSITN*1,ORGNIZ*1" => "\nCHARACTER POSITN\nCHARACTER ORGNIZ")
+    str = replace(str, "CHARACTER    BUFFER1*80,BUFFER2*80" => "CHARACTER*80 BUFFER1\nCHARACTER*80 BUFFER2")
+    str = replace(str, "CHARACTER    PTRFMT*16,INDFMT*16,VALFMT*20" => "CHARACTER*16 PTRFMT\n CHARACTER*16 INDFMT\n CHARACTER*20 VALFMT")
+  end
+  if !occursin("hsl", basename) && occursin("me62", basename)
+    str = replace(str, "CHARACTER FILNAM(2)*128" => "CHARACTER*128 FILNAM(2)")
+  end
+  if !occursin("hsl", basename) && occursin("mf36", basename)
+    str = replace(str, "CHARACTER      TITLE*80" => "CHARACTER*80 TITLE")
   end
 
   # For FORTRAN 90 files, not all functions or subroutines are public
@@ -280,7 +310,7 @@ function fortran_analyzer(str::String, basename::String, extension::String)
         # Determine the type of the arguments
         verbose = false
         (fname == "unknown") && (verbose = true)
-        types = fortran_types(code, arguments, verbose=verbose)
+        types, strlen = fortran_types(code, arguments, verbose=verbose)
 
         # Determine the type of the ouput
         output_type = fortran_output(case, v[index])
@@ -295,25 +325,22 @@ function fortran_analyzer(str::String, basename::String, extension::String)
         end
         signature = signature * ")"
 
-        push!(functions, (signature, fname, arguments, types, output_type))
+        push!(functions, (signature, fname, arguments, types, output_type, strlen))
       end
     end
   end
   return functions
 end
 
-function main(name::String="all")
+function main(name::String="all"; verbose::Bool=false)
   # Create a vector with all symbols exported by the shared library libhsl
   symbols = read(symbols_path, String)
   symbols = split(symbols, "\n", keepempty=false)
   symbols = [symbol[20:end] for symbol in symbols]
 
-  # Verbose mode
-  verbose = false
-
   for (root, dirs, files) in walkdir(libhsl)
 
-    # We don't want to go inside "metis" and "libhsl" folders
+    # We don't want to go inside "examples", metis" and "libhsl" folders
     mapreduce(excluded_folder -> occursin(excluded_folder, root), |, ["examples", "metis", "libhsl/libhsl"]) && continue
 
     # Test that we are in one subfolder of libhsl
@@ -356,7 +383,7 @@ function main(name::String="all")
         format = true
         index = 0
         for fun in fnames_package
-          signature, fname, arguments, types, output_type = fun
+          signature, fname, arguments, types, output_type, strlen = fun
           narguments = length(arguments)
 
           # Only define functions directly related to the HSL package
@@ -372,14 +399,24 @@ function main(name::String="all")
             for k = 1:narguments
               if types[k] == ""
                 format = false
-                @info "Unable to determine the type of $(arguments[k])"
+                @warn "Unable to determine the type of $(arguments[k])"
               end
               write(file_wrapper, "$(arguments[k])::$(types[k])")
               (k < narguments) && write(file_wrapper, ", ")
             end
+
+            # Hidden arguments
+            if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types
+              verbose && @info "Hidden argument in $fname."
+            end
+            for k = 1:narguments
+              (types[k] == "Ref{UInt8}") && write(file_wrapper, ", 1::Csize_t")
+              (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
+            end
+
             if output_type == ""
               format = false
-              @info "Unable to determine the output type"
+              @warn "Unable to determine the output type"
             end
             write(file_wrapper, ")::$(output_type)\n")
             write(file_wrapper, "end\n")

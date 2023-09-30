@@ -5,15 +5,17 @@ function mc36ad(nmax, nzmax, title, elt, nrow, ncol, nnzero, colptr, rowind, val
                         rowind::Ptr{Cint}, values::Ptr{Float64}, maxrhs::Ref{Cint}, nrhs::Ref{Cint},
                         nzrhs::Ref{Cint}, rhsptr::Ptr{Cint}, rhsind::Ptr{Cint},
                         rhsval::Ptr{Float64}, guess::Ptr{Float64}, soln::Ptr{Float64},
-                        iw::Ptr{Cint}, icntl::Ptr{Cint}, info::Ptr{Cint})::Cvoid
+                        iw::Ptr{Cint}, icntl::Ptr{Cint}, info::Ptr{Cint}, 80::Csize_t)::Cvoid
 end
 
 function mc36bd(n, ind, fmtind, lunit)
-  @ccall libhsl.mc36bd_(n::Ref{Cint}, ind::Ptr{Cint}, fmtind::Ptr{UInt8}, lunit::Ref{Cint})::Cvoid
+  @ccall libhsl.mc36bd_(n::Ref{Cint}, ind::Ptr{Cint}, fmtind::Ptr{UInt8}, lunit::Ref{Cint},
+                        16::Csize_t)::Cvoid
 end
 
 function mc36cd(n, a, fmta, lunit)
-  @ccall libhsl.mc36cd_(n::Ref{Cint}, a::Ptr{Float64}, fmta::Ptr{UInt8}, lunit::Ref{Cint})::Cvoid
+  @ccall libhsl.mc36cd_(n::Ref{Cint}, a::Ptr{Float64}, fmta::Ptr{UInt8}, lunit::Ref{Cint},
+                        20::Csize_t)::Cvoid
 end
 
 function mc36a(nmax, nzmax, title, elt, nrow, ncol, nnzero, colptr, rowind, values, maxrhs, nrhs,
@@ -23,13 +25,15 @@ function mc36a(nmax, nzmax, title, elt, nrow, ncol, nnzero, colptr, rowind, valu
                        rowind::Ptr{Cint}, values::Ptr{Float32}, maxrhs::Ref{Cint}, nrhs::Ref{Cint},
                        nzrhs::Ref{Cint}, rhsptr::Ptr{Cint}, rhsind::Ptr{Cint}, rhsval::Ptr{Float32},
                        guess::Ptr{Float32}, soln::Ptr{Float32}, iw::Ptr{Cint}, icntl::Ptr{Cint},
-                       info::Ptr{Cint})::Cvoid
+                       info::Ptr{Cint}, 80::Csize_t)::Cvoid
 end
 
 function mc36b(n, ind, fmtind, lunit)
-  @ccall libhsl.mc36b_(n::Ref{Cint}, ind::Ptr{Cint}, fmtind::Ptr{UInt8}, lunit::Ref{Cint})::Cvoid
+  @ccall libhsl.mc36b_(n::Ref{Cint}, ind::Ptr{Cint}, fmtind::Ptr{UInt8}, lunit::Ref{Cint},
+                       16::Csize_t)::Cvoid
 end
 
 function mc36c(n, a, fmta, lunit)
-  @ccall libhsl.mc36c_(n::Ref{Cint}, a::Ptr{Float32}, fmta::Ptr{UInt8}, lunit::Ref{Cint})::Cvoid
+  @ccall libhsl.mc36c_(n::Ref{Cint}, a::Ptr{Float32}, fmta::Ptr{UInt8}, lunit::Ref{Cint},
+                       20::Csize_t)::Cvoid
 end
