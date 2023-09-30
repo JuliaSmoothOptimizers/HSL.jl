@@ -129,7 +129,7 @@ function ma49ld(mat, trans, m, n, ifact, lft, r, lr, istack, q, lq, qstack, awor
                         b::Ptr{Float64}, x::Ptr{Float64}, ides::Ref{Cint}, nsteps::Ref{Cint},
                         maxfrt::Ref{Cint}, nproc::Ref{Cint}, nstk::Ptr{Cint}, pool::Ptr{Cint},
                         maxlea::Ref{Cint}, nbrad::Ref{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint},
-                        iflag::Ref{Cint}, ierror::Ref{Cint})::Cvoid
+                        iflag::Ref{Cint}, ierror::Ref{Cint}, 1::Csize_t, 1::Csize_t)::Cvoid
 end
 
 function ma49md(n, rwblk, nstk, ndd, lerow, ma59cd, fils, frere, mstk, ncstk, nelim, nsteps, info,
@@ -388,7 +388,7 @@ function ma49l(mat, trans, m, n, ifact, lft, r, lr, istack, q, lq, qstack, awork
                        b::Ptr{Float32}, x::Ptr{Float32}, ides::Ref{Cint}, nsteps::Ref{Cint},
                        maxfrt::Ref{Cint}, nproc::Ref{Cint}, nstk::Ptr{Cint}, pool::Ptr{Cint},
                        maxlea::Ref{Cint}, nbrad::Ref{Cint}, fils::Ptr{Cint}, frere::Ptr{Cint},
-                       iflag::Ref{Cint}, ierror::Ref{Cint})::Cvoid
+                       iflag::Ref{Cint}, ierror::Ref{Cint}, 1::Csize_t, 1::Csize_t)::Cvoid
 end
 
 function ma49m(n, rwblk, nstk, ndd, lerow, ma59c, fils, frere, mstk, ncstk, nelim, nsteps, info,

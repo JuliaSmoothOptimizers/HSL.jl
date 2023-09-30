@@ -87,7 +87,7 @@ end
 
 function eb22wd(a, adim, n, p, r, work, wantrs, nvecs)
   @ccall libhsl.eb22wd_(a::Ptr{Float64}, adim::Ref{Cint}, n::Ref{Cint}, p::Ref{Cint}, r::Ref{Cint},
-                        work::Ptr{Float64}, wantrs::Ptr{UInt8}, nvecs::Ref{Cint})::Cvoid
+                        work::Ptr{Float64}, wantrs::Ref{UInt8}, nvecs::Ref{Cint}, 1::Csize_t)::Cvoid
 end
 
 function eb22xd(a, b, c, d, e, f)
@@ -199,7 +199,7 @@ end
 
 function eb22w(a, adim, n, p, r, work, wantrs, nvecs)
   @ccall libhsl.eb22w_(a::Ptr{Float32}, adim::Ref{Cint}, n::Ref{Cint}, p::Ref{Cint}, r::Ref{Cint},
-                       work::Ptr{Float32}, wantrs::Ptr{UInt8}, nvecs::Ref{Cint})::Cvoid
+                       work::Ptr{Float32}, wantrs::Ref{UInt8}, nvecs::Ref{Cint}, 1::Csize_t)::Cvoid
 end
 
 function eb22x(a, b, c, d, e, f)

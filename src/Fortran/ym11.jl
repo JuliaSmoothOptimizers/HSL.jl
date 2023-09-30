@@ -5,7 +5,7 @@ end
 function ym11ac(m, n, nzin, nzout, irn, a, jcolst, iw, icntl, key, iseed)
   @ccall libhsl.ym11ac_(m::Ref{Cint}, n::Ref{Cint}, nzin::Ref{Cint}, nzout::Ref{Cint},
                         irn::Ptr{Cint}, a::Ptr{ComplexF32}, jcolst::Ptr{Cint}, iw::Ptr{Cint},
-                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint})::Cvoid
+                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint}, 8::Csize_t)::Cvoid
 end
 
 function ym11bc(n, m, perm, invprm, iseed)
@@ -20,7 +20,7 @@ end
 function ym11ad(m, n, nzin, nzout, irn, a, jcolst, iw, icntl, key, iseed)
   @ccall libhsl.ym11ad_(m::Ref{Cint}, n::Ref{Cint}, nzin::Ref{Cint}, nzout::Ref{Cint},
                         irn::Ptr{Cint}, a::Ptr{Float64}, jcolst::Ptr{Cint}, iw::Ptr{Cint},
-                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint})::Cvoid
+                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint}, 8::Csize_t)::Cvoid
 end
 
 function ym11bd(n, m, perm, invprm, iseed)
@@ -35,7 +35,7 @@ end
 function ym11ai(m, n, nzin, nzout, irn, a, jcolst, iw, icntl, key, iseed)
   @ccall libhsl.ym11ai_(m::Ref{Cint}, n::Ref{Cint}, nzin::Ref{Cint}, nzout::Ref{Cint},
                         irn::Ptr{Cint}, a::Ptr{Cint}, jcolst::Ptr{Cint}, iw::Ptr{Cint},
-                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint})::Cvoid
+                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint}, 8::Csize_t)::Cvoid
 end
 
 function ym11bi(n, m, perm, invprm, iseed)
@@ -50,7 +50,7 @@ end
 function ym11a(m, n, nzin, nzout, irn, a, jcolst, iw, icntl, key, iseed)
   @ccall libhsl.ym11a_(m::Ref{Cint}, n::Ref{Cint}, nzin::Ref{Cint}, nzout::Ref{Cint},
                        irn::Ptr{Cint}, a::Ptr{Float32}, jcolst::Ptr{Cint}, iw::Ptr{Cint},
-                       icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint})::Cvoid
+                       icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint}, 8::Csize_t)::Cvoid
 end
 
 function ym11b(n, m, perm, invprm, iseed)
@@ -65,7 +65,7 @@ end
 function ym11az(m, n, nzin, nzout, irn, a, jcolst, iw, icntl, key, iseed)
   @ccall libhsl.ym11az_(m::Ref{Cint}, n::Ref{Cint}, nzin::Ref{Cint}, nzout::Ref{Cint},
                         irn::Ptr{Cint}, a::Ptr{ComplexF64}, jcolst::Ptr{Cint}, iw::Ptr{Cint},
-                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint})::Cvoid
+                        icntl::Ptr{Cint}, key::Ptr{UInt8}, iseed::Ref{Cint}, 8::Csize_t)::Cvoid
 end
 
 function ym11bz(n, m, perm, invprm, iseed)
