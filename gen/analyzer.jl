@@ -323,6 +323,10 @@ function main(name::String="all")
       # generate the wrappers for all packages
       all_flag = (name == "all") && ('/' ∉ package) && !occursin("hsl", package)
       if (name == package) || all_flag
+
+        # Uncomment to update src/wrappers.jl
+        # println("include(\"Fortran/$package.jl\")")
+
         path_wrapper = joinpath(@__DIR__, "..", "src", "Fortran", "$(package).jl")
         file_wrapper = open(path_wrapper, "w")
         
