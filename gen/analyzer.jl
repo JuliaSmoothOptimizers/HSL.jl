@@ -1,7 +1,9 @@
 # Script to partially generate wrappers from Fortran files
 using HSL_jll
 using JuliaFormatter
-juliahsl = "/home/alexis/Bureau/git/hsl/juliahsl/"
+
+release = "2023.9.27"
+libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL-$release/"
 
 # Symbols of the shared library libhsl
 symbols_path = "symbols.txt"
@@ -96,7 +98,7 @@ function type_detector(types::Vector{String}, arguments::Vector{<:AbstractString
   julia_type = type_mapping(type)
 
   if startswith(line, type) || startswith(line, lowercase(type))
-    if type == "TYPE"
+    if type == "TYPE" && !startswith(line, "TYPE=")  # We have a variable named TYPE in MA38...
       str = split(line[len+2:end], ')')
       julia_type = str[1]
       variables = split(str[2], ',')
@@ -300,24 +302,28 @@ function fortran_analyzer(str::String, basename::String, extension::String)
   return functions
 end
 
-function main(name::String)
+function main(name::String="all")
   # Create a vector with all symbols exported by the shared library libhsl
   symbols = read(symbols_path, String)
   symbols = split(symbols, "\n", keepempty=false)
   symbols = [symbol[20:end] for symbol in symbols]
 
-  for (root, dirs, files) in walkdir(juliahsl)
+  # Verbose mode
+  verbose = false
 
-    # We don't want to go inside "metis" and "juliahsl" folders
-    mapreduce(excluded_folder -> occursin(excluded_folder, root), |, ["metis", "juliahsl/juliahsl"]) && continue
+  for (root, dirs, files) in walkdir(libhsl)
 
-    # Test that we are in one subfolder of juliahsl
-    if root != juliahsl
-      package = split(root, juliahsl, keepempty=false)[1]
+    # We don't want to go inside "metis" and "libhsl" folders
+    mapreduce(excluded_folder -> occursin(excluded_folder, root), |, ["examples", "metis", "libhsl/libhsl"]) && continue
+
+    # Test that we are in one subfolder of libhsl
+    if root != libhsl
+      package = split(root, libhsl, keepempty=false)[1]
       # We are in the main folder of an HSL package
-      # if '/' ∉ package && !occursin("hsl", package)  # generate the wrappers for all packages
-      if package == name
-        path_wrapper = joinpath("..", "src", "Fortran", "$(package).jl")
+      # generate the wrappers for all packages
+      all_flag = (name == "all") && ('/' ∉ package) && !occursin("hsl", package)
+      if (name == package) || all_flag
+        path_wrapper = joinpath(@__DIR__, "..", "src", "Fortran", "$(package).jl")
         file_wrapper = open(path_wrapper, "w")
         
         # Debug mode (also replace `package == name` by `'/' ∉ package`)
@@ -352,9 +358,9 @@ function main(name::String)
           # Only define functions directly related to the HSL package
           if occursin(hsl_name, signature)
             index = index + 1
-            println()
-            display(signature)
-            display(types)
+            verbose && println()
+            verbose && display(signature)
+            verbose && display(types)
             # display(output_type)
             (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl"
             write(file_wrapper, "function $signature\n")
