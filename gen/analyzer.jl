@@ -25,6 +25,9 @@ function file_extension(file::String)
   return basename, extension
 end
 
+"""
+Return the output type of a Fortran function or subroutine.
+"""
 function fortran_output(case::String, text::AbstractString)
   if case in ("SUBROUTINE", "subroutine")
     output_type = "Cvoid"
@@ -67,9 +70,6 @@ function reference_type(variable::AbstractString, type::String)
   if occursin('(', variable) && type != "TYPE"
     ref = "Ptr"
     var = split(variable, '(')[1]
-  elseif occursin('*', variable) && type == "CHARACTER"
-    ref = "Ptr"
-    var = split(variable, '*')[1]
   else
     ref = "Ref"
     var = variable
@@ -122,9 +122,8 @@ end
 Determine all public symbols of a FORTRAN 90 file.
 """
 function fortran_public(str::String)
-  str = replace(str, "&\n" => "")
   str = replace(str, " " => "")
-  lines = split(str, "\n")
+  lines = split(str, "\n", keepempty=false)
   exported_symbols = String[]
   for line in lines
     if startswith(line, "public") || startswith(line, "PUBLIC")
@@ -140,15 +139,13 @@ end
 function fortran_types(code::AbstractString, arguments::Vector{String}; verbose::Bool=false)
   narguments = length(arguments)
   types = ["" for i=1:narguments]
-  lines = split(code, "\n")
+  lines = split(code, "\n", keepempty=false)
   nlines = length(lines)
 
   # Number of characters for each string input
   strlen = Dict{String,Int}()
 
   for i = nlines:-1:1
-    lines[i] = replace(lines[i], "\t" => "")
-    lines[i] = replace(lines[i], "\r" => "")
     lines[i] = replace(lines[i], " " => "")
 
     # For code written in FORTRAN 90
@@ -170,14 +167,6 @@ function fortran_types(code::AbstractString, arguments::Vector{String}; verbose:
           find = true
           lines[i] = lines[i][1:k-1]
         end
-      end
-    end
-
-    # The variables of the same type inside a function or a subroutine are sometimes split across multiple lines
-    for p = 5:-1:2
-      if (i ≥ p) && mapreduce(index -> startswith(lines[index], '+') || startswith(lines[index], '$') || startswith(lines[index], '*') || startswith(lines[index], '&'), &, i-p+2:i)
-        lines[i-p+1] = lines[i-p+1] * "," * lines[i][2:end] * ","
-        lines[i] = ""
       end
     end
   end
@@ -206,11 +195,16 @@ function fortran_types(code::AbstractString, arguments::Vector{String}; verbose:
       end
 
       variables = split(line[start:end], ',')
+      vec = [occursin('(', variable) for variable in variables]
       variables = [split(variable, '(')[1] for variable in variables]
-      for variable in variables
+      for (j, variable) in enumerate(variables)
         for (i, argument) in enumerate(arguments)
           if (argument == variable) || (uppercase(argument) == variable)
-            types[i] = "Ptr{UInt8}"
+            if vec[j]
+              types[i] = "Ptr{Ptr{UInt8}}"
+            else
+              types[i] = "Ptr{UInt8}"
+            end
             strlen[argument] = len
           end
         end
@@ -224,7 +218,7 @@ function fortran_analyzer(str::String, basename::String, extension::String)
   functions = []
 
   # Remove the comments
-  lines = split(str, "\n")
+  lines = split(str, "\n", keepempty=false)
   str = ""
   for line in lines
     if extension == "f"
@@ -232,8 +226,8 @@ function fortran_analyzer(str::String, basename::String, extension::String)
         str = str * line * "\n"
       end
     elseif extension == "f90"
-      modified_line = replace(line, " " => "")
-      if !startswith(modified_line, '!')
+      line_nospace = replace(line, " " => "")
+      if !startswith(line_nospace, '!')
         str = str * line * "\n"
       end
     else
@@ -241,35 +235,86 @@ function fortran_analyzer(str::String, basename::String, extension::String)
     end
   end
 
-  # Specific patterns
-  if !occursin("hsl", basename) && occursin("eb22", basename)
-    str = replace(str, "CHARACTER WANTRS*1" => "CHARACTER WANTRS")
+  # Remove special caracters
+  str = replace(str, "\t" => "")  # tab
+  str = replace(str, "\r" => "")  # carriage return
+
+  # The variables of the same type inside a function or a subroutine are sometimes splited across multiple lines
+  lines = split(str, "\n", keepempty=false)
+  str = ""
+  for line in lines
+    line_nospace = replace(line, " " => "")
+    if startswith(line_nospace, '+') || startswith(line_nospace, '$') || startswith(line_nospace, '*') || startswith(line_nospace, '&')
+      pos1 = startswith(line_nospace, '+') ? findfirst('+', line) : Inf
+      pos2 = startswith(line_nospace, '$') ? findfirst('$', line) : Inf
+      pos3 = startswith(line_nospace, '*') ? findfirst('*', line) : Inf
+      pos4 = startswith(line_nospace, '&') ? findfirst('&', line) : Inf
+      pos = min(pos1, pos2, pos3, pos4) |> Int
+      str = str[1:end-1] * line[pos+1:end] * "\n"
+    else
+      str = str * line * "\n"
+    end
   end
-  if !occursin("hsl", basename) && occursin("ma62", basename)
-    str = replace(str, "CHARACTER FILNAM(2)*128" => "CHARACTER*128 FILNAM(2)")
+
+  # Remove double spaces
+  double_spaces = occursin("  ", str)
+  while double_spaces
+    str = replace(str, "  " => " ")
+    double_spaces = occursin("  ", str)
   end
-  if !occursin("hsl", basename) && occursin("mc36", basename)
-    str = replace(str, "CHARACTER  TITLE*80" => "CHARACTER*80  TITLE")
-    str = replace(str, "CHARACTER           TITLE*80" => "CHARACTER*80 TITLE")
+
+  # Remove the first space if it's the first character of a line
+  lines = split(str, "\n", keepempty=false)
+  str = ""
+  for line in lines
+    pos = startswith(line, ' ') ? 2 : 1
+    str = str * line[pos:end] * "\n"
   end
-  if !occursin("hsl", basename) && occursin("mc54", basename)
-    str = replace(str, "CHARACTER         TITLE*72,KEY*8" => "CHARACTER*72 TITLE\nCHARACTER*8 KEY")
+
+  # Remove double newlines
+  double_newlines = occursin("\n\n", str)
+  while double_newlines
+    str = replace(str, "\n\n" => "\n")
+    double_newlines = occursin("\n\n", str)
   end
-  if !occursin("hsl", basename) && occursin("mc55", basename)
-    str = replace(str, "CHARACTER         TITLE*72,KEY*8,DATTYP*3,POSITN*1,ORGNIZ*1," => "CHARACTER*72 TITLE\nCHARACTER*8 KEY\nCHARACTER*3 DATTYP\nCHARACTER POSITN\nCHARACTER ORGNIZ")
-    str = replace(str, "CASEID*8" => "\nCHARACTER*8 CASEID")
+
+  str = replace(str, "&\n" => "")
+  str = replace(str, "( " => "(")
+  str = replace(str, ", " => ",")
+  str = replace(str, " )" => ")")
+
+  # Rewrite some definitions related to characters
+  lines = split(str, "\n", keepempty=false)
+  str = ""
+  for line in lines
+    if startswith(line, "CHARACTER ")
+      parameters = split(line, "CHARACTER ")[2]
+      parameters = split(parameters, ",", keepempty=false)
+      for parameter in parameters
+        if occursin('*', parameter)
+          param, size = split(parameter, "*")
+          size = parse(Int, size)
+          if size == 1
+            str = str * "CHARACTER " * param * "\n"
+          else
+            str = str * "CHARACTER*" * "$size " * param * "\n"
+          end
+        else
+          str = str * "CHARACTER " * parameter * "\n"
+        end
+      end
+    else
+      str = str * line * "\n"
+    end
   end
-  if !occursin("hsl", basename) && occursin("mc56", basename)
-    str = replace(str, "CHARACTER        TITLE*72,KEY*8,CASEID*8,DATTYP*3," => "CHARACTER*72 TITLE\nCHARACTER*8 KEY\nCHARACTER*8 CASEID\nCHARACTER*3 DATTYP")
-    str = replace(str, "POSITN*1,ORGNIZ*1" => "\nCHARACTER POSITN\nCHARACTER ORGNIZ")
-    str = replace(str, "CHARACTER    BUFFER1*80,BUFFER2*80" => "CHARACTER*80 BUFFER1\nCHARACTER*80 BUFFER2")
-    str = replace(str, "CHARACTER    PTRFMT*16,INDFMT*16,VALFMT*20" => "CHARACTER*16 PTRFMT\n CHARACTER*16 INDFMT\n CHARACTER*20 VALFMT")
-  end
-  if !occursin("hsl", basename) && occursin("me62", basename)
-    str = replace(str, "CHARACTER FILNAM(2)*128" => "CHARACTER*128 FILNAM(2)")
-  end
-  if !occursin("hsl", basename) && occursin("mf36", basename)
-    str = replace(str, "CHARACTER      TITLE*80" => "CHARACTER*80 TITLE")
+
+  # --- DEBUG ---
+  debug = false
+  if debug
+    lines = split(str, "\n", keepempty=false)
+    for line in lines
+      display(line)
+    end
   end
 
   # For FORTRAN 90 files, not all functions or subroutines are public
@@ -412,6 +457,8 @@ function main(name::String="all"; verbose::Bool=false)
             for k = 1:narguments
               (types[k] == "Ref{UInt8}") && write(file_wrapper, ", 1::Csize_t")
               (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
+              # FIX ME
+              # (types[k] == "Ptr{Ptr{UInt8}}") && ...
             end
 
             if output_type == ""
