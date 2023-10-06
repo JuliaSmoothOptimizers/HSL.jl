@@ -16,7 +16,7 @@ end
 
 function ma62pd(istrm, filnam, lenbuf, icntl, isave, info)
   @ccall libhsl.ma62pd_(istrm::Ptr{Cint}, filnam::Ptr{Ptr{UInt8}}, lenbuf::Ptr{Cint},
-                        icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint})::Cvoid
+                        icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint}, 128::Csize_t)::Cvoid
 end
 
 function ma62bd(nvar, ivar, ndf, last, lavar, avar, nrhsb, rhs, lx, x, lenbuf, lw, w, liw, iw,
@@ -142,7 +142,7 @@ end
 
 function ma62p(istrm, filnam, lenbuf, icntl, isave, info)
   @ccall libhsl.ma62p_(istrm::Ptr{Cint}, filnam::Ptr{Ptr{UInt8}}, lenbuf::Ptr{Cint},
-                       icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint})::Cvoid
+                       icntl::Ptr{Cint}, isave::Ptr{Cint}, info::Ptr{Cint}, 128::Csize_t)::Cvoid
 end
 
 function ma62b(nvar, ivar, ndf, last, lavar, avar, nrhsb, rhs, lx, x, lenbuf, lw, w, liw, iw, icntl,
