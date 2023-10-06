@@ -2,7 +2,7 @@
 using HSL_jll
 using JuliaFormatter
 
-release = "2023.9.27"
+release = "2023.10.5"
 libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL-$release/"
 
 # Symbols of the shared library libhsl
@@ -451,14 +451,13 @@ function main(name::String="all"; verbose::Bool=false)
             end
 
             # Hidden arguments
-            if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types
+            if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types || "Ptr{Ptr{UInt8}}" ∈ types
               verbose && @info "Hidden argument in $fname."
             end
             for k = 1:narguments
               (types[k] == "Ref{UInt8}") && write(file_wrapper, ", 1::Csize_t")
               (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
-              # FIX ME
-              # (types[k] == "Ptr{Ptr{UInt8}}") && ...
+              (types[k] == "Ptr{Ptr{UInt8}}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
             end
 
             if output_type == ""
