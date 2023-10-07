@@ -19,6 +19,36 @@ function eb22bd(n, numcol, er, ei, y, x, u, w, ln, tw, res, ipos, info, keep, rk
                         info::Ptr{Cint}, keep::Ptr{Cint}, rkeep::Ptr{Float64})::Cvoid
 end
 
+function eb22gd(ind, n, numeig, numcol, eps, x, u, work, ln, nlow, nup, qtaq, w, er, ei, itype,
+                ipos, ifound, lch, ch, lev, ev, lcvg, cvg, erold, eiold, iflag, icntl, keep, rkeep)
+  @ccall libhsl.eb22gd_(ind::Ref{Cint}, n::Ref{Cint}, numeig::Ref{Cint}, numcol::Ref{Cint},
+                        eps::Ptr{Float64}, x::Ptr{Float64}, u::Ptr{Float64}, work::Ptr{Float64},
+                        ln::Ref{Cint}, nlow::Ref{Cint}, nup::Ref{Cint}, qtaq::Ptr{Float64},
+                        w::Ptr{Float64}, er::Ptr{Float64}, ei::Ptr{Float64}, itype::Ptr{Cint},
+                        ipos::Ref{Cint}, ifound::Ref{Cint}, lch::Ref{Cint}, ch::Ptr{Float64},
+                        lev::Ref{Cint}, ev::Ptr{Float64}, lcvg::Ref{Cint}, cvg::Ptr{Float64},
+                        erold::Ptr{Float64}, eiold::Ptr{Float64}, iflag::Ref{Cint},
+                        icntl::Ptr{Cint}, keep::Ptr{Cint}, rkeep::Ptr{Float64})::Cvoid
+end
+
+function eb22hd(ind, sig, n, numcol, qtaq, workz, qwork, q, ln, eps, er, ei, itype, ifound, aq)
+  @ccall libhsl.eb22hd_(ind::Ref{Cint}, sig::Ref{Float64}, n::Ref{Cint}, numcol::Ref{Cint},
+                        qtaq::Ptr{Float64}, workz::Ptr{Float64}, qwork::Ptr{Float64},
+                        q::Ptr{Float64}, ln::Ref{Cint}, eps::Ref{Float64}, er::Ptr{Float64},
+                        ei::Ptr{Float64}, itype::Ptr{Cint}, ifound::Ref{Cint},
+                        aq::Ptr{Float64})::Cvoid
+end
+
+function eb22fd(ifound, n, numcol, numeig, eps, itype, t, aq, q, ln, work, er, ei, erold, eiold,
+                iflag, ipower, r, icntl)
+  @ccall libhsl.eb22fd_(ifound::Ref{Cint}, n::Ref{Cint}, numcol::Ref{Cint}, numeig::Ref{Cint},
+                        eps::Ptr{Float64}, itype::Ptr{Cint}, t::Ptr{Float64}, aq::Ptr{Float64},
+                        q::Ptr{Float64}, ln::Ref{Cint}, work::Ptr{Float64}, er::Ptr{Float64},
+                        ei::Ptr{Float64}, erold::Ptr{Float64}, eiold::Ptr{Float64},
+                        iflag::Ref{Cint}, ipower::Ref{Cint}, r::Ptr{Float64},
+                        icntl::Ptr{Cint})::Cvoid
+end
+
 function eb22jd(n, m, z, zout)
   @ccall libhsl.eb22jd_(n::Ref{Cint}, m::Ref{Cint}, z::Ptr{Float64}, zout::Ptr{Float64})::Cvoid
 end
@@ -60,6 +90,13 @@ end
 function eb22qd(a, b, t, d, a2, c2)
   @ccall libhsl.eb22qd_(a::Ref{Float64}, b::Ref{Float64}, t::Ref{Float64}, d::Ref{Float64},
                         a2::Ref{Float64}, c2::Ref{Float64})::Cvoid
+end
+
+function eb22rd(ind, sig, a, v, n, nlow, nup, eps, er, ei, type, na, nv)
+  @ccall libhsl.eb22rd_(ind::Ref{Cint}, sig::Ref{Float64}, a::Ptr{Float64}, v::Ptr{Float64},
+                        n::Ref{Cint}, nlow::Ref{Cint}, nup::Ref{Cint}, eps::Ref{Float64},
+                        er::Ptr{Float64}, ei::Ptr{Float64}, type::Ptr{Cint}, na::Ref{Cint},
+                        nv::Ref{Cint})::Cvoid
 end
 
 function eb22sd(a, v, n, l, b1, b2, eps, fail, na, nv, rmach)
@@ -133,6 +170,35 @@ function eb22b(n, numcol, er, ei, y, x, u, w, ln, tw, res, ipos, info, keep, rke
                        info::Ptr{Cint}, keep::Ptr{Cint}, rkeep::Ptr{Float32})::Cvoid
 end
 
+function eb22g(ind, n, numeig, numcol, eps, x, u, work, ln, nlow, nup, qtaq, w, er, ei, itype, ipos,
+               ifound, lch, ch, lev, ev, lcvg, cvg, erold, eiold, iflag, icntl, keep, rkeep)
+  @ccall libhsl.eb22g_(ind::Ref{Cint}, n::Ref{Cint}, numeig::Ref{Cint}, numcol::Ref{Cint},
+                       eps::Ptr{Float32}, x::Ptr{Float32}, u::Ptr{Float32}, work::Ptr{Float32},
+                       ln::Ref{Cint}, nlow::Ref{Cint}, nup::Ref{Cint}, qtaq::Ptr{Float32},
+                       w::Ptr{Float32}, er::Ptr{Float32}, ei::Ptr{Float32}, itype::Ptr{Cint},
+                       ipos::Ref{Cint}, ifound::Ref{Cint}, lch::Ref{Cint}, ch::Ptr{Float32},
+                       lev::Ref{Cint}, ev::Ptr{Float32}, lcvg::Ref{Cint}, cvg::Ptr{Float32},
+                       erold::Ptr{Float32}, eiold::Ptr{Float32}, iflag::Ref{Cint}, icntl::Ptr{Cint},
+                       keep::Ptr{Cint}, rkeep::Ptr{Float32})::Cvoid
+end
+
+function eb22h(ind, sig, n, numcol, qtaq, workz, qwork, q, ln, eps, er, ei, itype, ifound, aq)
+  @ccall libhsl.eb22h_(ind::Ref{Cint}, sig::Ref{Float32}, n::Ref{Cint}, numcol::Ref{Cint},
+                       qtaq::Ptr{Float32}, workz::Ptr{Float32}, qwork::Ptr{Float32},
+                       q::Ptr{Float32}, ln::Ref{Cint}, eps::Ref{Float32}, er::Ptr{Float32},
+                       ei::Ptr{Float32}, itype::Ptr{Cint}, ifound::Ref{Cint},
+                       aq::Ptr{Float32})::Cvoid
+end
+
+function eb22f(ifound, n, numcol, numeig, eps, itype, t, aq, q, ln, work, er, ei, erold, eiold,
+               iflag, ipower, r, icntl)
+  @ccall libhsl.eb22f_(ifound::Ref{Cint}, n::Ref{Cint}, numcol::Ref{Cint}, numeig::Ref{Cint},
+                       eps::Ptr{Float32}, itype::Ptr{Cint}, t::Ptr{Float32}, aq::Ptr{Float32},
+                       q::Ptr{Float32}, ln::Ref{Cint}, work::Ptr{Float32}, er::Ptr{Float32},
+                       ei::Ptr{Float32}, erold::Ptr{Float32}, eiold::Ptr{Float32}, iflag::Ref{Cint},
+                       ipower::Ref{Cint}, r::Ptr{Float32}, icntl::Ptr{Cint})::Cvoid
+end
+
 function eb22j(n, m, z, zout)
   @ccall libhsl.eb22j_(n::Ref{Cint}, m::Ref{Cint}, z::Ptr{Float32}, zout::Ptr{Float32})::Cvoid
 end
@@ -172,6 +238,13 @@ end
 function eb22q(a, b, t, d, a2, c2)
   @ccall libhsl.eb22q_(a::Ref{Float32}, b::Ref{Float32}, t::Ref{Float32}, d::Ref{Float32},
                        a2::Ref{Float32}, c2::Ref{Float32})::Cvoid
+end
+
+function eb22r(ind, sig, a, v, n, nlow, nup, eps, er, ei, type, na, nv)
+  @ccall libhsl.eb22r_(ind::Ref{Cint}, sig::Ref{Float32}, a::Ptr{Float32}, v::Ptr{Float32},
+                       n::Ref{Cint}, nlow::Ref{Cint}, nup::Ref{Cint}, eps::Ref{Float32},
+                       er::Ptr{Float32}, ei::Ptr{Float32}, type::Ptr{Cint}, na::Ref{Cint},
+                       nv::Ref{Cint})::Cvoid
 end
 
 function eb22s(a, v, n, l, b1, b2, eps, fail, na, nv, rmach)
