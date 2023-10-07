@@ -2,7 +2,7 @@
 using HSL_jll
 using JuliaFormatter
 
-release = "2023.10.5"
+release = "2023.10.6"
 libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL-$release/"
 
 # Symbols of the shared library libhsl
@@ -139,37 +139,12 @@ end
 function fortran_types(code::AbstractString, arguments::Vector{String}; verbose::Bool=false)
   narguments = length(arguments)
   types = ["" for i=1:narguments]
+  code = replace(code, " " => "")
   lines = split(code, "\n", keepempty=false)
   nlines = length(lines)
 
   # Number of characters for each string input
   strlen = Dict{String,Int}()
-
-  for i = nlines:-1:1
-    lines[i] = replace(lines[i], " " => "")
-
-    # For code written in FORTRAN 90
-    lines[i] = replace(lines[i], "::" => "")
-    lines[i] = replace(lines[i], ",intent(in)" => "")
-    lines[i] = replace(lines[i], ",intent(out)" => "")
-    lines[i] = replace(lines[i], ",intent(inout)" => "")
-    lines[i] = replace(lines[i], ",INTENT(IN)" => "")
-    lines[i] = replace(lines[i], ",INTENT(OUT)" => "")
-    lines[i] = replace(lines[i], ",INTENT(INOUT)" => "")
-    lines[i] = replace(lines[i], ",allocatable" => "")
-    lines[i] = replace(lines[i], ",OPTIONAL" => "")
-    lines[i] = replace(lines[i], "CHARACTER(len=*)" => "CHARACTER(N),")
-
-    if occursin("!", lines[i])
-      find = false
-      for (k, value) in enumerate(lines[i])
-        if value == '!' && !find
-          find = true
-          lines[i] = lines[i][1:k-1]
-        end
-      end
-    end
-  end
 
   for line in lines
     type_detector(types, arguments, line, "INTEGER")
@@ -256,6 +231,39 @@ function fortran_analyzer(str::String, basename::String, extension::String)
     end
   end
 
+  # Remove some patterns to more easily parse files in FORTRAN 90
+  if extension == "f90"
+    str = replace(str, ", " => ",")
+    str = replace(str, "::" => "")
+    for pattern in ("in", "out", "inout")
+      str = replace(str, " $pattern " => pattern)
+      str = replace(str, " $(uppercase(pattern)) " => uppercase(pattern))
+    end
+    for pattern in (",intent(in)", ",intent(out)", ",intent(inout)")
+      str = replace(str, pattern => "")
+      str = replace(str, uppercase(pattern) => "")
+    end
+    str = replace(str, ",allocatable" => "")
+    str = replace(str, ",OPTIONAL" => "")
+    # str = replace(str, "CHARACTER(len=*)" => "CHARACTER(N),")
+
+    lines = split(str, "\n", keepempty=false)
+    str = ""
+    for line in lines
+      if occursin("!", line)
+        find = false
+        for (k, value) in enumerate(line)
+          if value == '!' && !find
+            find = true
+            str = str * line[1:k-1] * "\n"
+          end
+        end
+      else
+        str = str * line * "\n"
+      end
+    end
+  end
+
   # Remove double spaces
   double_spaces = occursin("  ", str)
   while double_spaces
@@ -322,8 +330,9 @@ function fortran_analyzer(str::String, basename::String, extension::String)
   (extension == "f90") && @info "The exported symbols of $(basename).f90 are $(exported_symbols)."
 
   for case in ["SUBROUTINE", "subroutine", "FUNCTION", "function"]
+    # v is a list of subroutines and functions
     v = split(str, case)
-    if length(v) != 1
+    if length(v) ≥ 1
       # We found at least one subroutine or one function
       for (index, text) in enumerate(v[2:end])
         signature = split(text, ")")[1]
@@ -333,7 +342,7 @@ function fortran_analyzer(str::String, basename::String, extension::String)
         !occursin("(", signature) && continue
 
         # It's not the definition of a function if we find one of these patterns
-        excluded_patterns = ["/", "-", ".", ":", "!", "'", "=", "EXTERNAL", "TYPE"]
+        excluded_patterns = ["/", "-", ".", ":", "!", "'", "="]
         mapreduce(excluded_pattern -> occursin(excluded_pattern, signature), |, excluded_patterns) && continue
 
         # Signature cleaning
@@ -350,7 +359,7 @@ function fortran_analyzer(str::String, basename::String, extension::String)
         fname ∈ ("ma46u", "ma46ud", "ma46w", "ma46wd") && continue
 
         # The function or the subroutine is private
-        (extension == "f90") && !isempty(exported_symbols) && !(fname ∈ exported_symbols) && continue
+        (extension == "f90") && !isempty(exported_symbols) && !(fname ∈ exported_symbols) && !(uppercase(fname) ∈ exported_symbols) && continue
 
         # Determine the type of the arguments
         verbose = false
