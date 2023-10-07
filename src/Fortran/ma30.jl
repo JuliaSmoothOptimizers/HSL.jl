@@ -14,6 +14,13 @@ function ma30bd(n, icn, a, licn, lenr, lenrl, idisp, ip, iq, w, iw, iflag)
                         iq::Ptr{Cint}, w::Ptr{Float64}, iw::Ptr{Cint}, iflag::Ref{Cint})::Cvoid
 end
 
+function ma30cd(n, icn, a, licn, lenr, lenrl, lenoff, idisp, ip, iq, x, w, mtype)
+  @ccall libhsl.ma30cd_(n::Ref{Cint}, icn::Ptr{Cint}, a::Ptr{Float64}, licn::Ref{Cint},
+                        lenr::Ptr{Cint}, lenrl::Ptr{Cint}, lenoff::Ptr{Cint}, idisp::Ptr{Cint},
+                        ip::Ptr{Cint}, iq::Ptr{Cint}, x::Ptr{Float64}, w::Ptr{Float64},
+                        mtype::Ref{Cint})::Cvoid
+end
+
 function ma30dd(a, icn, iptr, n, iactiv, itop, reals)
   @ccall libhsl.ma30dd_(a::Ptr{Float64}, icn::Ptr{Cint}, iptr::Ptr{Cint}, n::Ref{Cint},
                         iactiv::Ref{Cint}, itop::Ref{Cint}, reals::Ref{Cint})::Cvoid
@@ -33,6 +40,13 @@ function ma30b(n, icn, a, licn, lenr, lenrl, idisp, ip, iq, w, iw, iflag)
   @ccall libhsl.ma30b_(n::Ref{Cint}, icn::Ptr{Cint}, a::Ptr{Float32}, licn::Ref{Cint},
                        lenr::Ptr{Cint}, lenrl::Ptr{Cint}, idisp::Ptr{Cint}, ip::Ptr{Cint},
                        iq::Ptr{Cint}, w::Ptr{Float32}, iw::Ptr{Cint}, iflag::Ref{Cint})::Cvoid
+end
+
+function ma30c(n, icn, a, licn, lenr, lenrl, lenoff, idisp, ip, iq, x, w, mtype)
+  @ccall libhsl.ma30c_(n::Ref{Cint}, icn::Ptr{Cint}, a::Ptr{Float32}, licn::Ref{Cint},
+                       lenr::Ptr{Cint}, lenrl::Ptr{Cint}, lenoff::Ptr{Cint}, idisp::Ptr{Cint},
+                       ip::Ptr{Cint}, iq::Ptr{Cint}, x::Ptr{Float32}, w::Ptr{Float32},
+                       mtype::Ref{Cint})::Cvoid
 end
 
 function ma30d(a, icn, iptr, n, iactiv, itop, reals)

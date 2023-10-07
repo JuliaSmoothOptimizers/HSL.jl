@@ -18,9 +18,36 @@ function eb13bd(n, nblock, nsteps, er, ei, ln, x, u, w, nev, y, res, ikeep, rkee
                         ikeep::Ptr{Cint}, rkeep::Ptr{Float64})::Cvoid
 end
 
+function eb13cd(ipos, ind, n, numeig, nblock, numcol, x, u, w, ln, nlow, nup, qtaq, work, er, ei,
+                itype, ch, ev, erold, eiold, icntl, info, rinfo, ikeep, keep, cntl)
+  @ccall libhsl.eb13cd_(ipos::Ref{Cint}, ind::Ref{Cint}, n::Ref{Cint}, numeig::Ref{Cint},
+                        nblock::Ref{Cint}, numcol::Ref{Cint}, x::Ptr{Float64}, u::Ptr{Float64},
+                        w::Ptr{Float64}, ln::Ref{Cint}, nlow::Ref{Cint}, nup::Ref{Cint},
+                        qtaq::Ptr{Float64}, work::Ptr{Float64}, er::Ptr{Float64}, ei::Ptr{Float64},
+                        itype::Ptr{Cint}, ch::Ptr{Float64}, ev::Ptr{Float64}, erold::Ptr{Float64},
+                        eiold::Ptr{Float64}, icntl::Ptr{Cint}, info::Ptr{Cint}, rinfo::Ptr{Float64},
+                        ikeep::Ptr{Cint}, keep::Ptr{Float64}, cntl::Ptr{Float64})::Cvoid
+end
+
+function eb13dd(n, numcol, nblock, numeig, itype, t, aq, q, ln, er, ei, erold, eiold, icntl, info,
+                rinfo, r, work, cntl)
+  @ccall libhsl.eb13dd_(n::Ref{Cint}, numcol::Ref{Cint}, nblock::Ref{Cint}, numeig::Ref{Cint},
+                        itype::Ptr{Cint}, t::Ptr{Float64}, aq::Ptr{Float64}, q::Ptr{Float64},
+                        ln::Ref{Cint}, er::Ptr{Float64}, ei::Ptr{Float64}, erold::Ptr{Float64},
+                        eiold::Ptr{Float64}, icntl::Ptr{Cint}, info::Ptr{Cint}, rinfo::Ptr{Float64},
+                        r::Ptr{Float64}, work::Ptr{Float64}, cntl::Ptr{Float64})::Cvoid
+end
+
 function eb13ed(n, w, ldw, v, ldv, m)
   @ccall libhsl.eb13ed_(n::Ref{Cint}, w::Ptr{Float64}, ldw::Ref{Cint}, v::Ptr{Float64},
                         ldv::Ref{Cint}, m::Ref{Cint})::Cvoid
+end
+
+function eb13fd(jnd, ind, n, numcol, ifound, qtaq, z, qwork, q, ln, eps, er, ei, itype)
+  @ccall libhsl.eb13fd_(jnd::Ref{Cint}, ind::Ref{Cint}, n::Ref{Cint}, numcol::Ref{Cint},
+                        ifound::Ref{Cint}, qtaq::Ptr{Float64}, z::Ptr{Float64}, qwork::Ptr{Float64},
+                        q::Ptr{Float64}, ln::Ref{Cint}, eps::Ref{Float64}, er::Ptr{Float64},
+                        ei::Ptr{Float64}, itype::Ptr{Cint})::Cvoid
 end
 
 function eb13gd(nev, er, ei, vec, ratio, wrt1, d, c2, a2)
@@ -38,6 +65,12 @@ end
 function eb13jd(a, adim, n, p, r, work)
   @ccall libhsl.eb13jd_(a::Ptr{Float64}, adim::Ref{Cint}, n::Ref{Cint}, p::Ref{Cint}, r::Ref{Cint},
                         work::Ptr{Float64})::Cvoid
+end
+
+function eb13kd(ind, a, v, n, nlow, nup, eps, er, ei, type, na, nv)
+  @ccall libhsl.eb13kd_(ind::Ref{Cint}, a::Ptr{Float64}, v::Ptr{Float64}, n::Ref{Cint},
+                        nlow::Ref{Cint}, nup::Ref{Cint}, eps::Ref{Float64}, er::Ptr{Float64},
+                        ei::Ptr{Float64}, type::Ptr{Cint}, na::Ref{Cint}, nv::Ref{Cint})::Cvoid
 end
 
 function eb13ld(n, low, a, ort, z)
@@ -100,9 +133,36 @@ function eb13b(n, nblock, nsteps, er, ei, ln, x, u, w, nev, y, res, ikeep, rkeep
                        ikeep::Ptr{Cint}, rkeep::Ptr{Float32})::Cvoid
 end
 
+function eb13c(ipos, ind, n, numeig, nblock, numcol, x, u, w, ln, nlow, nup, qtaq, work, er, ei,
+               itype, ch, ev, erold, eiold, icntl, info, rinfo, ikeep, keep, cntl)
+  @ccall libhsl.eb13c_(ipos::Ref{Cint}, ind::Ref{Cint}, n::Ref{Cint}, numeig::Ref{Cint},
+                       nblock::Ref{Cint}, numcol::Ref{Cint}, x::Ptr{Float32}, u::Ptr{Float32},
+                       w::Ptr{Float32}, ln::Ref{Cint}, nlow::Ref{Cint}, nup::Ref{Cint},
+                       qtaq::Ptr{Float32}, work::Ptr{Float32}, er::Ptr{Float32}, ei::Ptr{Float32},
+                       itype::Ptr{Cint}, ch::Ptr{Float32}, ev::Ptr{Float32}, erold::Ptr{Float32},
+                       eiold::Ptr{Float32}, icntl::Ptr{Cint}, info::Ptr{Cint}, rinfo::Ptr{Float32},
+                       ikeep::Ptr{Cint}, keep::Ptr{Float32}, cntl::Ptr{Float32})::Cvoid
+end
+
+function eb13d(n, numcol, nblock, numeig, itype, t, aq, q, ln, er, ei, erold, eiold, icntl, info,
+               rinfo, r, work, cntl)
+  @ccall libhsl.eb13d_(n::Ref{Cint}, numcol::Ref{Cint}, nblock::Ref{Cint}, numeig::Ref{Cint},
+                       itype::Ptr{Cint}, t::Ptr{Float32}, aq::Ptr{Float32}, q::Ptr{Float32},
+                       ln::Ref{Cint}, er::Ptr{Float32}, ei::Ptr{Float32}, erold::Ptr{Float32},
+                       eiold::Ptr{Float32}, icntl::Ptr{Cint}, info::Ptr{Cint}, rinfo::Ptr{Float32},
+                       r::Ptr{Float32}, work::Ptr{Float32}, cntl::Ptr{Float32})::Cvoid
+end
+
 function eb13e(n, w, ldw, v, ldv, m)
   @ccall libhsl.eb13e_(n::Ref{Cint}, w::Ptr{Float32}, ldw::Ref{Cint}, v::Ptr{Float32},
                        ldv::Ref{Cint}, m::Ref{Cint})::Cvoid
+end
+
+function eb13f(jnd, ind, n, numcol, ifound, qtaq, z, qwork, q, ln, eps, er, ei, itype)
+  @ccall libhsl.eb13f_(jnd::Ref{Cint}, ind::Ref{Cint}, n::Ref{Cint}, numcol::Ref{Cint},
+                       ifound::Ref{Cint}, qtaq::Ptr{Float32}, z::Ptr{Float32}, qwork::Ptr{Float32},
+                       q::Ptr{Float32}, ln::Ref{Cint}, eps::Ref{Float32}, er::Ptr{Float32},
+                       ei::Ptr{Float32}, itype::Ptr{Cint})::Cvoid
 end
 
 function eb13g(nev, er, ei, vec, ratio, wrt1, d, c2, a2)
@@ -120,6 +180,12 @@ end
 function eb13j(a, adim, n, p, r, work)
   @ccall libhsl.eb13j_(a::Ptr{Float32}, adim::Ref{Cint}, n::Ref{Cint}, p::Ref{Cint}, r::Ref{Cint},
                        work::Ptr{Float32})::Cvoid
+end
+
+function eb13k(ind, a, v, n, nlow, nup, eps, er, ei, type, na, nv)
+  @ccall libhsl.eb13k_(ind::Ref{Cint}, a::Ptr{Float32}, v::Ptr{Float32}, n::Ref{Cint},
+                       nlow::Ref{Cint}, nup::Ref{Cint}, eps::Ref{Float32}, er::Ptr{Float32},
+                       ei::Ptr{Float32}, type::Ptr{Cint}, na::Ref{Cint}, nv::Ref{Cint})::Cvoid
 end
 
 function eb13l(n, low, a, ort, z)

@@ -2,6 +2,15 @@ function ma75id(icntl, cntl)
   @ccall libhsl.ma75id_(icntl::Ptr{Cint}, cntl::Ptr{Float64})::Cvoid
 end
 
+function ma75ad(m, n, itype, nzain, nza, yeswgt, wgt, a, ind, iptr, ata, lata, iata, liata, iw,
+                icntl, cntl, info)
+  @ccall libhsl.ma75ad_(m::Ref{Cint}, n::Ref{Cint}, itype::Ref{Cint}, nzain::Ref{Cint},
+                        nza::Ref{Cint}, yeswgt::Ref{Cint}, wgt::Ptr{Float64}, a::Ptr{Float64},
+                        ind::Ptr{Cint}, iptr::Ptr{Cint}, ata::Ptr{Float64}, lata::Ref{Cint},
+                        iata::Ptr{Cint}, liata::Ref{Cint}, iw::Ptr{Cint}, icntl::Ptr{Cint},
+                        cntl::Ptr{Float64}, info::Ptr{Cint})::Cvoid
+end
+
 function ma75bd(m, n, nza, yeswgt, wgt, a, ind, iptr, ata, lata, iata, liata, res, rhs, x, w, iw)
   @ccall libhsl.ma75bd_(m::Ref{Cint}, n::Ref{Cint}, nza::Ref{Cint}, yeswgt::Ref{Cint},
                         wgt::Ptr{Float64}, a::Ptr{Float64}, ind::Ptr{Cint}, iptr::Ptr{Cint},
@@ -29,6 +38,15 @@ end
 
 function ma75i(icntl, cntl)
   @ccall libhsl.ma75i_(icntl::Ptr{Cint}, cntl::Ptr{Float32})::Cvoid
+end
+
+function ma75a(m, n, itype, nzain, nza, yeswgt, wgt, a, ind, iptr, ata, lata, iata, liata, iw,
+               icntl, cntl, info)
+  @ccall libhsl.ma75a_(m::Ref{Cint}, n::Ref{Cint}, itype::Ref{Cint}, nzain::Ref{Cint},
+                       nza::Ref{Cint}, yeswgt::Ref{Cint}, wgt::Ptr{Float32}, a::Ptr{Float32},
+                       ind::Ptr{Cint}, iptr::Ptr{Cint}, ata::Ptr{Float32}, lata::Ref{Cint},
+                       iata::Ptr{Cint}, liata::Ref{Cint}, iw::Ptr{Cint}, icntl::Ptr{Cint},
+                       cntl::Ptr{Float32}, info::Ptr{Cint})::Cvoid
 end
 
 function ma75b(m, n, nza, yeswgt, wgt, a, ind, iptr, ata, lata, iata, liata, res, rhs, x, w, iw)

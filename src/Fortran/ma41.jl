@@ -24,6 +24,13 @@ function ma41bd(n, nz, nsteps, irn, icn, aspk, a, la, iw, liw, ikeep, nfsiz, fil
                         info::Ptr{Cint}, rinfo::Ptr{Float64}, keep::Ptr{Cint})::Cvoid
 end
 
+function ma41cd(n, a, la, iw, liw, w, maxfrt, rhs, ptlust, nsteps, w2, mtype, icntl)
+  @ccall libhsl.ma41cd_(n::Ref{Cint}, a::Ptr{Float64}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
+                        w::Ptr{Float64}, maxfrt::Ref{Cint}, rhs::Ptr{Float64}, ptlust::Ptr{Cint},
+                        nsteps::Ref{Cint}, w2::Ptr{Float64}, mtype::Ref{Cint},
+                        icntl::Ptr{Cint})::Cvoid
+end
+
 function ma41dd(n, ipe, iw, lw, iwfr, ncmpa)
   @ccall libhsl.ma41dd_(n::Ref{Cint}, ipe::Ptr{Cint}, iw::Ptr{Cint}, lw::Ref{Cint}, iwfr::Ref{Cint},
                         ncmpa::Ref{Cint})::Cvoid
@@ -108,6 +115,16 @@ function ma41pd(n, r, w)
   @ccall libhsl.ma41pd_(n::Ref{Cint}, r::Ptr{Float64}, w::Ptr{Float64})::Cvoid
 end
 
+function ma41qd(mtype, iflag, n, nz, aspk, irn, icn, lhs, wrhs, w, rhs, givsol, sol, anorm, xnorm,
+                sclnrm, mprint, cntl, icntl)
+  @ccall libhsl.ma41qd_(mtype::Ref{Cint}, iflag::Ref{Cint}, n::Ref{Cint}, nz::Ref{Cint},
+                        aspk::Ptr{Float64}, irn::Ptr{Cint}, icn::Ptr{Cint}, lhs::Ptr{Float64},
+                        wrhs::Ptr{Float64}, w::Ptr{Float64}, rhs::Ptr{Float64}, givsol::Ref{Cint},
+                        sol::Ptr{Float64}, anorm::Ref{Float64}, xnorm::Ref{Float64},
+                        sclnrm::Ref{Float64}, mprint::Ref{Cint}, cntl::Ptr{Float64},
+                        icntl::Ptr{Cint})::Cvoid
+end
+
 function ma41rd(n, a, la, iw, liw, w, maxfrt, rhs, ptlust, nblk)
   @ccall libhsl.ma41rd_(n::Ref{Cint}, a::Ptr{Float64}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
                         w::Ptr{Float64}, maxfrt::Ref{Cint}, rhs::Ptr{Float64}, ptlust::Ptr{Cint},
@@ -130,6 +147,17 @@ function ma41ud(n, a, la, iw, liw, w, maxfrt, rhs, ptlust, nblk, w2)
   @ccall libhsl.ma41ud_(n::Ref{Cint}, a::Ptr{Float64}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
                         w::Ptr{Float64}, maxfrt::Ref{Cint}, rhs::Ptr{Float64}, ptlust::Ptr{Cint},
                         nblk::Ref{Cint}, w2::Ptr{Float64})::Cvoid
+end
+
+function ma41vd(mtype, aspk, nz, n, irn, icn, rhs, rhso, a, la, iw, liw, w1, iw1, ptlust, nsteps,
+                maxfrt, rinfo, lscal, colsca, rowsca, cntl, icntl, info)
+  @ccall libhsl.ma41vd_(mtype::Ref{Cint}, aspk::Ptr{Float64}, nz::Ref{Cint}, n::Ref{Cint},
+                        irn::Ptr{Cint}, icn::Ptr{Cint}, rhs::Ptr{Float64}, rhso::Ptr{Float64},
+                        a::Ptr{Float64}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
+                        w1::Ptr{Float64}, iw1::Ptr{Cint}, ptlust::Ptr{Cint}, nsteps::Ref{Cint},
+                        maxfrt::Ref{Cint}, rinfo::Ptr{Float64}, lscal::Ref{Cint},
+                        colsca::Ptr{Float64}, rowsca::Ptr{Float64}, cntl::Ptr{Float64},
+                        icntl::Ptr{Cint}, info::Ptr{Cint})::Cvoid
 end
 
 function ma41wd(a, nz, n, irn, icn, rhs, x, y, d, w, iw, kase, omega, erx, job, cond, maxit, noiter,
@@ -193,6 +221,13 @@ function ma41b(n, nz, nsteps, irn, icn, aspk, a, la, iw, liw, ikeep, nfsiz, fils
                        iw3::Ptr{Cint}, liw3::Ref{Cint}, lscal::Ref{Cint}, colsca::Ptr{Float32},
                        rowsca::Ptr{Float32}, ipta::Ptr{Cint}, cntl::Ptr{Float32}, icntl::Ptr{Cint},
                        info::Ptr{Cint}, rinfo::Ptr{Float32}, keep::Ptr{Cint})::Cvoid
+end
+
+function ma41c(n, a, la, iw, liw, w, maxfrt, rhs, ptlust, nsteps, w2, mtype, icntl)
+  @ccall libhsl.ma41c_(n::Ref{Cint}, a::Ptr{Float32}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
+                       w::Ptr{Float32}, maxfrt::Ref{Cint}, rhs::Ptr{Float32}, ptlust::Ptr{Cint},
+                       nsteps::Ref{Cint}, w2::Ptr{Float32}, mtype::Ref{Cint},
+                       icntl::Ptr{Cint})::Cvoid
 end
 
 function ma41d(n, ipe, iw, lw, iwfr, ncmpa)
@@ -278,6 +313,16 @@ function ma41p(n, r, w)
   @ccall libhsl.ma41p_(n::Ref{Cint}, r::Ptr{Float32}, w::Ptr{Float32})::Cvoid
 end
 
+function ma41q(mtype, iflag, n, nz, aspk, irn, icn, lhs, wrhs, w, rhs, givsol, sol, anorm, xnorm,
+               sclnrm, mprint, cntl, icntl)
+  @ccall libhsl.ma41q_(mtype::Ref{Cint}, iflag::Ref{Cint}, n::Ref{Cint}, nz::Ref{Cint},
+                       aspk::Ptr{Float32}, irn::Ptr{Cint}, icn::Ptr{Cint}, lhs::Ptr{Float32},
+                       wrhs::Ptr{Float32}, w::Ptr{Float32}, rhs::Ptr{Float32}, givsol::Ref{Cint},
+                       sol::Ptr{Float32}, anorm::Ref{Float32}, xnorm::Ref{Float32},
+                       sclnrm::Ref{Float32}, mprint::Ref{Cint}, cntl::Ptr{Float32},
+                       icntl::Ptr{Cint})::Cvoid
+end
+
 function ma41r(n, a, la, iw, liw, w, maxfrt, rhs, ptlust, nblk)
   @ccall libhsl.ma41r_(n::Ref{Cint}, a::Ptr{Float32}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
                        w::Ptr{Float32}, maxfrt::Ref{Cint}, rhs::Ptr{Float32}, ptlust::Ptr{Cint},
@@ -300,6 +345,17 @@ function ma41u(n, a, la, iw, liw, w, maxfrt, rhs, ptlust, nblk, w2)
   @ccall libhsl.ma41u_(n::Ref{Cint}, a::Ptr{Float32}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
                        w::Ptr{Float32}, maxfrt::Ref{Cint}, rhs::Ptr{Float32}, ptlust::Ptr{Cint},
                        nblk::Ref{Cint}, w2::Ptr{Float32})::Cvoid
+end
+
+function ma41v(mtype, aspk, nz, n, irn, icn, rhs, rhso, a, la, iw, liw, w1, iw1, ptlust, nsteps,
+               maxfrt, rinfo, lscal, colsca, rowsca, cntl, icntl, info)
+  @ccall libhsl.ma41v_(mtype::Ref{Cint}, aspk::Ptr{Float32}, nz::Ref{Cint}, n::Ref{Cint},
+                       irn::Ptr{Cint}, icn::Ptr{Cint}, rhs::Ptr{Float32}, rhso::Ptr{Float32},
+                       a::Ptr{Float32}, la::Ref{Cint}, iw::Ptr{Cint}, liw::Ref{Cint},
+                       w1::Ptr{Float32}, iw1::Ptr{Cint}, ptlust::Ptr{Cint}, nsteps::Ref{Cint},
+                       maxfrt::Ref{Cint}, rinfo::Ptr{Float32}, lscal::Ref{Cint},
+                       colsca::Ptr{Float32}, rowsca::Ptr{Float32}, cntl::Ptr{Float32},
+                       icntl::Ptr{Cint}, info::Ptr{Cint})::Cvoid
 end
 
 function ma41w(a, nz, n, irn, icn, rhs, x, y, d, w, iw, kase, omega, erx, job, cond, maxit, noiter,
