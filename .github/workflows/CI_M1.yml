@@ -37,8 +37,8 @@ jobs:
       - name: Install HSL_jll.jl
         shell: julia --color=yes {0}
         run: |
-          using HSL, Pkg
-          Pkg.activate(pathof(HSL))
+          using Pkg
+          Pkg.activate("~/actions-runner/_work/HSL.jl/HSL.jl")
           Pkg.develop(path=ENV["HSL_JLL_PATH"])
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
