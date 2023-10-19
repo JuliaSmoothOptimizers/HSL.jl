@@ -13,15 +13,15 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.6'
+          # - '1.6'
           - '1'
-          - 'nightly'
+          # - 'nightly'
         arch:
           - x64
           - aarch64
-        exclude:
-          - version: '1.6'
-            arch: aarch64
+        # exclude:
+        #   - version: '1.6'
+        #     arch: aarch64
     steps:
       - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
@@ -39,6 +39,9 @@ jobs:
         run: |
           using Pkg
           Pkg.activate("~/actions-runner/_work/HSL.jl/HSL.jl")
+          for var in ENV
+            println(var)
+          end
           Pkg.develop(path=ENV["HSL_JLL_PATH"])
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
