@@ -48,7 +48,7 @@ jobs:
         shell: julia --color=yes {0}
         run: |
           using Pkg
-          Pkg.activate("~/actions-runner/_work/HSL.jl/HSL.jl")
+          Pkg.develop("~/actions-runner/_work/HSL.jl/HSL.jl")
           Pkg.test("HSL")
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v3
