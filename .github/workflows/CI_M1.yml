@@ -38,9 +38,12 @@ jobs:
         run: |
           using Pkg
           if VERSION ≥ v"1.9"
-            Pkg.develop(path=ENV["HSL_JLL_LBT_PATH"])
+            println(readdir(ENV["HSL_JLL_LBT_PATH"]))
+            path_hsl_jll = joinpath(ENV["HSL_JLL_LBT_PATH"], "HSL_jll.jl")
+            Pkg.develop(path=path_hsl_jll)
           else
-            Pkg.develop(path=ENV["HSL_JLL_OPENBLAS_PATH"])
+            path_hsl_jll = joinpath(ENV["HSL_JLL_OPENBLAS_PATH"], "HSL_jll.jl")
+            Pkg.develop(path=path_hsl_jll)
           end
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
