@@ -15,7 +15,7 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
   options = load_options(joinpath(@__DIR__, "hsl.toml"))
   options["general"]["output_file_path"] = joinpath("..", "src", "C", "$(name).jl")
 
-  if name != "juliahsl"
+  if name != "libhsl"
     solver = split(name, "_")[2]
     optimized && (options["general"]["output_ignorelist"] = ["$(solver)realtype_[sdcz]_\$",
                                                              "$(solver)pkgtype_[sdcz]_\$",
@@ -36,7 +36,7 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
 
   path = options["general"]["output_file_path"]
 
-  (name != "juliahsl") && format_file(path, YASStyle())
+  (name != "libhsl") && format_file(path, YASStyle())
   rewrite!(path, name, optimized)
   return nothing
 end
@@ -49,8 +49,8 @@ end
 function main(name::String="all"; optimized::Bool=false)
   include = joinpath(HSL_jll.artifact_dir, "include")
 
-  if name == "all" || name == "juliahsl"
-    wrapper("juliahsl", [joinpath(include, "juliahsl.h")], optimized)
+  if name == "all" || name == "libhsl"
+    wrapper("libhsl", [joinpath(include, "libhsl.h")], optimized)
   end
 
   if name == "all" || name == "hsl_ma48"
