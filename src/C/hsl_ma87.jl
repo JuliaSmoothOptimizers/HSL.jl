@@ -10,6 +10,8 @@ mutable struct ma87_control{T}
   diag_zero_minus::T
   diag_zero_plus::T
   unused::NTuple{40,Cchar}
+
+  ma87_control{T}() where T = new()
 end
 
 function ma87_default_control_s(control)
@@ -27,6 +29,8 @@ mutable struct ma87_info{T}
   stat::Cint
   num_zero::Cint
   unused::NTuple{40,Cchar}
+
+  ma87_info{T}() where T = new()
 end
 
 function ma87_analyse_s(n, ptr, row, order, keep, control, info)

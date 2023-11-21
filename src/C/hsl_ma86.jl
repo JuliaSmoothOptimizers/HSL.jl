@@ -14,6 +14,8 @@ mutable struct ma86_control{T}
   u::T
   umin::T
   scaling::Cint
+
+  ma86_control{T}() where T = new()
 end
 
 function ma86_default_control_s(control)
@@ -37,6 +39,8 @@ mutable struct ma86_info{T}
   pool_size::Cint
   stat::Cint
   usmall::T
+
+  ma86_info{T}() where T = new()
 end
 
 function ma86_analyse_s(n, ptr, row, order, keep, control, info)

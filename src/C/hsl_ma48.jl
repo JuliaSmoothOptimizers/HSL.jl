@@ -23,6 +23,8 @@ mutable struct ma48_control{T}
   diagonal_pivoting::Cint
   fill_in::Cint
   switch_mode::Cint
+
+  ma48_control{T}() where T = new()
 end
 
 function ma48_default_control_s(control)
@@ -47,6 +49,8 @@ mutable struct ma48_ainfo{T}
   lblock::Cint
   sblock::Cint
   tblock::Clong
+
+  ma48_ainfo{T}() where T = new()
 end
 
 mutable struct ma48_finfo{T}
@@ -59,6 +63,8 @@ mutable struct ma48_finfo{T}
   drop::Clong
   rank::Cint
   stat::Cint
+
+  ma48_finfo{T}() where T = new()
 end
 
 function ma48_analyse_s(m, n, ne, row, col, val, factors, control, ainfo, finfo, perm, endcol)
@@ -84,6 +90,8 @@ mutable struct ma48_sinfo
   flag::Cint
   more::Cint
   stat::Cint
+
+  ma48_sinfo() = new()
 end
 
 function ma48_solve_s(m, n, ne, row, col, val, factors, rhs, x, control, sinfo, trans, resid, error)

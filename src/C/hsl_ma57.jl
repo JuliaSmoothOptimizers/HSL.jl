@@ -27,6 +27,8 @@ mutable struct ma57_control{T}
   rank_deficient::Cint
   ispare::NTuple{5,Cint}
   rspare::NTuple{10,T}
+
+  ma57_control{T}() where T = new()
 end
 
 function ma57_default_control_s(control)
@@ -57,6 +59,8 @@ mutable struct ma57_ainfo{T}
   stat::Cint
   ispare::NTuple{5,Cint}
   rspare::NTuple{10,T}
+
+  ma57_ainfo{T}() where T = new()
 end
 
 function ma57_analyse_s(n, ne, row, col, factors, control, ainfo, perm)
@@ -94,6 +98,8 @@ mutable struct ma57_finfo{T}
   stat::Cint
   ispare::NTuple{5,Cint}
   rspare::NTuple{10,T}
+
+  ma57_finfo{T}() where T = new()
 end
 
 function ma57_factorize_s(n, ne, row, col, val, factors, control, finfo)
@@ -112,6 +118,8 @@ mutable struct ma57_sinfo{T}
   stat::Cint
   ispare::NTuple{5,Cint}
   rspare::NTuple{10,T}
+
+  ma57_sinfo{T}() where T = new()
 end
 
 function ma57_solve_s(n, ne, row, col, val, factors, nrhs, x, control, sinfo, rhs, iter, cond)

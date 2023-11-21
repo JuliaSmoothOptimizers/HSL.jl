@@ -9,6 +9,8 @@ mutable struct mc68_control
   print_level::Cint
   row_full_thresh::Cint
   row_search::Cint
+
+  mc68_control() = new()
 end
 
 function mc68_default_control_i(control)
@@ -26,6 +28,8 @@ mutable struct mc68_info
   l_workspace::Clong
   zb01_info::Cint
   n_dense_rows::Cint
+
+  mc68_info() = new()
 end
 
 function mc68_order_i(ord, n, ptr, row, perm, control, info)

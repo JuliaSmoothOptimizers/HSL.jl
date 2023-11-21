@@ -22,6 +22,8 @@ mutable struct mi20_control{T}
   print::Cint
   error::Cint
   one_pass_coarsen::Cint
+
+  mi20_control{T}() where T = new()
 end
 
 function mi20_default_control_s(control)
@@ -37,6 +39,8 @@ mutable struct mi20_solve_control{T}
   max_its::Cint
   preconditioner_side::Cint
   rel_tol::T
+
+  mi20_solve_control{T}() where T = new()
 end
 
 function mi20_default_solve_control_s(solve_control)
@@ -52,6 +56,8 @@ mutable struct mi20_info{T}
   getrf_info::Cint
   iterations::Cint
   residual::T
+
+  mi20_info{T}() where T = new()
 end
 
 function mi20_setup_s(n, ptr, col, val, keep, control, info)

@@ -10,6 +10,8 @@ mutable struct mc78_control
   svar::Cint
   sort::Cint
   lopt::Cint
+
+  mc78_control() = new()
 end
 
 function mc78_default_control_i(control)

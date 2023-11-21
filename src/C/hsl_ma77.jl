@@ -28,6 +28,8 @@ mutable struct ma77_control{T}
   ispare::NTuple{5,Cint}
   lspare::NTuple{5,Clong}
   rspare::NTuple{5,T}
+
+  ma77_control{T}() where T = new()
 end
 
 function ma77_default_control_s(control)
@@ -69,6 +71,8 @@ mutable struct ma77_info{T}
   ispare::NTuple{5,Cint}
   lspare::NTuple{5,Clong}
   rspare::NTuple{5,T}
+
+  ma77_info{T}() where T = new()
 end
 
 function ma77_open_nelt_s(n, fname1, fname2, fname3, fname4, keep, control, info, nelt)

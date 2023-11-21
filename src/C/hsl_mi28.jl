@@ -14,6 +14,8 @@ mutable struct mi28_control{T}
   tau2::T
   unit_error::Cint
   unit_warning::Cint
+
+  mi28_control{T}() where T = new()
 end
 
 function mi28_default_control_s(control)
@@ -37,6 +39,8 @@ mutable struct mi28_info{T}
   size_r::Int64
   stat::Cint
   alpha::T
+
+  mi28_info{T}() where T = new()
 end
 
 function mi28_factorize_s(n, ptr, row, val, lsize, rsize, keep, control, info, scale, perm)

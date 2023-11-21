@@ -5,6 +5,8 @@ mutable struct mc64_control
   sp::Cint
   ldiag::Cint
   checking::Cint
+
+  mc64_control() = new()
 end
 
 function mc64_default_control_s(control)
@@ -16,6 +18,8 @@ mutable struct mc64_info
   more::Cint
   strucrank::Cint
   stat::Cint
+
+  mc64_info() = new()
 end
 
 function mc64_matching_s(job, matrix_type, m, n, ptr, row, cval, control, info, perm, scale)
