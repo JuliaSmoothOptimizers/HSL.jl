@@ -62,27 +62,61 @@ function rewrite!(path::String, name::String, optimized::Bool)
       updated_text = replace(updated_text, "::Float32\n" => "::T\n")
       updated_text = replace(updated_text, "Float32}\n" => "T}\n")  # NTuple{N, Float32} → NTuple{N, T}
 
+      # Add two constructors for each structures
+      blocks = split(updated_text, "end\n", keepempty=false)
+      updated_text = ""
+      for code in blocks
+        if contains(code, "mutable struct")
+          structure = code * "end\n"
+          structure_name = split(split(code, "mutable struct ")[2], "\n")[1]
+          structure = replace(structure, "end\n" => "\n  " * structure_name * "() where T = new()\nend\n")
+
+          arguments = ""
+          lines = split(code, "\n", keepempty=false)
+          for line in lines
+            if contains(line, "::")
+              argument = split(line, "::")[1][3:end]
+              if arguments == ""
+                arguments *= argument
+              else
+                arguments *= ", $argument"
+              end
+            end
+          end
+          structure = replace(structure, "end\n" => "\n  " * structure_name * "($arguments) where T = new($arguments)\nend\n")
+          updated_text = updated_text * structure
+        else
+          updated_text = updated_text * code * "end\n"
+        end
+      end
+
       # Special cases where the structures are not parameterized.
       if name == "hsl_ma48"
         for type in ("T", "Float32", "Float64")
           updated_text = replace(updated_text, "$(solver)_sinfo{$type}" => "$(solver)_sinfo")
+          updated_text = replace(updated_text, Regex("$(solver)_sinfo(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_sinfo\\1"))
         end
       end
 
       if name == "hsl_mc64"
         for type in ("T", "Float32", "Float64")
           updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
+          updated_text = replace(updated_text, Regex("$(solver)_control(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_control\\1"))
           updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
+          updated_text = replace(updated_text, Regex("$(solver)_info(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_info\\1"))
         end
       end
 
       if name == "hsl_mc68" || name == "hsl_mc78" || name == "hsl_mc79"
         for type in ("T", "Cint", "Clong")
           updated_text = replace(updated_text, "$(solver)_control{$type}" => "$(solver)_control")
+          updated_text = replace(updated_text, Regex("$(solver)_control(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_control\\1"))
           updated_text = replace(updated_text, "$(solver)_info{$type}" => "$(solver)_info")
+          updated_text = replace(updated_text, Regex("$(solver)_info(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_info\\1"))
         end
       end
     end
   end
   write(path, updated_text)
+  (name != "libhsl") && format_file(path, YASStyle())
 end

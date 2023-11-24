@@ -4,6 +4,10 @@ mutable struct mc79_control
   wp::Cint
   mp::Cint
   print_level::Cint
+
+  mc79_control() = new()
+
+  mc79_control(f_arrays, lp, wp, mp, print_level) = new(f_arrays, lp, wp, mp, print_level)
 end
 
 function mc79_default_control_i(control)
@@ -24,6 +28,10 @@ mutable struct mc79_info
   n3::Cint
   nbar::Cint
   stat::Cint
+
+  mc79_info() = new()
+
+  mc79_info(flag, hz_comps, vt_comps, sq_comps, m1, m2, m3, mbar, n1, n2, n3, nbar, stat) = new(flag, hz_comps, vt_comps, sq_comps, m1, m2, m3, mbar, n1, n2, n3, nbar, stat)
 end
 
 function mc79_matching_i(m, n, ptr, row, rowmatch, colmatch, control, info)

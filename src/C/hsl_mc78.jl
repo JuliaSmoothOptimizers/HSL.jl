@@ -10,6 +10,10 @@ mutable struct mc78_control
   svar::Cint
   sort::Cint
   lopt::Cint
+
+  mc78_control() = new()
+
+  mc78_control(f_arrays, heuristic, nrelax, zrelax, nemin, unit_error, unit_warning, ssa_abort, svar, sort, lopt) = new(f_arrays, heuristic, nrelax, zrelax, nemin, unit_error, unit_warning, ssa_abort, svar, sort, lopt)
 end
 
 function mc78_default_control_i(control)
