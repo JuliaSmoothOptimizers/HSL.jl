@@ -14,62 +14,6 @@ export ma97_csc,
   ma97_least_squares
 export Ma97Exception
 
-"""
-# Main control type for MA97.
-
-    ma97_control{T}(; kwargs...)
-
-## Keyword arguments:
-
-* `print_level::Int`: integer controling the verbosit level. Accepted values are:
-    * <0: no printing
-    * 0: errors and warnings only (default)
-    * 1: errors, warnings and basic diagnostics
-    * 2: errors, warning and full diagnostics
-* `unit_diagnostics::Int`: Fortran file unit for diagnostics (default: 6)
-* `unit_error::Int`: Fortran file unit for errors (default: 6)
-* `unit_warning::Int`: Fortran file unit for warnings (default: 6)
-"""
-function ma97_control{T}(;
-  print_level::Int = -1,
-  unit_diagnostics::Int = 6,
-  unit_error::Int = 6,
-  unit_warning::Int = 6,
-) where {T}
-  control = ma97_control{T}(
-    0,
-    0,
-    0,
-    0.0,
-    0,
-    0,
-    0,
-    0.0,
-    0.0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0.0,
-    ntuple(x -> Cint(0), 5),
-    ntuple(x -> zero(T), 10),
-  )
-
-  T == Float32    && ma97_default_control_s(control)
-  T == Float64    && ma97_default_control_d(control)
-  T == ComplexF32 && ma97_default_control_c(control)
-  T == ComplexF64 && ma97_default_control_z(control)
-  control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
-  control.print_level = print_level
-  control.unit_diagnostics = unit_diagnostics
-  control.unit_error = unit_error
-  control.unit_warning = unit_warning
-  return control
-end
-
 const orderings97 = Dict{Symbol, Int}(
   :user => 0,
   :amd => 1,
@@ -114,38 +58,6 @@ const jobs97 = Dict{Symbol, Int}(
 mutable struct Ma97Exception <: Exception
   msg::AbstractString
   flag::Int
-end
-
-"""
-# Main info type for MA97
-
-    info = ma97_info{T}()
-
-An `info` structure used to collect statistics on the analysis, factorization and solve.
-"""
-function ma97_info{T}() where {T}
-  return ma97_info{T}(
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    ntuple(x -> Cint(0), 4),
-    ntuple(x -> zero(T), 10),
-  )
 end
 
 mutable struct Ma97{T, S}

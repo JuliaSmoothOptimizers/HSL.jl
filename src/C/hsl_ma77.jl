@@ -28,6 +28,10 @@ mutable struct ma77_control{T}
   ispare::NTuple{5,Cint}
   lspare::NTuple{5,Clong}
   rspare::NTuple{5,T}
+
+  ma77_control{T}() where T = new()
+
+  ma77_control{T}(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning, bits, buffer_lpage, buffer_npage, file_size, maxstore, storage, nemin, maxit, infnorm, thresh, nb54, action, multiplier, nb64, nbi, small, static_, storage_indef, u, umin, consist_tol, ispare, lspare, rspare) where T = new(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning, bits, buffer_lpage, buffer_npage, file_size, maxstore, storage, nemin, maxit, infnorm, thresh, nb54, action, multiplier, nb64, nbi, small, static_, storage_indef, u, umin, consist_tol, ispare, lspare, rspare)
 end
 
 function ma77_default_control_s(control)
@@ -69,6 +73,10 @@ mutable struct ma77_info{T}
   ispare::NTuple{5,Cint}
   lspare::NTuple{5,Clong}
   rspare::NTuple{5,T}
+
+  ma77_info{T}() where T = new()
+
+  ma77_info{T}(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange, maxdepth, maxfront, minstore, ndelay, nfactor, nflops, niter, nsup, num_neg, num_nothresh, num_perturbed, ntwo, stat, index, nio_read, nio_write, nwd_read, nwd_write, num_file, storage, tree_nodes, unit_restart, unused, usmall, ispare, lspare, rspare) where T = new(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange, maxdepth, maxfront, minstore, ndelay, nfactor, nflops, niter, nsup, num_neg, num_nothresh, num_perturbed, ntwo, stat, index, nio_read, nio_write, nwd_read, nwd_write, num_file, storage, tree_nodes, unit_restart, unused, usmall, ispare, lspare, rspare)
 end
 
 function ma77_open_nelt_s(n, fname1, fname2, fname3, fname4, keep, control, info, nelt)

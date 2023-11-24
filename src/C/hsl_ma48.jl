@@ -23,6 +23,10 @@ mutable struct ma48_control{T}
   diagonal_pivoting::Cint
   fill_in::Cint
   switch_mode::Cint
+
+  ma48_control{T}() where T = new()
+
+  ma48_control{T}(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp, ldiag, btf, struct_, maxit, factor_blocking, solve_blas, pivoting, diagonal_pivoting, fill_in, switch_mode) where T = new(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp, ldiag, btf, struct_, maxit, factor_blocking, solve_blas, pivoting, diagonal_pivoting, fill_in, switch_mode)
 end
 
 function ma48_default_control_s(control)
@@ -47,6 +51,10 @@ mutable struct ma48_ainfo{T}
   lblock::Cint
   sblock::Cint
   tblock::Clong
+
+  ma48_ainfo{T}() where T = new()
+
+  ma48_ainfo{T}(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize, leni_factorize, ncmpa, rank, drop, struc_rank, oor, dup, stat, lblock, sblock, tblock) where T = new(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize, leni_factorize, ncmpa, rank, drop, struc_rank, oor, dup, stat, lblock, sblock, tblock)
 end
 
 mutable struct ma48_finfo{T}
@@ -59,6 +67,10 @@ mutable struct ma48_finfo{T}
   drop::Clong
   rank::Cint
   stat::Cint
+
+  ma48_finfo{T}() where T = new()
+
+  ma48_finfo{T}(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop, rank, stat) where T = new(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop, rank, stat)
 end
 
 function ma48_analyse_s(m, n, ne, row, col, val, factors, control, ainfo, finfo, perm, endcol)
@@ -84,6 +96,10 @@ mutable struct ma48_sinfo
   flag::Cint
   more::Cint
   stat::Cint
+
+  ma48_sinfo() = new()
+
+  ma48_sinfo(flag, more, stat) = new(flag, more, stat)
 end
 
 function ma48_solve_s(m, n, ne, row, col, val, factors, rhs, x, control, sinfo, trans, resid, error)
