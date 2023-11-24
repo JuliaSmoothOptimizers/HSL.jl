@@ -62,7 +62,7 @@ function rewrite!(path::String, name::String, optimized::Bool)
       updated_text = replace(updated_text, "::Float32\n" => "::T\n")
       updated_text = replace(updated_text, "Float32}\n" => "T}\n")  # NTuple{N, Float32} → NTuple{N, T}
 
-      # Add two constructors for each structures
+      # Add two constructors for each structure
       blocks = split(updated_text, "end\n", keepempty=false)
       updated_text = ""
       for code in blocks
