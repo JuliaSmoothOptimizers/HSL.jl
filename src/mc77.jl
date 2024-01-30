@@ -6,7 +6,7 @@ mutable struct mc77_control{T}
 end
 
 function mc77_control{T}() where T
-  icntl = zeros(Int32, 10)
+  icntl = zeros(Cint, 10)
   cntl = zeros(T, 10)
   return mc77_control{T}(icntl, cntl)
 end
@@ -17,19 +17,21 @@ mutable struct mc77_info{T}
 end
 
 function mc77_info{T}() where T
-  info = zeros(Int32, 10)
+  info = zeros(Cint, 10)
   rinfo = zeros(T, 10)
   return mc77_info{T}(info, rinfo)
 end
 
 """
-    mc77(A::SparseMatrixCSC{T}, job::Integer)
-    mc77(A::Matrix{T}, job::Integer)
-    mc77(m::Integer, n::Integer, rows::Vector{Int32}, cols::Vector{Int32}, nzval::Vector{T}, job::Integer)
+    Dr, Dc = mc77(A::SparseMatrixCSC{T}, job::Integer; symmetric::Bool=false)
+    Dr, Dc = mc77(m::Integer, n::Integer, rows::Vector{Cint}, cols::Vector{Cint}, nzval::Vector{T}, job::Integer; symmetric::Bool=false)
+    Dr, Dc = mc77(A::Matrix{T}, job::Integer)
 
 * job=0 Equilibrate the infinity norm of rows and columns in matrix A.
 * job=p Equilibrate the p-th norm (p ≥ 1) of rows and columns in A.
 * job=-1 Equilibrate the p-th norm of rows and columns in A, with p ≥ 1 real. The value of p is given in CNTL[2].
+
+If the matrix is sparse and `symmetric` is set to `true`, only the lower triangular part should be stored.
 
 Let A be an m × n real matrix, and ‖•‖ₚ, p ∈ [1, ∞] a p-norm for real vectors.
 mc77 computes the scaling diagonal matrices Dr and Dc such that the p-norms of all columns and rows of
@@ -49,7 +51,8 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
                                                   (:mc77ic, :mc77ac, :mc77bc, :mc77cc, :ComplexF32, :Float32),
                                                   (:mc77iz, :mc77az, :mc77bz, :mc77cz, :ComplexF64, :Float64))
   @eval begin
-    function mc77(A::SparseMatrixCSC{$elty}, job::Integer)
+    function mc77(A::SparseMatrixCSC{$elty}, job::Integer; symmetric::Bool=false)
+      (job == -1) && error("job=$job is not supported.")
       m,n = size(A)
       nz = nnz(A)
       jcst = A.colptr
@@ -58,22 +61,28 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
       control = mc77_control{$subty}()
       info = mc77_info{$subty}()
       $iname(control.icntl, control.cntl)
-      if control.icntl[6] == 0
-        liw = m+n
-        ldw = control.icntl[5] == 0 ? nz + 2*(m+n) : 2*(m+n)
-      else
+      control.icntl[4] = 1
+      if symmetric
+        control.icntl[6] == 1
         liw = m
         ldw = control.icntl[5] == 0 ? nz + 2*m : 2*m
+      else
+        liw = m+n
+        ldw = control.icntl[5] == 0 ? nz + 2*(m+n) : 2*(m+n)
       end
       iw = zeros(Cint, liw)
       dw = zeros($subty, ldw)
       $aname(job, m, n, nz, jcst, irn, a, iw, liw, dw, ldw, control.icntl, control.cntl, info.info, info.rinfo)
       Dr = dw[1:m]
-      Dc = dw[m+1:m+n]
+      Dc = symmetric ? Dr : dw[m+1:m+n]
+      (info.info[1] == 0) || error("MC77 failed!")
       return Dr, Dc
     end
 
-    function mc77(m::Integer, n::Integer, rows::Vector{Cint}, cols::Vector{Cint}, nzval::Vector{$elty}, job::Integer)
+    function mc77(m::Integer, n::Integer, rows::Vector{Cint},
+                  cols::Vector{Cint}, nzval::Vector{$elty},
+                  job::Integer; symmetric::Bool=false)
+      (job == -1) && error("job=$job is not supported.")
       nz = length(nzval)
       irn = rows
       jcn = cols
@@ -81,39 +90,46 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
       control = mc77_control{$subty}()
       info = mc77_info{$subty}()
       $iname(control.icntl, control.cntl)
-      if control.icntl[6] == 0
-        liw = m+n
-        ldw = control.icntl[5] == 0 ? nz + 2*(m+n) : 2*(m+n)
-      else
+      control.icntl[4] = 1
+      if symmetric
+        control.icntl[6] == 1
         liw = m
         ldw = control.icntl[5] == 0 ? nz + 2*m : 2*m
+      else
+        liw = m+n
+        ldw = control.icntl[5] == 0 ? nz + 2*(m+n) : 2*(m+n)
       end
       iw = zeros(Cint, liw)
       dw = zeros($subty, ldw)
       $bname(job, m, n, nz, irn, jcn, a, iw, liw, dw, ldw, control.icntl, control.cntl, info.info, info.rinfo)
       Dr = dw[1:m]
-      Dc = dw[m+1:m+n]
+      Dc = symmetric ? Dr : dw[m+1:m+n]
+      (info.info[1] == 0) || error("MC77 failed!")
       return Dr, Dc
     end
 
     function mc77(A::Matrix{$elty}, job::Integer)
+      (job == -1) && error("job=$job is not supported.")
       m,n = size(A)
       lda = max(1,stride(A,2))
       control = mc77_control{$subty}()
       info = mc77_info{$subty}()
       $iname(control.icntl, control.cntl)
-      if control.icntl[6] == 0
-        liw = m+n
-        ldw = control.icntl[5] == 0 ? lda*n + 2*(m+n) : 2*(m+n)
-      else
+      symmetric = false
+      if symmetric
+        control.icntl[6] == 1
         liw = m
         ldw = control.icntl[5] == 0 ? div(m*(m+1),2) + 2*m : 2*m
+      else
+        liw = m+n
+        ldw = control.icntl[5] == 0 ? lda*n + 2*(m+n) : 2*(m+n)
       end
       iw = zeros(Cint, liw)
       dw = zeros($subty, ldw)
       $cname(job, m, n, A, lda, iw, liw, dw, ldw, control.icntl, control.cntl, info.info, info.rinfo)
       Dr = dw[1:m]
-      Dc = dw[m+1:m+n]
+      Dc = symmetric ? Dr : dw[m+1:m+n]
+      (info.info[1] == 0) || error("MC77 failed!")
       return Dr, Dc
     end
   end
