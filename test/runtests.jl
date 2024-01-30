@@ -4,6 +4,8 @@ using Test, Random
 
 Random.seed!(666)  # Random tests are diabolical
 
+@info("HSL_INSTALLATION : $(HSL.HSL_INSTALLATION)")
+
 if LIBHSL_isfunctional()
   include("test_hsl_ma57.jl")
   include("test_hsl_ma97.jl")

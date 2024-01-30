@@ -13,7 +13,7 @@
 
   for T ∈ (Float32, Float64, ComplexF32, ComplexF64)
     R = real(T)
-    for M ∈ (Matrix{T}(A), SparseMatrixCSC{T,Int32}(A))
+    for M ∈ (Matrix{T}(A), SparseMatrixCSC{T,Cint}(A))
       Dr, Dc = mc77(M, 0)
       @test round.(Dr, digits=3) ≈ R[10; 31.623; 0.729]
       @test round.(Dc, digits=3) ≈ R[10; 31.623; 0.159]

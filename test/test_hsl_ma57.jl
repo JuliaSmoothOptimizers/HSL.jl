@@ -1,8 +1,3 @@
-import SparseArrays.getindex_traverse_col
-# this should be fixed in a future release
-# see
-getindex_traverse_col(::AbstractUnitRange, lo::Integer, hi::Integer) = lo:hi
-
 function test_ma57(A, M, b, xexact)
   ϵ = sqrt(eps(eltype(A)))
   ma57_factorize!(M)
