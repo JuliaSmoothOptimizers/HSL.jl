@@ -192,3 +192,21 @@ function ma27r(n, a, la, iw, liw, w, maxfnt, rhs, iw2, nblk, latop, icntl)
                        w::Ptr{Float32}, maxfnt::Ref{Cint}, rhs::Ptr{Float32}, iw2::Ptr{Cint},
                        nblk::Ref{Cint}, latop::Ref{Cint}, icntl::Ptr{Cint})::Cvoid
 end
+
+# Routines available in the extension HSLQuadmathExt.jl
+function ma27iq end
+function ma27aq end
+function ma27bq end
+function ma27cq end
+function ma27gq end
+function ma27hq end
+function ma27uq end
+function ma27jq end
+function ma27kq end
+function ma27lq end
+function ma27mq end
+function ma27nq end
+function ma27oq end
+function ma27pq end
+function ma27qq end
+function ma27rq end
