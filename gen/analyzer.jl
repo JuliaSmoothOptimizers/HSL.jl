@@ -2,8 +2,8 @@
 using HSL_jll
 using JuliaFormatter
 
-release = "2023.11.7"
-libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL-$release/"
+release = "2024.11.8"
+libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL.v$release/"
 
 # Symbols of the shared library libhsl
 symbols_path = "symbols.txt"
