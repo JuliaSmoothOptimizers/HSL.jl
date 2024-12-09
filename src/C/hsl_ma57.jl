@@ -25,12 +25,20 @@ mutable struct ma57_control{T}
   ordering::Cint
   scaling::Cint
   rank_deficient::Cint
-  ispare::NTuple{5,Cint}
-  rspare::NTuple{10,T}
+  ispare::NTuple{5, Cint}
+  rspare::NTuple{10, T}
 
-  ma57_control{T}() where T = new()
+  ma57_control{T}() where {T} = new()
 
-  ma57_control{T}(f_arrays, multiplier, reduce, u, static_tolerance, static_level, tolerance, convergence, consist, lp, wp, mp, sp, ldiag, nemin, factorblocking, solveblocking, la, liw, maxla, maxliw, pivoting, thresh, ordering, scaling, rank_deficient, ispare, rspare) where T = new(f_arrays, multiplier, reduce, u, static_tolerance, static_level, tolerance, convergence, consist, lp, wp, mp, sp, ldiag, nemin, factorblocking, solveblocking, la, liw, maxla, maxliw, pivoting, thresh, ordering, scaling, rank_deficient, ispare, rspare)
+  function ma57_control{T}(f_arrays, multiplier, reduce, u, static_tolerance, static_level,
+                           tolerance, convergence, consist, lp, wp, mp, sp, ldiag, nemin,
+                           factorblocking, solveblocking, la, liw, maxla, maxliw, pivoting, thresh,
+                           ordering, scaling, rank_deficient, ispare, rspare) where {T}
+    return new(f_arrays, multiplier, reduce, u, static_tolerance, static_level, tolerance,
+               convergence, consist, lp, wp, mp, sp, ldiag, nemin, factorblocking, solveblocking,
+               la, liw, maxla, maxliw, pivoting, thresh, ordering, scaling, rank_deficient, ispare,
+               rspare)
+  end
 end
 
 function ma57_default_control_s(control)
@@ -59,12 +67,16 @@ mutable struct ma57_ainfo{T}
   dup::Cint
   maxfrt::Cint
   stat::Cint
-  ispare::NTuple{5,Cint}
-  rspare::NTuple{10,T}
+  ispare::NTuple{5, Cint}
+  rspare::NTuple{10, T}
 
-  ma57_ainfo{T}() where T = new()
+  ma57_ainfo{T}() where {T} = new()
 
-  ma57_ainfo{T}(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu, niradu, ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare) where T = new(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu, niradu, ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare)
+  function ma57_ainfo{T}(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu,
+                         niradu, ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare) where {T}
+    return new(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu, niradu,
+               ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare)
+  end
 end
 
 function ma57_analyse_s(n, ne, row, col, factors, control, ainfo, perm)
@@ -100,18 +112,25 @@ mutable struct ma57_finfo{T}
   modstep::Cint
   rank::Cint
   stat::Cint
-  ispare::NTuple{5,Cint}
-  rspare::NTuple{10,T}
+  ispare::NTuple{5, Cint}
+  rspare::NTuple{10, T}
 
-  ma57_finfo{T}() where T = new()
+  ma57_finfo{T}() where {T} = new()
 
-  ma57_finfo{T}(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu, nirbdu, nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay, signc, static_, modstep, rank, stat, ispare, rspare) where T = new(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu, nirbdu, nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay, signc, static_, modstep, rank, stat, ispare, rspare)
+  function ma57_finfo{T}(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu,
+                         nirbdu, nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay,
+                         signc, static_, modstep, rank, stat, ispare, rspare) where {T}
+    return new(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu, nirbdu,
+               nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay, signc, static_,
+               modstep, rank, stat, ispare, rspare)
+  end
 end
 
 function ma57_factorize_s(n, ne, row, col, val, factors, control, finfo)
   @ccall libhsl.ma57_factorize_s(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                  val::Ptr{Float32}, factors::Ptr{Ptr{Cvoid}},
-                                 control::Ref{ma57_control{Float32}}, finfo::Ref{ma57_finfo{Float32}})::Cvoid
+                                 control::Ref{ma57_control{Float32}},
+                                 finfo::Ref{ma57_finfo{Float32}})::Cvoid
 end
 
 mutable struct ma57_sinfo{T}
@@ -122,12 +141,14 @@ mutable struct ma57_sinfo{T}
   error::T
   flag::Cint
   stat::Cint
-  ispare::NTuple{5,Cint}
-  rspare::NTuple{10,T}
+  ispare::NTuple{5, Cint}
+  rspare::NTuple{10, T}
 
-  ma57_sinfo{T}() where T = new()
+  ma57_sinfo{T}() where {T} = new()
 
-  ma57_sinfo{T}(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare) where T = new(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare)
+  function ma57_sinfo{T}(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare) where {T}
+    return new(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare)
+  end
 end
 
 function ma57_solve_s(n, ne, row, col, val, factors, nrhs, x, control, sinfo, rhs, iter, cond)
@@ -186,7 +207,8 @@ function ma57_sparse_lsolve_s(factors, control, nzrhs, irhs, nzsoln, isoln, x, s
 end
 
 function ma57_fredholm_alternative_s(factors, control, x, fredx, sinfo)
-  @ccall libhsl.ma57_fredholm_alternative_s(factors::Ptr{Ptr{Cvoid}}, control::Ref{ma57_control{Float32}},
+  @ccall libhsl.ma57_fredholm_alternative_s(factors::Ptr{Ptr{Cvoid}},
+                                            control::Ref{ma57_control{Float32}},
                                             x::Ptr{Float32}, fredx::Ptr{Float32},
                                             sinfo::Ref{ma57_sinfo{Float32}})::Cvoid
 end
@@ -224,7 +246,8 @@ end
 function ma57_factorize_d(n, ne, row, col, val, factors, control, finfo)
   @ccall libhsl.ma57_factorize_d(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                  val::Ptr{Float64}, factors::Ptr{Ptr{Cvoid}},
-                                 control::Ref{ma57_control{Float64}}, finfo::Ref{ma57_finfo{Float64}})::Cvoid
+                                 control::Ref{ma57_control{Float64}},
+                                 finfo::Ref{ma57_finfo{Float64}})::Cvoid
 end
 
 function ma57_solve_d(n, ne, row, col, val, factors, nrhs, x, control, sinfo, rhs, iter, cond)
@@ -283,7 +306,8 @@ function ma57_sparse_lsolve_d(factors, control, nzrhs, irhs, nzsoln, isoln, x, s
 end
 
 function ma57_fredholm_alternative_d(factors, control, x, fredx, sinfo)
-  @ccall libhsl.ma57_fredholm_alternative_d(factors::Ptr{Ptr{Cvoid}}, control::Ref{ma57_control{Float64}},
+  @ccall libhsl.ma57_fredholm_alternative_d(factors::Ptr{Ptr{Cvoid}},
+                                            control::Ref{ma57_control{Float64}},
                                             x::Ptr{Float64}, fredx::Ptr{Float64},
                                             sinfo::Ref{ma57_sinfo{Float64}})::Cvoid
 end

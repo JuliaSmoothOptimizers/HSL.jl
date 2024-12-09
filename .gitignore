@@ -8,3 +8,4 @@ deps/build.log
 Manifest.toml
 docs/Manifest.toml
 gen/symbols.txt
+gen/symbols_64.txt

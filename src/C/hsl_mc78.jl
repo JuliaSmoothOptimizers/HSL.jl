@@ -1,8 +1,8 @@
 mutable struct mc78_control
   f_arrays::Cint
   heuristic::Cint
-  nrelax::NTuple{3,Cint}
-  zrelax::NTuple{3,Cdouble}
+  nrelax::NTuple{3, Cint}
+  zrelax::NTuple{3, Cdouble}
   nemin::Cint
   unit_error::Cint
   unit_warning::Cint
@@ -13,7 +13,11 @@ mutable struct mc78_control
 
   mc78_control() = new()
 
-  mc78_control(f_arrays, heuristic, nrelax, zrelax, nemin, unit_error, unit_warning, ssa_abort, svar, sort, lopt) = new(f_arrays, heuristic, nrelax, zrelax, nemin, unit_error, unit_warning, ssa_abort, svar, sort, lopt)
+  function mc78_control(f_arrays, heuristic, nrelax, zrelax, nemin, unit_error, unit_warning,
+                        ssa_abort, svar, sort, lopt)
+    return new(f_arrays, heuristic, nrelax, zrelax, nemin, unit_error, unit_warning, ssa_abort,
+               svar, sort, lopt)
+  end
 end
 
 function mc78_default_control_i(control)

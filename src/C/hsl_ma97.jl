@@ -16,44 +16,18 @@ mutable struct ma97_control{T}
   solve_min::Clong
   solve_mf::Cint
   consist_tol::T
-  ispare::NTuple{5,Cint}
-  rspare::NTuple{10,T}
+  ispare::NTuple{5, Cint}
+  rspare::NTuple{10, T}
 
-  """
-  # Main control type for MA97.
+  ma97_control{T}() where {T} = new()
 
-      ma97_control{T}(; kwargs...)
-
-  ## Keyword arguments:
-
-  * `print_level::Int`: integer controling the verbosit level. Accepted values are:
-      * <0: no printing
-      * 0: errors and warnings only (default)
-      * 1: errors, warnings and basic diagnostics
-      * 2: errors, warning and full diagnostics
-  * `unit_diagnostics::Int`: Fortran file unit for diagnostics (default: 6)
-  * `unit_error::Int`: Fortran file unit for errors (default: 6)
-  * `unit_warning::Int`: Fortran file unit for warnings (default: 6)
-  """
-  function ma97_control{T}(;
-    print_level::Int = -1,
-    unit_diagnostics::Int = 6,
-    unit_error::Int = 6,
-    unit_warning::Int = 6) where {T}
-    control = ma97_control{T}(0, 0, 0, 0.0, 0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0.0, ntuple(x -> Cint(0), 5), ntuple(x -> zero(T), 10))
-    T == Float32    && ma97_default_control_s(control)
-    T == Float64    && ma97_default_control_d(control)
-    T == ComplexF32 && ma97_default_control_c(control)
-    T == ComplexF64 && ma97_default_control_z(control)
-    control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
-    control.print_level = print_level
-    control.unit_diagnostics = unit_diagnostics
-    control.unit_error = unit_error
-    control.unit_warning = unit_warning
-    return control
+  function ma97_control{T}(f_arrays, action, nemin, multiplier, ordering, print_level, scaling,
+                           small, u, unit_diagnostics, unit_error, unit_warning, factor_min,
+                           solve_blas3, solve_min, solve_mf, consist_tol, ispare, rspare) where {T}
+    return new(f_arrays, action, nemin, multiplier, ordering, print_level, scaling, small, u,
+               unit_diagnostics, unit_error, unit_warning, factor_min, solve_blas3, solve_min,
+               solve_mf, consist_tol, ispare, rspare)
   end
-
-  ma97_control{T}(f_arrays, action, nemin, multiplier, ordering, print_level, scaling, small, u, unit_diagnostics, unit_error, unit_warning, factor_min, solve_blas3, solve_min, solve_mf, consist_tol, ispare, rspare) where T = new(f_arrays, action, nemin, multiplier, ordering, print_level, scaling, small, u, unit_diagnostics, unit_error, unit_warning, factor_min, solve_blas3, solve_min, solve_mf, consist_tol, ispare, rspare)
 end
 
 function ma97_default_control_s(control)
@@ -79,21 +53,19 @@ mutable struct ma97_info{T}
   ordering::Cint
   stat::Cint
   maxsupernode::Cint
-  ispare::NTuple{4,Cint}
-  rspare::NTuple{10,T}
+  ispare::NTuple{4, Cint}
+  rspare::NTuple{10, T}
 
-  """
-  # Main info type for MA97
+  ma97_info{T}() where {T} = new()
 
-      info = ma97_info{T}()
-
-  An `info` structure used to collect statistics on the analysis, factorization and solve.
-  """
-  function ma97_info{T}() where {T}
-    return new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ntuple(x -> Cint(0), 4), ntuple(x -> zero(T), 10))
+  function ma97_info{T}(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange,
+                        matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor, num_flops,
+                        num_neg, num_sup, num_two, ordering, stat, maxsupernode, ispare,
+                        rspare) where {T}
+    return new(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange, matrix_missing_diag,
+               maxdepth, maxfront, num_delay, num_factor, num_flops, num_neg, num_sup, num_two,
+               ordering, stat, maxsupernode, ispare, rspare)
   end
-
-  ma97_info{T}(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange, matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor, num_flops, num_neg, num_sup, num_two, ordering, stat, maxsupernode, ispare, rspare) where T = new(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange, matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor, num_flops, num_neg, num_sup, num_two, ordering, stat, maxsupernode, ispare, rspare)
 end
 
 function ma97_analyse_s(check, n, ptr, row, val, akeep, control, info, order)
@@ -106,7 +78,8 @@ end
 function ma97_analyse_coord_s(n, ne, row, col, val, akeep, control, info, order)
   @ccall libhsl.ma97_analyse_coord_s(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                      val::Ptr{Float32}, akeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                     control::Ref{ma97_control{Float32}},
+                                     info::Ref{ma97_info{Float32}},
                                      order::Ptr{Cint})::Cvoid
 end
 
@@ -122,14 +95,16 @@ function ma97_factor_solve_s(matrix_type, ptr, row, val, nrhs, x, ldx, akeep, fk
   @ccall libhsl.ma97_factor_solve_s(matrix_type::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                     val::Ptr{Float32}, nrhs::Cint, x::Ptr{Float32},
                                     ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                    control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                    control::Ref{ma97_control{Float32}},
+                                    info::Ref{ma97_info{Float32}},
                                     scale::Ptr{Float32})::Cvoid
 end
 
 function ma97_solve_s(job, nrhs, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_s(job::Cint, nrhs::Cint, x::Ptr{Float32}, ldx::Cint,
                              akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}})::Cvoid
+                             control::Ref{ma97_control{Float32}},
+                             info::Ref{ma97_info{Float32}})::Cvoid
 end
 
 function ma97_free_akeep_s(akeep)
@@ -146,25 +121,29 @@ end
 
 function ma97_enquire_posdef_s(akeep, fkeep, control, info, d)
   @ccall libhsl.ma97_enquire_posdef_s(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                      control::Ref{ma97_control{Float32}},
+                                      info::Ref{ma97_info{Float32}},
                                       d::Ptr{Float32})::Cvoid
 end
 
 function ma97_enquire_indef_s(akeep, fkeep, control, info, piv_order, d)
   @ccall libhsl.ma97_enquire_indef_s(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                     control::Ref{ma97_control{Float32}},
+                                     info::Ref{ma97_info{Float32}},
                                      piv_order::Ptr{Cint}, d::Ptr{Float32})::Cvoid
 end
 
 function ma97_alter_s(d, akeep, fkeep, control, info)
   @ccall libhsl.ma97_alter_s(d::Ptr{Float32}, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}})::Cvoid
+                             control::Ref{ma97_control{Float32}},
+                             info::Ref{ma97_info{Float32}})::Cvoid
 end
 
 function ma97_solve_fredholm_s(nrhs, flag_out, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_fredholm_s(nrhs::Cint, flag_out::Ptr{Cint}, x::Ptr{Float32},
                                       ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}})::Cvoid
+                                      control::Ref{ma97_control{Float32}},
+                                      info::Ref{ma97_info{Float32}})::Cvoid
 end
 
 function ma97_lmultiply_s(trans, k, x, ldx, y, ldy, akeep, fkeep, control, info)
@@ -196,7 +175,8 @@ end
 function ma97_analyse_coord_d(n, ne, row, col, val, akeep, control, info, order)
   @ccall libhsl.ma97_analyse_coord_d(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                      val::Ptr{Float64}, akeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                     control::Ref{ma97_control{Float64}},
+                                     info::Ref{ma97_info{Float64}},
                                      order::Ptr{Cint})::Cvoid
 end
 
@@ -212,14 +192,16 @@ function ma97_factor_solve_d(matrix_type, ptr, row, val, nrhs, x, ldx, akeep, fk
   @ccall libhsl.ma97_factor_solve_d(matrix_type::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                     val::Ptr{Float64}, nrhs::Cint, x::Ptr{Float64},
                                     ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                    control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                    control::Ref{ma97_control{Float64}},
+                                    info::Ref{ma97_info{Float64}},
                                     scale::Ptr{Float64})::Cvoid
 end
 
 function ma97_solve_d(job, nrhs, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_d(job::Cint, nrhs::Cint, x::Ptr{Float64}, ldx::Cint,
                              akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}})::Cvoid
+                             control::Ref{ma97_control{Float64}},
+                             info::Ref{ma97_info{Float64}})::Cvoid
 end
 
 function ma97_free_akeep_d(akeep)
@@ -236,25 +218,29 @@ end
 
 function ma97_enquire_posdef_d(akeep, fkeep, control, info, d)
   @ccall libhsl.ma97_enquire_posdef_d(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                      control::Ref{ma97_control{Float64}},
+                                      info::Ref{ma97_info{Float64}},
                                       d::Ptr{Float64})::Cvoid
 end
 
 function ma97_enquire_indef_d(akeep, fkeep, control, info, piv_order, d)
   @ccall libhsl.ma97_enquire_indef_d(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                     control::Ref{ma97_control{Float64}},
+                                     info::Ref{ma97_info{Float64}},
                                      piv_order::Ptr{Cint}, d::Ptr{Float64})::Cvoid
 end
 
 function ma97_alter_d(d, akeep, fkeep, control, info)
   @ccall libhsl.ma97_alter_d(d::Ptr{Float64}, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}})::Cvoid
+                             control::Ref{ma97_control{Float64}},
+                             info::Ref{ma97_info{Float64}})::Cvoid
 end
 
 function ma97_solve_fredholm_d(nrhs, flag_out, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_fredholm_d(nrhs::Cint, flag_out::Ptr{Cint}, x::Ptr{Float64},
                                       ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}})::Cvoid
+                                      control::Ref{ma97_control{Float64}},
+                                      info::Ref{ma97_info{Float64}})::Cvoid
 end
 
 function ma97_lmultiply_d(trans, k, x, ldx, y, ldy, akeep, fkeep, control, info)
@@ -286,7 +272,8 @@ end
 function ma97_analyse_coord_c(n, ne, row, col, val, akeep, control, info, order)
   @ccall libhsl.ma97_analyse_coord_c(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                      val::Ptr{ComplexF32}, akeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                     control::Ref{ma97_control{Float32}},
+                                     info::Ref{ma97_info{Float32}},
                                      order::Ptr{Cint})::Cvoid
 end
 
@@ -302,14 +289,16 @@ function ma97_factor_solve_c(matrix_type, ptr, row, val, nrhs, x, ldx, akeep, fk
   @ccall libhsl.ma97_factor_solve_c(matrix_type::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                     val::Ptr{ComplexF32}, nrhs::Cint, x::Ptr{ComplexF32},
                                     ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                    control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                    control::Ref{ma97_control{Float32}},
+                                    info::Ref{ma97_info{Float32}},
                                     scale::Ptr{Float32})::Cvoid
 end
 
 function ma97_solve_c(job, nrhs, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_c(job::Cint, nrhs::Cint, x::Ptr{ComplexF32}, ldx::Cint,
                              akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}})::Cvoid
+                             control::Ref{ma97_control{Float32}},
+                             info::Ref{ma97_info{Float32}})::Cvoid
 end
 
 function ma97_free_akeep_c(akeep)
@@ -326,25 +315,29 @@ end
 
 function ma97_enquire_posdef_c(akeep, fkeep, control, info, d)
   @ccall libhsl.ma97_enquire_posdef_c(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                      control::Ref{ma97_control{Float32}},
+                                      info::Ref{ma97_info{Float32}},
                                       d::Ptr{Float32})::Cvoid
 end
 
 function ma97_enquire_indef_c(akeep, fkeep, control, info, piv_order, d)
   @ccall libhsl.ma97_enquire_indef_c(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}},
+                                     control::Ref{ma97_control{Float32}},
+                                     info::Ref{ma97_info{Float32}},
                                      piv_order::Ptr{Cint}, d::Ptr{ComplexF32})::Cvoid
 end
 
 function ma97_alter_c(d, akeep, fkeep, control, info)
   @ccall libhsl.ma97_alter_c(d::Ptr{ComplexF32}, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}})::Cvoid
+                             control::Ref{ma97_control{Float32}},
+                             info::Ref{ma97_info{Float32}})::Cvoid
 end
 
 function ma97_solve_fredholm_c(nrhs, flag_out, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_fredholm_c(nrhs::Cint, flag_out::Ptr{Cint}, x::Ptr{ComplexF32},
                                       ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float32}}, info::Ref{ma97_info{Float32}})::Cvoid
+                                      control::Ref{ma97_control{Float32}},
+                                      info::Ref{ma97_info{Float32}})::Cvoid
 end
 
 function ma97_lmultiply_c(trans, k, x, ldx, y, ldy, akeep, fkeep, control, info)
@@ -376,7 +369,8 @@ end
 function ma97_analyse_coord_z(n, ne, row, col, val, akeep, control, info, order)
   @ccall libhsl.ma97_analyse_coord_z(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                      val::Ptr{ComplexF64}, akeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                     control::Ref{ma97_control{Float64}},
+                                     info::Ref{ma97_info{Float64}},
                                      order::Ptr{Cint})::Cvoid
 end
 
@@ -392,14 +386,16 @@ function ma97_factor_solve_z(matrix_type, ptr, row, val, nrhs, x, ldx, akeep, fk
   @ccall libhsl.ma97_factor_solve_z(matrix_type::Cint, ptr::Ptr{Cint}, row::Ptr{Cint},
                                     val::Ptr{ComplexF64}, nrhs::Cint, x::Ptr{ComplexF64},
                                     ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                    control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                    control::Ref{ma97_control{Float64}},
+                                    info::Ref{ma97_info{Float64}},
                                     scale::Ptr{Float64})::Cvoid
 end
 
 function ma97_solve_z(job, nrhs, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_z(job::Cint, nrhs::Cint, x::Ptr{ComplexF64}, ldx::Cint,
                              akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}})::Cvoid
+                             control::Ref{ma97_control{Float64}},
+                             info::Ref{ma97_info{Float64}})::Cvoid
 end
 
 function ma97_free_akeep_z(akeep)
@@ -416,25 +412,29 @@ end
 
 function ma97_enquire_posdef_z(akeep, fkeep, control, info, d)
   @ccall libhsl.ma97_enquire_posdef_z(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                      control::Ref{ma97_control{Float64}},
+                                      info::Ref{ma97_info{Float64}},
                                       d::Ptr{Float64})::Cvoid
 end
 
 function ma97_enquire_indef_z(akeep, fkeep, control, info, piv_order, d)
   @ccall libhsl.ma97_enquire_indef_z(akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                     control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}},
+                                     control::Ref{ma97_control{Float64}},
+                                     info::Ref{ma97_info{Float64}},
                                      piv_order::Ptr{Cint}, d::Ptr{ComplexF64})::Cvoid
 end
 
 function ma97_alter_z(d, akeep, fkeep, control, info)
   @ccall libhsl.ma97_alter_z(d::Ptr{ComplexF64}, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                             control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}})::Cvoid
+                             control::Ref{ma97_control{Float64}},
+                             info::Ref{ma97_info{Float64}})::Cvoid
 end
 
 function ma97_solve_fredholm_z(nrhs, flag_out, x, ldx, akeep, fkeep, control, info)
   @ccall libhsl.ma97_solve_fredholm_z(nrhs::Cint, flag_out::Ptr{Cint}, x::Ptr{ComplexF64},
                                       ldx::Cint, akeep::Ptr{Ptr{Cvoid}}, fkeep::Ptr{Ptr{Cvoid}},
-                                      control::Ref{ma97_control{Float64}}, info::Ref{ma97_info{Float64}})::Cvoid
+                                      control::Ref{ma97_control{Float64}},
+                                      info::Ref{ma97_info{Float64}})::Cvoid
 end
 
 function ma97_lmultiply_z(trans, k, x, ldx, y, ldy, akeep, fkeep, control, info)

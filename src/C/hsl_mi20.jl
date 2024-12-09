@@ -23,9 +23,18 @@ mutable struct mi20_control{T}
   error::Cint
   one_pass_coarsen::Cint
 
-  mi20_control{T}() where T = new()
+  mi20_control{T}() where {T} = new()
 
-  mi20_control{T}(f_arrays, aggressive, c_fail, max_levels, max_points, reduction, st_method, st_parameter, testing, trunc_parameter, coarse_solver, coarse_solver_its, damping, err_tol, levels, pre_smoothing, smoother, post_smoothing, v_iterations, print_level, print, error, one_pass_coarsen) where T = new(f_arrays, aggressive, c_fail, max_levels, max_points, reduction, st_method, st_parameter, testing, trunc_parameter, coarse_solver, coarse_solver_its, damping, err_tol, levels, pre_smoothing, smoother, post_smoothing, v_iterations, print_level, print, error, one_pass_coarsen)
+  function mi20_control{T}(f_arrays, aggressive, c_fail, max_levels, max_points, reduction,
+                           st_method, st_parameter, testing, trunc_parameter, coarse_solver,
+                           coarse_solver_its, damping, err_tol, levels, pre_smoothing, smoother,
+                           post_smoothing, v_iterations, print_level, print, error,
+                           one_pass_coarsen) where {T}
+    return new(f_arrays, aggressive, c_fail, max_levels, max_points, reduction, st_method,
+               st_parameter, testing, trunc_parameter, coarse_solver, coarse_solver_its, damping,
+               err_tol, levels, pre_smoothing, smoother, post_smoothing, v_iterations, print_level,
+               print, error, one_pass_coarsen)
+  end
 end
 
 function mi20_default_control_s(control)
@@ -42,9 +51,13 @@ mutable struct mi20_solve_control{T}
   preconditioner_side::Cint
   rel_tol::T
 
-  mi20_solve_control{T}() where T = new()
+  mi20_solve_control{T}() where {T} = new()
 
-  mi20_solve_control{T}(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver, max_its, preconditioner_side, rel_tol) where T = new(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver, max_its, preconditioner_side, rel_tol)
+  function mi20_solve_control{T}(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver,
+                                 max_its, preconditioner_side, rel_tol) where {T}
+    return new(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver, max_its,
+               preconditioner_side, rel_tol)
+  end
 end
 
 function mi20_default_solve_control_s(solve_control)
@@ -61,9 +74,12 @@ mutable struct mi20_info{T}
   iterations::Cint
   residual::T
 
-  mi20_info{T}() where T = new()
+  mi20_info{T}() where {T} = new()
 
-  mi20_info{T}(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations, residual) where T = new(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations, residual)
+  function mi20_info{T}(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations,
+                        residual) where {T}
+    return new(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations, residual)
+  end
 end
 
 function mi20_setup_s(n, ptr, col, val, keep, control, info)
@@ -87,7 +103,8 @@ end
 function mi20_setup_coord_s(n, ne, row, col, val, keep, control, info)
   @ccall libhsl.mi20_setup_coord_s(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                    val::Ptr{Float32}, keep::Ptr{Ptr{Cvoid}},
-                                   control::Ref{mi20_control{Float32}}, info::Ref{mi20_info{Float32}})::Cvoid
+                                   control::Ref{mi20_control{Float32}},
+                                   info::Ref{mi20_info{Float32}})::Cvoid
 end
 
 function mi20_finalize_s(keep, control, info)
@@ -137,7 +154,8 @@ end
 function mi20_setup_coord_d(n, ne, row, col, val, keep, control, info)
   @ccall libhsl.mi20_setup_coord_d(n::Cint, ne::Cint, row::Ptr{Cint}, col::Ptr{Cint},
                                    val::Ptr{Float64}, keep::Ptr{Ptr{Cvoid}},
-                                   control::Ref{mi20_control{Float64}}, info::Ref{mi20_info{Float64}})::Cvoid
+                                   control::Ref{mi20_control{Float64}},
+                                   info::Ref{mi20_info{Float64}})::Cvoid
 end
 
 function mi20_finalize_d(keep, control, info)

@@ -15,9 +15,14 @@ mutable struct ma86_control{T}
   umin::T
   scaling::Cint
 
-  ma86_control{T}() where T = new()
+  ma86_control{T}() where {T} = new()
 
-  ma86_control{T}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin, nb, action, nbi, pool_size, small_, static_, u, umin, scaling) where T = new(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin, nb, action, nbi, pool_size, small_, static_, u, umin, scaling)
+  function ma86_control{T}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning,
+                           nemin, nb, action, nbi, pool_size, small_, static_, u, umin,
+                           scaling) where {T}
+    return new(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin, nb,
+               action, nbi, pool_size, small_, static_, u, umin, scaling)
+  end
 end
 
 function ma86_default_control_s(control)
@@ -42,9 +47,14 @@ mutable struct ma86_info{T}
   stat::Cint
   usmall::T
 
-  ma86_info{T}() where T = new()
+  ma86_info{T}() where {T} = new()
 
-  ma86_info{T}(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor, num_flops, num_neg, num_nodes, num_nothresh, num_perturbed, num_two, pool_size, stat, usmall) where T = new(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor, num_flops, num_neg, num_nodes, num_nothresh, num_perturbed, num_two, pool_size, stat, usmall)
+  function ma86_info{T}(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor,
+                        num_flops, num_neg, num_nodes, num_nothresh, num_perturbed, num_two,
+                        pool_size, stat, usmall) where {T}
+    return new(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor, num_flops,
+               num_neg, num_nodes, num_nothresh, num_perturbed, num_two, pool_size, stat, usmall)
+  end
 end
 
 function ma86_analyse_s(n, ptr, row, order, keep, control, info)
@@ -55,7 +65,8 @@ end
 
 function ma86_factor_s(n, ptr, row, val, order, keep, control, info, scale)
   @ccall libhsl.ma86_factor_s(n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint}, val::Ptr{Float32},
-                              order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}}, control::Ref{ma86_control{Float32}},
+                              order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}},
+                              control::Ref{ma86_control{Float32}},
                               info::Ref{ma86_info{Float32}}, scale::Ptr{Float32})::Cvoid
 end
 
@@ -69,7 +80,8 @@ end
 
 function ma86_solve_s(job, nrhs, ldx, x, order, keep, control, info, scale)
   @ccall libhsl.ma86_solve_s(job::Cint, nrhs::Cint, ldx::Cint, x::Ptr{Float32},
-                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}}, control::Ref{ma86_control{Float32}},
+                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}},
+                             control::Ref{ma86_control{Float32}},
                              info::Ref{ma86_info{Float32}}, scale::Ptr{Float32})::Cvoid
 end
 
@@ -89,7 +101,8 @@ end
 
 function ma86_factor_d(n, ptr, row, val, order, keep, control, info, scale)
   @ccall libhsl.ma86_factor_d(n::Cint, ptr::Ptr{Cint}, row::Ptr{Cint}, val::Ptr{Float64},
-                              order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}}, control::Ref{ma86_control{Float64}},
+                              order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}},
+                              control::Ref{ma86_control{Float64}},
                               info::Ref{ma86_info{Float64}}, scale::Ptr{Float64})::Cvoid
 end
 
@@ -103,7 +116,8 @@ end
 
 function ma86_solve_d(job, nrhs, ldx, x, order, keep, control, info, scale)
   @ccall libhsl.ma86_solve_d(job::Cint, nrhs::Cint, ldx::Cint, x::Ptr{Float64},
-                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}}, control::Ref{ma86_control{Float64}},
+                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}},
+                             control::Ref{ma86_control{Float64}},
                              info::Ref{ma86_info{Float64}}, scale::Ptr{Float64})::Cvoid
 end
 
@@ -139,7 +153,8 @@ end
 
 function ma86_solve_c(job, nrhs, ldx, x, order, keep, control, info, scale)
   @ccall libhsl.ma86_solve_c(job::Cint, nrhs::Cint, ldx::Cint, x::Ptr{ComplexF32},
-                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}}, control::Ref{ma86_control{Float32}},
+                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}},
+                             control::Ref{ma86_control{Float32}},
                              info::Ref{ma86_info{Float32}}, scale::Ptr{Float32})::Cvoid
 end
 
@@ -175,7 +190,8 @@ end
 
 function ma86_solve_z(job, nrhs, ldx, x, order, keep, control, info, scale)
   @ccall libhsl.ma86_solve_z(job::Cint, nrhs::Cint, ldx::Cint, x::Ptr{ComplexF64},
-                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}}, control::Ref{ma86_control{Float64}},
+                             order::Ptr{Cint}, keep::Ptr{Ptr{Cvoid}},
+                             control::Ref{ma86_control{Float64}},
                              info::Ref{ma86_info{Float64}}, scale::Ptr{Float64})::Cvoid
 end
 

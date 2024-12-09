@@ -15,9 +15,14 @@ mutable struct mi28_control{T}
   unit_error::Cint
   unit_warning::Cint
 
-  mi28_control{T}() where T = new()
+  mi28_control{T}() where {T} = new()
 
-  mi28_control{T}(f_arrays, alpha, check, iorder, iscale, lowalpha, maxshift, rrt, shift_factor, shift_factor2, small, tau1, tau2, unit_error, unit_warning) where T = new(f_arrays, alpha, check, iorder, iscale, lowalpha, maxshift, rrt, shift_factor, shift_factor2, small, tau1, tau2, unit_error, unit_warning)
+  function mi28_control{T}(f_arrays, alpha, check, iorder, iscale, lowalpha, maxshift, rrt,
+                           shift_factor, shift_factor2, small, tau1, tau2, unit_error,
+                           unit_warning) where {T}
+    return new(f_arrays, alpha, check, iorder, iscale, lowalpha, maxshift, rrt, shift_factor,
+               shift_factor2, small, tau1, tau2, unit_error, unit_warning)
+  end
 end
 
 function mi28_default_control_s(control)
@@ -42,9 +47,14 @@ mutable struct mi28_info{T}
   stat::Cint
   alpha::T
 
-  mi28_info{T}() where T = new()
+  mi28_info{T}() where {T} = new()
 
-  mi28_info{T}(band_after, band_before, dup, flag, flag61, flag64, flag68, flag77, nrestart, nshift, oor, profile_before, profile_after, size_r, stat, alpha) where T = new(band_after, band_before, dup, flag, flag61, flag64, flag68, flag77, nrestart, nshift, oor, profile_before, profile_after, size_r, stat, alpha)
+  function mi28_info{T}(band_after, band_before, dup, flag, flag61, flag64, flag68, flag77,
+                        nrestart, nshift, oor, profile_before, profile_after, size_r, stat,
+                        alpha) where {T}
+    return new(band_after, band_before, dup, flag, flag61, flag64, flag68, flag77, nrestart, nshift,
+               oor, profile_before, profile_after, size_r, stat, alpha)
+  end
 end
 
 function mi28_factorize_s(n, ptr, row, val, lsize, rsize, keep, control, info, scale, perm)

@@ -2,12 +2,16 @@
 using HSL_jll
 using JuliaFormatter
 
-release = "2023.11.7"
-libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL-$release/"
+release = "2024.11.28"
+libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL.v$release/"
 
 # Symbols of the shared library libhsl
 symbols_path = "symbols.txt"
 run(pipeline(`nm -D $(HSL_jll.libhsl_path)`, stdout=symbols_path))
+
+# Symbols of the shared library libhsl_subset_64
+symbols_64_path = "symbols_64.txt"
+run(pipeline(`nm -D $(HSL_jll.libhsl_subset_64_path)`, stdout=symbols_64_path))
 
 # Relation between the hsl precision and the name of the symbols
 hsl_precision = Dict{Char, String}('i' => "integer",
@@ -392,6 +396,11 @@ function main(name::String="all"; verbose::Bool=false)
   symbols = split(symbols, "\n", keepempty=false)
   symbols = [symbol[20:end] for symbol in symbols]
 
+  # Create a vector with all symbols exported by the shared library libhsl_subset_64
+  symbols_64 = read(symbols_64_path, String)
+  symbols_64 = split(symbols_64, "\n", keepempty=false)
+  symbols_64 = [symbol_64[20:end] for symbol_64 in symbols_64]
+
   for (root, dirs, files) in walkdir(libhsl)
 
     # We don't want to go inside "examples", metis" and "libhsl" folders
@@ -475,6 +484,43 @@ function main(name::String="all"; verbose::Bool=false)
             end
             write(file_wrapper, ")::$(output_type)\n")
             write(file_wrapper, "end\n")
+
+            # Symbols with the suffix `64_`
+            if "$(fname)64_" in symbols_64
+              write(file_wrapper, "\n")
+              signature64 = replace(signature, fname[1:end-1] => "$(fname)64")
+              signature64 = replace(signature64, "Cint" => "Int64")
+              write(file_wrapper, "function $signature64\n")
+              write(file_wrapper, "  @ccall libhsl_subset_64.$(fname)64_(")
+              for k = 1:narguments
+                if types[k] == ""
+                  format = false
+                  @warn "Unable to determine the type of $(arguments[k])"
+                else
+                  type64 = replace(types[k], "Cint" => "Int64")
+                  write(file_wrapper, "$(arguments[k])::$(type64)")
+                end
+                (k < narguments) && write(file_wrapper, ", ")
+              end
+
+              # Hidden arguments
+              if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types || "Ptr{Ptr{UInt8}}" ∈ types
+                verbose && @info "Hidden argument in $fname."
+              end
+              for k = 1:narguments
+                (types[k] == "Ref{UInt8}") && write(file_wrapper, ", 1::Csize_t")
+                (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
+                (types[k] == "Ptr{Ptr{UInt8}}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
+              end
+
+              if output_type == ""
+                format = false
+                @warn "Unable to determine the output type"
+              end
+              write(file_wrapper, ")::$(output_type)\n")
+              write(file_wrapper, "end\n")
+            end
+
             index < num_fnames && write(file_wrapper, "\n")
           end
         end
