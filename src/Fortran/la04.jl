@@ -8,8 +8,24 @@ function la04ad(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, x, z
                         iws::Ptr{Cint}, liws::Ref{Cint})::Cvoid
 end
 
+function la04ad_64(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, x, z, g, rinfo, ws,
+                   lws, iws, liws)
+  @ccall libhsl_subset_64.la04ad_64_(a::Ptr{Float64}, la::Ref{Int64}, irn::Ptr{Int64},
+                                     ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float64},
+                                     c::Ptr{Float64}, bnd::Ptr{Float64}, kb::Ref{Int64},
+                                     lb::Ref{Int64}, job::Ref{Int64}, cntl::Ptr{Float64},
+                                     ix::Ptr{Int64}, jx::Ptr{Int64}, x::Ptr{Float64},
+                                     z::Ptr{Float64}, g::Ptr{Float64}, rinfo::Ptr{Float64},
+                                     ws::Ptr{Float64}, lws::Ref{Int64}, iws::Ptr{Int64},
+                                     liws::Ref{Int64})::Cvoid
+end
+
 function la04id(cntl)
   @ccall libhsl.la04id_(cntl::Ptr{Float64})::Cvoid
+end
+
+function la04id_64(cntl)
+  @ccall libhsl_subset_64.la04id_64_(cntl::Ptr{Float64})::Cvoid
 end
 
 function la04bd(a, la, irn, ip, m, n, bnd, kb, cntl, ix, g, rinfo, iw, irow, pv, y)
@@ -17,6 +33,15 @@ function la04bd(a, la, irn, ip, m, n, bnd, kb, cntl, ix, g, rinfo, iw, irow, pv,
                         n::Ref{Cint}, bnd::Ptr{Float64}, kb::Ref{Cint}, cntl::Ptr{Float64},
                         ix::Ptr{Cint}, g::Ptr{Float64}, rinfo::Ptr{Float64}, iw::Ptr{Cint},
                         irow::Ptr{Cint}, pv::Ptr{Float64}, y::Ptr{Float64})::Cvoid
+end
+
+function la04bd_64(a, la, irn, ip, m, n, bnd, kb, cntl, ix, g, rinfo, iw, irow, pv, y)
+  @ccall libhsl_subset_64.la04bd_64_(a::Ptr{Float64}, la::Ref{Int64}, irn::Ptr{Int64},
+                                     ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64},
+                                     bnd::Ptr{Float64}, kb::Ref{Int64}, cntl::Ptr{Float64},
+                                     ix::Ptr{Int64}, g::Ptr{Float64}, rinfo::Ptr{Float64},
+                                     iw::Ptr{Int64}, irow::Ptr{Int64}, pv::Ptr{Float64},
+                                     y::Ptr{Float64})::Cvoid
 end
 
 function la04cd(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, g, rinfo, x, z, ba, ib,
@@ -31,6 +56,20 @@ function la04cd(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, g, r
                         c15::Ptr{Float64}, iseed::Ref{Cint})::Cvoid
 end
 
+function la04cd_64(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, g, rinfo, x, z, ba,
+                   ib, indb, ipb, iwb, v, w, y, yy, i15, c15, iseed)
+  @ccall libhsl_subset_64.la04cd_64_(a::Ptr{Float64}, la::Ref{Int64}, irn::Ptr{Int64},
+                                     ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float64},
+                                     c::Ptr{Float64}, bnd::Ptr{Float64}, kb::Ref{Int64},
+                                     lb::Ref{Int64}, job::Ref{Int64}, cntl::Ptr{Float64},
+                                     ix::Ptr{Int64}, jx::Ptr{Int64}, g::Ptr{Float64},
+                                     rinfo::Ptr{Float64}, x::Ptr{Float64}, z::Ptr{Float64},
+                                     ba::Ptr{Float64}, ib::Ref{Int64}, indb::Ptr{Int64},
+                                     ipb::Ptr{Int64}, iwb::Ptr{Int64}, v::Ptr{Float64},
+                                     w::Ptr{Float64}, y::Ptr{Float64}, yy::Ptr{Float64},
+                                     i15::Ptr{Int64}, c15::Ptr{Float64}, iseed::Ref{Int64})::Cvoid
+end
+
 function la04dd(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, x, ix, jx, z, g, rinfo, ba,
                 indb, ipb, iwb, w, v, ir, y, yy, ib, i15, c15)
   @ccall libhsl.la04dd_(a::Ptr{Float64}, la::Ref{Cint}, irn::Ptr{Cint}, ip::Ptr{Cint}, m::Ref{Cint},
@@ -43,6 +82,20 @@ function la04dd(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, x, ix, jx, z
                         i15::Ptr{Cint}, c15::Ptr{Float64})::Cvoid
 end
 
+function la04dd_64(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, x, ix, jx, z, g, rinfo, ba,
+                   indb, ipb, iwb, w, v, ir, y, yy, ib, i15, c15)
+  @ccall libhsl_subset_64.la04dd_64_(a::Ptr{Float64}, la::Ref{Int64}, irn::Ptr{Int64},
+                                     ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float64},
+                                     c::Ptr{Float64}, bnd::Ptr{Float64}, kb::Ref{Int64},
+                                     lb::Ref{Int64}, job::Ref{Int64}, cntl::Ptr{Float64},
+                                     x::Ptr{Float64}, ix::Ptr{Int64}, jx::Ptr{Int64},
+                                     z::Ptr{Float64}, g::Ptr{Float64}, rinfo::Ptr{Float64},
+                                     ba::Ptr{Float64}, indb::Ptr{Int64}, ipb::Ptr{Int64},
+                                     iwb::Ptr{Int64}, w::Ptr{Float64}, v::Ptr{Float64},
+                                     ir::Ptr{Int64}, y::Ptr{Float64}, yy::Ptr{Float64},
+                                     ib::Ref{Int64}, i15::Ptr{Int64}, c15::Ptr{Float64})::Cvoid
+end
+
 function la04ed(a, la, irn, ip, m, n, b, x, dx, ix, jin, rinfo, ba, indb, ipb, iwb, w, y, ib, trans,
                 i15, c15)
   @ccall libhsl.la04ed_(a::Ptr{Float64}, la::Ref{Cint}, irn::Ptr{Cint}, ip::Ptr{Cint}, m::Ref{Cint},
@@ -53,11 +106,30 @@ function la04ed(a, la, irn, ip, m, n, b, x, dx, ix, jin, rinfo, ba, indb, ipb, i
                         c15::Ptr{Float64})::Cvoid
 end
 
+function la04ed_64(a, la, irn, ip, m, n, b, x, dx, ix, jin, rinfo, ba, indb, ipb, iwb, w, y, ib,
+                   trans, i15, c15)
+  @ccall libhsl_subset_64.la04ed_64_(a::Ptr{Float64}, la::Ref{Int64}, irn::Ptr{Int64},
+                                     ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float64},
+                                     x::Ptr{Float64}, dx::Ref{Float64}, ix::Ptr{Int64},
+                                     jin::Ref{Int64}, rinfo::Ptr{Float64}, ba::Ptr{Float64},
+                                     indb::Ptr{Int64}, ipb::Ptr{Int64}, iwb::Ptr{Int64},
+                                     w::Ptr{Float64}, y::Ptr{Float64}, ib::Ref{Int64},
+                                     trans::Ref{Int64}, i15::Ptr{Int64}, c15::Ptr{Float64})::Cvoid
+end
+
 function la04sd(a, la, irn, ip, m, n, b, c, bnd, kb, sigma, rs, cs, ws, jcn)
   @ccall libhsl.la04sd_(a::Ptr{Float64}, la::Ref{Cint}, irn::Ptr{Cint}, ip::Ptr{Cint}, m::Ref{Cint},
                         n::Ref{Cint}, b::Ptr{Float64}, c::Ptr{Float64}, bnd::Ptr{Float64},
                         kb::Ref{Cint}, sigma::Ref{Float64}, rs::Ptr{Float64}, cs::Ptr{Float64},
                         ws::Ptr{Float64}, jcn::Ptr{Cint})::Cvoid
+end
+
+function la04sd_64(a, la, irn, ip, m, n, b, c, bnd, kb, sigma, rs, cs, ws, jcn)
+  @ccall libhsl_subset_64.la04sd_64_(a::Ptr{Float64}, la::Ref{Int64}, irn::Ptr{Int64},
+                                     ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float64},
+                                     c::Ptr{Float64}, bnd::Ptr{Float64}, kb::Ref{Int64},
+                                     sigma::Ref{Float64}, rs::Ptr{Float64}, cs::Ptr{Float64},
+                                     ws::Ptr{Float64}, jcn::Ptr{Int64})::Cvoid
 end
 
 function la04a(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, x, z, g, rinfo, ws, lws,
@@ -70,8 +142,24 @@ function la04a(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, x, z,
                        iws::Ptr{Cint}, liws::Ref{Cint})::Cvoid
 end
 
+function la04a_64(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, x, z, g, rinfo, ws,
+                  lws, iws, liws)
+  @ccall libhsl_subset_64.la04a_64_(a::Ptr{Float32}, la::Ref{Int64}, irn::Ptr{Int64},
+                                    ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float32},
+                                    c::Ptr{Float32}, bnd::Ptr{Float32}, kb::Ref{Int64},
+                                    lb::Ref{Int64}, job::Ref{Int64}, cntl::Ptr{Float32},
+                                    ix::Ptr{Int64}, jx::Ptr{Int64}, x::Ptr{Float32},
+                                    z::Ptr{Float32}, g::Ptr{Float32}, rinfo::Ptr{Float32},
+                                    ws::Ptr{Float32}, lws::Ref{Int64}, iws::Ptr{Int64},
+                                    liws::Ref{Int64})::Cvoid
+end
+
 function la04i(cntl)
   @ccall libhsl.la04i_(cntl::Ptr{Float32})::Cvoid
+end
+
+function la04i_64(cntl)
+  @ccall libhsl_subset_64.la04i_64_(cntl::Ptr{Float32})::Cvoid
 end
 
 function la04b(a, la, irn, ip, m, n, bnd, kb, cntl, ix, g, rinfo, iw, irow, pv, y)
@@ -79,6 +167,14 @@ function la04b(a, la, irn, ip, m, n, bnd, kb, cntl, ix, g, rinfo, iw, irow, pv, 
                        n::Ref{Cint}, bnd::Ptr{Float32}, kb::Ref{Cint}, cntl::Ptr{Float32},
                        ix::Ptr{Cint}, g::Ptr{Float32}, rinfo::Ptr{Float32}, iw::Ptr{Cint},
                        irow::Ptr{Cint}, pv::Ptr{Float32}, y::Ptr{Float32})::Cvoid
+end
+
+function la04b_64(a, la, irn, ip, m, n, bnd, kb, cntl, ix, g, rinfo, iw, irow, pv, y)
+  @ccall libhsl_subset_64.la04b_64_(a::Ptr{Float32}, la::Ref{Int64}, irn::Ptr{Int64},
+                                    ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, bnd::Ptr{Float32},
+                                    kb::Ref{Int64}, cntl::Ptr{Float32}, ix::Ptr{Int64},
+                                    g::Ptr{Float32}, rinfo::Ptr{Float32}, iw::Ptr{Int64},
+                                    irow::Ptr{Int64}, pv::Ptr{Float32}, y::Ptr{Float32})::Cvoid
 end
 
 function la04c(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, g, rinfo, x, z, ba, ib,
@@ -93,6 +189,20 @@ function la04c(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, g, ri
                        c15::Ptr{Float32}, iseed::Ref{Cint})::Cvoid
 end
 
+function la04c_64(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, ix, jx, g, rinfo, x, z, ba,
+                  ib, indb, ipb, iwb, v, w, y, yy, i15, c15, iseed)
+  @ccall libhsl_subset_64.la04c_64_(a::Ptr{Float32}, la::Ref{Int64}, irn::Ptr{Int64},
+                                    ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float32},
+                                    c::Ptr{Float32}, bnd::Ptr{Float32}, kb::Ref{Int64},
+                                    lb::Ref{Int64}, job::Ref{Int64}, cntl::Ptr{Float32},
+                                    ix::Ptr{Int64}, jx::Ptr{Int64}, g::Ptr{Float32},
+                                    rinfo::Ptr{Float32}, x::Ptr{Float32}, z::Ptr{Float32},
+                                    ba::Ptr{Float32}, ib::Ref{Int64}, indb::Ptr{Int64},
+                                    ipb::Ptr{Int64}, iwb::Ptr{Int64}, v::Ptr{Float32},
+                                    w::Ptr{Float32}, y::Ptr{Float32}, yy::Ptr{Float32},
+                                    i15::Ptr{Int64}, c15::Ptr{Float32}, iseed::Ref{Int64})::Cvoid
+end
+
 function la04d(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, x, ix, jx, z, g, rinfo, ba, indb,
                ipb, iwb, w, v, ir, y, yy, ib, i15, c15)
   @ccall libhsl.la04d_(a::Ptr{Float32}, la::Ref{Cint}, irn::Ptr{Cint}, ip::Ptr{Cint}, m::Ref{Cint},
@@ -105,6 +215,20 @@ function la04d(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, x, ix, jx, z,
                        i15::Ptr{Cint}, c15::Ptr{Float32})::Cvoid
 end
 
+function la04d_64(a, la, irn, ip, m, n, b, c, bnd, kb, lb, job, cntl, x, ix, jx, z, g, rinfo, ba,
+                  indb, ipb, iwb, w, v, ir, y, yy, ib, i15, c15)
+  @ccall libhsl_subset_64.la04d_64_(a::Ptr{Float32}, la::Ref{Int64}, irn::Ptr{Int64},
+                                    ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float32},
+                                    c::Ptr{Float32}, bnd::Ptr{Float32}, kb::Ref{Int64},
+                                    lb::Ref{Int64}, job::Ref{Int64}, cntl::Ptr{Float32},
+                                    x::Ptr{Float32}, ix::Ptr{Int64}, jx::Ptr{Int64},
+                                    z::Ptr{Float32}, g::Ptr{Float32}, rinfo::Ptr{Float32},
+                                    ba::Ptr{Float32}, indb::Ptr{Int64}, ipb::Ptr{Int64},
+                                    iwb::Ptr{Int64}, w::Ptr{Float32}, v::Ptr{Float32},
+                                    ir::Ptr{Int64}, y::Ptr{Float32}, yy::Ptr{Float32},
+                                    ib::Ref{Int64}, i15::Ptr{Int64}, c15::Ptr{Float32})::Cvoid
+end
+
 function la04e(a, la, irn, ip, m, n, b, x, dx, ix, jin, rinfo, ba, indb, ipb, iwb, w, y, ib, trans,
                i15, c15)
   @ccall libhsl.la04e_(a::Ptr{Float32}, la::Ref{Cint}, irn::Ptr{Cint}, ip::Ptr{Cint}, m::Ref{Cint},
@@ -115,9 +239,28 @@ function la04e(a, la, irn, ip, m, n, b, x, dx, ix, jin, rinfo, ba, indb, ipb, iw
                        c15::Ptr{Float32})::Cvoid
 end
 
+function la04e_64(a, la, irn, ip, m, n, b, x, dx, ix, jin, rinfo, ba, indb, ipb, iwb, w, y, ib,
+                  trans, i15, c15)
+  @ccall libhsl_subset_64.la04e_64_(a::Ptr{Float32}, la::Ref{Int64}, irn::Ptr{Int64},
+                                    ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float32},
+                                    x::Ptr{Float32}, dx::Ref{Float32}, ix::Ptr{Int64},
+                                    jin::Ref{Int64}, rinfo::Ptr{Float32}, ba::Ptr{Float32},
+                                    indb::Ptr{Int64}, ipb::Ptr{Int64}, iwb::Ptr{Int64},
+                                    w::Ptr{Float32}, y::Ptr{Float32}, ib::Ref{Int64},
+                                    trans::Ref{Int64}, i15::Ptr{Int64}, c15::Ptr{Float32})::Cvoid
+end
+
 function la04s(a, la, irn, ip, m, n, b, c, bnd, kb, sigma, rs, cs, ws, jcn)
   @ccall libhsl.la04s_(a::Ptr{Float32}, la::Ref{Cint}, irn::Ptr{Cint}, ip::Ptr{Cint}, m::Ref{Cint},
                        n::Ref{Cint}, b::Ptr{Float32}, c::Ptr{Float32}, bnd::Ptr{Float32},
                        kb::Ref{Cint}, sigma::Ref{Float32}, rs::Ptr{Float32}, cs::Ptr{Float32},
                        ws::Ptr{Float32}, jcn::Ptr{Cint})::Cvoid
+end
+
+function la04s_64(a, la, irn, ip, m, n, b, c, bnd, kb, sigma, rs, cs, ws, jcn)
+  @ccall libhsl_subset_64.la04s_64_(a::Ptr{Float32}, la::Ref{Int64}, irn::Ptr{Int64},
+                                    ip::Ptr{Int64}, m::Ref{Int64}, n::Ref{Int64}, b::Ptr{Float32},
+                                    c::Ptr{Float32}, bnd::Ptr{Float32}, kb::Ref{Int64},
+                                    sigma::Ref{Float32}, rs::Ptr{Float32}, cs::Ptr{Float32},
+                                    ws::Ptr{Float32}, jcn::Ptr{Int64})::Cvoid
 end

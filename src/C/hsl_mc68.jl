@@ -12,7 +12,11 @@ mutable struct mc68_control
 
   mc68_control() = new()
 
-  mc68_control(f_array_in, f_array_out, min_l_workspace, lp, wp, mp, nemin, print_level, row_full_thresh, row_search) = new(f_array_in, f_array_out, min_l_workspace, lp, wp, mp, nemin, print_level, row_full_thresh, row_search)
+  function mc68_control(f_array_in, f_array_out, min_l_workspace, lp, wp, mp, nemin, print_level,
+                        row_full_thresh, row_search)
+    return new(f_array_in, f_array_out, min_l_workspace, lp, wp, mp, nemin, print_level,
+               row_full_thresh, row_search)
+  end
 end
 
 function mc68_default_control_i(control)
@@ -33,7 +37,11 @@ mutable struct mc68_info
 
   mc68_info() = new()
 
-  mc68_info(flag, iostat, stat, out_range, duplicate, n_compressions, n_zero_eigs, l_workspace, zb01_info, n_dense_rows) = new(flag, iostat, stat, out_range, duplicate, n_compressions, n_zero_eigs, l_workspace, zb01_info, n_dense_rows)
+  function mc68_info(flag, iostat, stat, out_range, duplicate, n_compressions, n_zero_eigs,
+                     l_workspace, zb01_info, n_dense_rows)
+    return new(flag, iostat, stat, out_range, duplicate, n_compressions, n_zero_eigs, l_workspace,
+               zb01_info, n_dense_rows)
+  end
 end
 
 function mc68_order_i(ord, n, ptr, row, perm, control, info)

@@ -54,6 +54,38 @@ const jobs97 = Dict{Symbol, Int}(
   :DLPS => 4,  # solve DL'P'S⁻¹x = b
 )
 
+"""
+    ma97_control_variant{T}(; kwargs...)
+
+## Keyword arguments:
+* `print_level::Int`: integer controling the verbosit level. Accepted values are:
+    * <0: no printing
+    * 0: errors and warnings only (default)
+    * 1: errors, warnings and basic diagnostics
+    * 2: errors, warning and full diagnostics
+* `unit_diagnostics::Int`: Fortran file unit for diagnostics (default: 6)
+* `unit_error::Int`: Fortran file unit for errors (default: 6)
+* `unit_warning::Int`: Fortran file unit for warnings (default: 6)
+"""
+function ma97_control_variant(
+  ::Type{T};
+  print_level::Int = -1,
+  unit_diagnostics::Int = 6,
+  unit_error::Int = 6,
+  unit_warning::Int = 6) where {T}
+  control = ma97_control{T}()
+  T == Float32    && ma97_default_control_s(control)
+  T == Float64    && ma97_default_control_d(control)
+  T == ComplexF32 && ma97_default_control_c(control)
+  T == ComplexF64 && ma97_default_control_z(control)
+  control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
+  control.print_level = print_level
+  control.unit_diagnostics = unit_diagnostics
+  control.unit_error = unit_error
+  control.unit_warning = unit_warning
+  return control
+end
+
 "Exception type raised in case of error."
 mutable struct Ma97Exception <: Exception
   msg::AbstractString
@@ -109,7 +141,7 @@ for (fname, freename, elty, subty) in ((:ma97_analyse_s, :ma97_free_akeep_s, :Fl
       nzval::Vector{$elty};
       kwargs...,
     ) where {Ti <: Integer}
-      control = ma97_control{$subty}(; kwargs...)
+      control = ma97_control_variant($subty; kwargs...)
       info = ma97_info{$subty}()
       M = Ma97{$elty, $subty}(
         [Ptr{Cvoid}(C_NULL)],
@@ -173,7 +205,7 @@ for (fname, freename, elty, subty) in ((:ma97_analyse_coord_s, :ma97_free_akeep_
       nzval::Vector{$elty};
       kwargs...,
     ) where {Ti <: Integer}
-      control = ma97_control{$subty}(; kwargs...)
+      control = ma97_control_variant($subty; kwargs...)
       info = ma97_info{$subty}()
       M = Ma97{$elty, $subty}(
         [convert(Ptr{Cvoid}, C_NULL)],

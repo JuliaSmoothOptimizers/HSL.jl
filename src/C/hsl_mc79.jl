@@ -31,7 +31,9 @@ mutable struct mc79_info
 
   mc79_info() = new()
 
-  mc79_info(flag, hz_comps, vt_comps, sq_comps, m1, m2, m3, mbar, n1, n2, n3, nbar, stat) = new(flag, hz_comps, vt_comps, sq_comps, m1, m2, m3, mbar, n1, n2, n3, nbar, stat)
+  function mc79_info(flag, hz_comps, vt_comps, sq_comps, m1, m2, m3, mbar, n1, n2, n3, nbar, stat)
+    return new(flag, hz_comps, vt_comps, sq_comps, m1, m2, m3, mbar, n1, n2, n3, nbar, stat)
+  end
 end
 
 function mc79_matching_i(m, n, ptr, row, rowmatch, colmatch, control, info)

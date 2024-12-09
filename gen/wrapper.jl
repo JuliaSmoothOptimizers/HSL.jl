@@ -11,7 +11,7 @@ function wrapper(name::String, headers::Vector{String}, optimized::Bool)
   @info "Wrapping $name"
 
   cd(@__DIR__)
-  include_dir = joinpath(HSL_jll.artifact_dir, "include")
+  include_dir = joinpath(HSL_jll.artifact_dir, "include", "libhsl")
   options = load_options(joinpath(@__DIR__, "hsl.toml"))
   options["general"]["output_file_path"] = joinpath("..", "src", "C", "$(name).jl")
 
@@ -47,7 +47,7 @@ function hsl_headers(include::String, package::String, precisions::Vector{Char})
 end
 
 function main(name::String="all"; optimized::Bool=false)
-  include = joinpath(HSL_jll.artifact_dir, "include")
+  include = joinpath(HSL_jll.artifact_dir, "include", "libhsl")
 
   if name == "all" || name == "libhsl"
     wrapper("libhsl", [joinpath(include, "libhsl.h")], optimized)
