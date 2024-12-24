@@ -3,13 +3,19 @@ module HSL
 using Libdl
 using LinearAlgebra
 using SparseArrays
+using Quadmath
 
 if haskey(ENV, "JULIA_HSL_LIBRARY_PATH")
   const libhsl = joinpath(ENV["JULIA_HSL_LIBRARY_PATH"], "libhsl.$dlext")
+  const libhsl_subset = joinpath(ENV["JULIA_HSL_LIBRARY_PATH"], "libhsl_subset.$dlext")
+  const libhsl_subset_64 = joinpath(ENV["JULIA_HSL_LIBRARY_PATH"], "libhsl_subset_64.$dlext")
   const HSL_INSTALLATION = "CUSTOM"
 else
-  using OpenBLAS32_jll
-  using HSL_jll
+  import OpenBLAS32_jll
+  import HSL_jll
+  const libhsl = HSL_jll.libhsl
+  const libhsl_subset = HSL_jll.libhsl_subset
+  const libhsl_subset_64 = HSL_jll.libhsl_subset_64
   const HSL_INSTALLATION = "ARTIFACT"
 end
 

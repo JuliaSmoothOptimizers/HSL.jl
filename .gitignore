@@ -7,5 +7,6 @@ deps/src
 deps/build.log
 Manifest.toml
 docs/Manifest.toml
-gen/symbols.txt
-gen/symbols_64.txt
+gen/symbols_libhsl.txt
+gen/symbols_libhsl_subset.txt
+gen/symbols_libhsl_subset_64.txt

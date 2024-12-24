@@ -7,10 +7,12 @@ HSL_jll = "017b0a0e-03f4-516a-9b91-836bbd1904dd"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OpenBLAS32_jll = "656ef2d0-ae68-5445-9ca0-591084a874a2"
+Quadmath = "be4d8f0f-7fa4-5f49-b795-2f01399ab2dd"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
 OpenBLAS32_jll = "0.3.9"
+Quadmath = "0.5.10"
 julia = "^1.6.0"
 
 [extras]
