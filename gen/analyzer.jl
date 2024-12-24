@@ -2,16 +2,27 @@
 using HSL_jll
 using JuliaFormatter
 
+# libHSL
+name_hsl_package = "libhsl"
 release = "2024.11.28"
 libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL.v$release/"
 
+# HSL_SUBSET
+# name_hsl_package = "hsl_subset"
+# release = ""
+# libhsl = "/home/alexis/Bureau/git/hsl/hsl_subset/src/"
+
 # Symbols of the shared library libhsl
-symbols_path = "symbols.txt"
-run(pipeline(`nm -D $(HSL_jll.libhsl_path)`, stdout=symbols_path))
+symbols_libhsl_path = "symbols_libhsl.txt"
+run(pipeline(`nm -D $(HSL_jll.libhsl_path)`, stdout=symbols_libhsl_path))
+
+# Symbols of the shared library libhsl_subset
+symbols_libhsl_subset_path = "symbols_libhsl_subset.txt"
+run(pipeline(`nm -D $(HSL_jll.libhsl_subset_path)`, stdout=symbols_libhsl_subset_path))
 
 # Symbols of the shared library libhsl_subset_64
-symbols_64_path = "symbols_64.txt"
-run(pipeline(`nm -D $(HSL_jll.libhsl_subset_64_path)`, stdout=symbols_64_path))
+symbols_libhsl_subset_64_path = "symbols_libhsl_subset_64.txt"
+run(pipeline(`nm -D $(HSL_jll.libhsl_subset_64_path)`, stdout=symbols_libhsl_subset_64_path))
 
 # Relation between the hsl precision and the name of the symbols
 hsl_precision = Dict{Char, String}('i' => "integer",
@@ -40,8 +51,12 @@ function fortran_output(case::String, text::AbstractString)
     taille = length(text)
     if (taille ≥ 8) && mapreduce(pattern -> occursin(pattern, text[end-7:end-1]), |, ["integer", "INTEGER"])
       output_type = "Cint"
+    elseif (taille ≥ 13) && mapreduce(pattern -> occursin(pattern, text[end-12:end-1]), |, ["integer(ip_)", "INTEGER(ip_)"])
+      output_type = "INT"
     elseif (taille ≥ 17) && mapreduce(pattern -> occursin(pattern, text[end-16:end-1]), |, ["double precision", "DOUBLE PRECISION"])
       output_type = "Float64"
+    elseif (taille ≥ 10) && mapreduce(pattern -> occursin(pattern, text[end-9:end-1]), |, ["real(rp_)", "REAL(rp_)"])
+      output_type = "FLOAT"
     elseif (taille ≥ 5) && mapreduce(pattern -> occursin(pattern, text[end-4:end-1]), |, ["real", "REAL"])
       output_type = "Float32"
     elseif (taille ≥ 8) && mapreduce(pattern -> occursin(pattern, text[end-7:end-1]), |, ["complex", "COMPLEX"])
@@ -86,6 +101,10 @@ Mapping between Fortran and Julia types.
 """
 function type_mapping(type::String)
   julia_type = ""
+  (type == "INTEGER(ip_)") && (julia_type = "INT")
+  (type == "REAL(rp_)") && (julia_type = "FLOAT")
+  (type == "LOGICAL(lp_)") && (julia_type = "Cint")
+  (type == "REAL(r4_)") && (julia_type = "Float32")
   (type == "INTEGER") && (julia_type = "Cint")
   (type == "LOGICAL") && (julia_type = "Cint")
   (type == "REAL") && (julia_type = "Float32")
@@ -161,6 +180,10 @@ function fortran_types(code::AbstractString, arguments::Vector{String}; verbose:
     type_detector(types, arguments, line, "COMPLEX*16")
     type_detector(types, arguments, line, "CHARACTER")
     type_detector(types, arguments, line, "TYPE")
+    type_detector(types, arguments, line, "INTEGER(ip_)")
+    type_detector(types, arguments, line, "REAL(rp_)")
+    type_detector(types, arguments, line, "LOGICAL(lp_)")
+    type_detector(types, arguments, line, "REAL(r4_)")
 
     if startswith(line, "CHARACTER*") || startswith(line, "character*")
       # start=12 -> CHARACTER*N with N < 10
@@ -193,7 +216,7 @@ function fortran_types(code::AbstractString, arguments::Vector{String}; verbose:
   return types, strlen
 end
 
-function fortran_analyzer(str::String, basename::String, extension::String)
+function fortran_analyzer(name_hsl_package::String, str::String, basename::String, extension::String)
   functions = []
 
   # Remove the comments
@@ -232,39 +255,6 @@ function fortran_analyzer(str::String, basename::String, extension::String)
       str = str[1:end-1] * line[pos+1:end] * "\n"
     else
       str = str * line * "\n"
-    end
-  end
-
-  # Remove some patterns to more easily parse files in FORTRAN 90
-  if extension == "f90"
-    str = replace(str, ", " => ",")
-    str = replace(str, "::" => "")
-    for pattern in ("in", "out", "inout")
-      str = replace(str, " $pattern " => pattern)
-      str = replace(str, " $(uppercase(pattern)) " => uppercase(pattern))
-    end
-    for pattern in (",intent(in)", ",intent(out)", ",intent(inout)")
-      str = replace(str, pattern => "")
-      str = replace(str, uppercase(pattern) => "")
-    end
-    str = replace(str, ",allocatable" => "")
-    str = replace(str, ",OPTIONAL" => "")
-    # str = replace(str, "CHARACTER(len=*)" => "CHARACTER(N),")
-
-    lines = split(str, "\n", keepempty=false)
-    str = ""
-    for line in lines
-      if occursin("!", line)
-        find = false
-        for (k, value) in enumerate(line)
-          if value == '!' && !find
-            find = true
-            str = str * line[1:k-1] * "\n"
-          end
-        end
-      else
-        str = str * line * "\n"
-      end
     end
   end
 
@@ -317,6 +307,49 @@ function fortran_analyzer(str::String, basename::String, extension::String)
       end
     else
       str = str * line * "\n"
+    end
+  end
+
+  # Remove some patterns to more easily parse files in FORTRAN 90
+  if extension == "f90" || name_hsl_package == "hsl_subset"
+    str = replace(str, ", " => ",")
+    str = replace(str, "::" => "")
+    for pattern in (",intent(in)", ",intent(out)", ",intent(inout)")
+      str = replace(str, pattern => "")
+      str = replace(str, uppercase(pattern) => "")
+    end
+    str = replace(str, ",allocatable" => "")
+    str = replace(str, ",OPTIONAL" => "")
+    # str = replace(str, "CHARACTER(len=*)" => "CHARACTER(N),")
+
+    lines = split(str, "\n", keepempty=false)
+    str = ""
+    for line in lines
+      if occursin("!", line)
+        find = false
+        for (k, value) in enumerate(line)
+          if value == '!' && !find
+            find = true
+            str = str * line[1:k-1] * "\n"
+          end
+        end
+      else
+        str = str * line * "\n"
+      end
+    end
+
+    lines = split(str, "\n", keepempty=false)
+    str = ""
+    for line in lines
+      if contains(line, "DIMENSION")
+        dim = split(split(line, "DIMENSION(")[2], ")")[1]
+        line2 = replace(line, ",DIMENSION($dim)" => "")
+        line2 = replace(line2, "," => "($dim),")
+        line2 = line2 * "($dim)"
+        str = str * line2 * "\n"
+      else
+        str = str * line * "\n"
+      end
     end
   end
 
@@ -390,21 +423,32 @@ function fortran_analyzer(str::String, basename::String, extension::String)
   return functions
 end
 
-function main(name::String="all"; verbose::Bool=false)
+function main(name::String="all"; verbose::Bool=false, f90::Bool=false, print_include::Bool=false)
   # Create a vector with all symbols exported by the shared library libhsl
-  symbols = read(symbols_path, String)
+  symbols = read(symbols_libhsl_path, String)
   symbols = split(symbols, "\n", keepempty=false)
   symbols = [symbol[20:end] for symbol in symbols]
 
+  # Create a vector with all symbols exported by the shared library libhsl_subset
+  symbols2 = read(symbols_libhsl_subset_path, String)
+  symbols2 = split(symbols2, "\n", keepempty=false)
+  symbols2 = [symbol2[20:end] for symbol2 in symbols2]
+
   # Create a vector with all symbols exported by the shared library libhsl_subset_64
-  symbols_64 = read(symbols_64_path, String)
+  symbols_64 = read(symbols_libhsl_subset_64_path, String)
   symbols_64 = split(symbols_64, "\n", keepempty=false)
   symbols_64 = [symbol_64[20:end] for symbol_64 in symbols_64]
+
+  extensions = f90 ? ("f", "f90") : ("f",)
+
+  # We use it to update src/wrappers.jl
+  list_include = String[]
 
   for (root, dirs, files) in walkdir(libhsl)
 
     # We don't want to go inside "examples", metis" and "libhsl" folders
     mapreduce(excluded_folder -> occursin(excluded_folder, root), |, ["examples", "metis", "libhsl/libhsl"]) && continue
+    mapreduce(excluded_folder -> occursin(excluded_folder, root), |, ["blas", "lapack", "makedefs"]) && continue
 
     # Test that we are in one subfolder of libhsl
     if root != libhsl
@@ -414,10 +458,10 @@ function main(name::String="all"; verbose::Bool=false)
       all_flag = (name == "all") && ('/' ∉ package) && !occursin("hsl", package)
       if (name == package) || all_flag
 
-        # Uncomment to update src/wrappers.jl
-        # println("include(\"Fortran/$package.jl\")")
+        # Update list_include
+        push!(list_include, "include(\"Fortran/$(name_hsl_package)/$(package).jl\")")
 
-        path_wrapper = joinpath(@__DIR__, "..", "src", "Fortran", "$(package).jl")
+        path_wrapper = joinpath(@__DIR__, "..", "src", "Fortran", name_hsl_package, "$(package).jl") |> normpath
         file_wrapper = open(path_wrapper, "w")
         
         # Debug mode (also replace `package == name` by `'/' ∉ package`)
@@ -428,12 +472,12 @@ function main(name::String="all"; verbose::Bool=false)
         fnames_package = String[]
         for file in files
           basename, ext = file_extension(file)
-          if ext ∈ ("f", "f90")
+          if ext ∈ extensions
             path_fortran = joinpath(root, file)
             file_fortran = open(path_fortran, "r")
             str = read(file_fortran, String)
             close(file_fortran)
-            fnames = fortran_analyzer(str, basename, ext)
+            fnames = fortran_analyzer(name_hsl_package, str, basename, ext)
             fnames_package = vcat(fnames_package, fnames)
           end
         end
@@ -455,54 +499,20 @@ function main(name::String="all"; verbose::Bool=false)
             verbose && println()
             verbose && display(signature)
             verbose && display(types)
-            # display(output_type)
-            (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl"
-            write(file_wrapper, "function $signature\n")
-            write(file_wrapper, "  @ccall libhsl.$fname(")
-            for k = 1:narguments
-              if types[k] == ""
-                format = false
-                @warn "Unable to determine the type of $(arguments[k])"
-              end
-              write(file_wrapper, "$(arguments[k])::$(types[k])")
-              (k < narguments) && write(file_wrapper, ", ")
-            end
+            verbose && display(output_type)
 
-            # Hidden arguments
-            if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types || "Ptr{Ptr{UInt8}}" ∈ types
-              verbose && @info "Hidden argument in $fname."
-            end
-            for k = 1:narguments
-              (types[k] == "Ref{UInt8}") && write(file_wrapper, ", 1::Csize_t")
-              (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
-              (types[k] == "Ptr{Ptr{UInt8}}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
-            end
-
-            if output_type == ""
-              format = false
-              @warn "Unable to determine the output type"
-            end
-            write(file_wrapper, ")::$(output_type)\n")
-            write(file_wrapper, "end\n")
-
-            # Symbols with the suffix `64_`
-            if "$(fname)64_" in symbols_64
-              write(file_wrapper, "\n")
-              signature64 = replace(signature, fname[1:end-1] => "$(fname)64")
-              signature64 = replace(signature64, "Cint" => "Int64")
-              write(file_wrapper, "function $signature64\n")
-              write(file_wrapper, "  @ccall libhsl_subset_64.$(fname)64_(")
+            if name_hsl_package == "libhsl"
+              (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl."
+              write(file_wrapper, "function $signature\n")
+              write(file_wrapper, "  @ccall libhsl.$fname(")
               for k = 1:narguments
                 if types[k] == ""
                   format = false
                   @warn "Unable to determine the type of $(arguments[k])"
-                else
-                  type64 = replace(types[k], "Cint" => "Int64")
-                  write(file_wrapper, "$(arguments[k])::$(type64)")
                 end
+                write(file_wrapper, "$(arguments[k])::$(types[k])")
                 (k < narguments) && write(file_wrapper, ", ")
               end
-
               # Hidden arguments
               if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types || "Ptr{Ptr{UInt8}}" ∈ types
                 verbose && @info "Hidden argument in $fname."
@@ -512,21 +522,79 @@ function main(name::String="all"; verbose::Bool=false)
                 (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
                 (types[k] == "Ptr{Ptr{UInt8}}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
               end
-
               if output_type == ""
                 format = false
                 @warn "Unable to determine the output type"
               end
               write(file_wrapper, ")::$(output_type)\n")
               write(file_wrapper, "end\n")
-            end
 
+            elseif name_hsl_package == "hsl_subset"
+              if endswith(fname, "r_")
+                variant = 0
+                for (ip_, rp_, suffix, library) in (("Int32", "Float32" , "_"    , "libhsl_subset"   ),
+                                                    ("Int32", "Float64" , "d_"   , "libhsl_subset"   ),
+                                                    ("Int32", "Float128", "q_"   , "libhsl_subset"   ),
+                                                    ("Int64", "Float32" , "_64_" , "libhsl_subset_64"),
+                                                    ("Int64", "Float64" , "d_64_", "libhsl_subset_64"),
+                                                    ("Int64", "Float128", "q_64_", "libhsl_subset_64"))
+                  variant += 1
+                  pp_fname = fname[1:end-2] * suffix
+                  (pp_fname ∉ symbols2) && (pp_fname ∉ symbols_64) && @warn "Unable to find the symbol $(pp_fname) in the shared libraries libhsl_subset and libhsl_subset_64."
+                  (pp_fname ∉ symbols2) && (pp_fname ∉ symbols_64) && continue
+
+                  (index > 1 || variant > 1) && write(file_wrapper, "\n")
+                  jname = fname[1:end-1]
+                  signature2 = replace(signature, fname => jname)
+                  signature2 = replace(signature2, "$jname(" => "$jname(::Type{$rp_}, ::Type{$ip_}, ")
+                  write(file_wrapper, "function $signature2\n")
+                  write(file_wrapper, "  @ccall $library.$(pp_fname)(")
+                  for k = 1:narguments
+                    if types[k] == ""
+                      format = false
+                      @warn "Unable to determine the type of $(arguments[k])"
+                    end
+                    type = replace(types[k], "INT" => ip_)
+                    type = replace(type, "FLOAT" => rp_)
+                    write(file_wrapper, "$(arguments[k])::$type")
+                    (k < narguments) && write(file_wrapper, ", ")
+                  end
+
+                  # Hidden arguments
+                  if "Ref{UInt8}" ∈ types || "Ptr{UInt8}" ∈ types || "Ptr{Ptr{UInt8}}" ∈ types
+                    verbose && @info "Hidden argument in $fname."
+                  end
+                  for k = 1:narguments
+                    (types[k] == "Ref{UInt8}") && write(file_wrapper, ", 1::Csize_t")
+                    (types[k] == "Ptr{UInt8}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
+                    (types[k] == "Ptr{Ptr{UInt8}}") && write(file_wrapper, ", $(strlen[arguments[k]])::Csize_t")
+                  end
+
+                  if output_type == ""
+                    format = false
+                    @warn "Unable to determine the output type"
+                  end
+                  output_type2 = replace(output_type, "FLOAT" => rp_)
+                  output_type2 = replace(output_type2, "INT" => ip_)
+                  write(file_wrapper, ")::$(output_type2)\n")
+                  write(file_wrapper, "end\n")
+                end
+              end
+            else
+              error("The collection $(name_hsl_package) is not supported.")
+            end
             index < num_fnames && write(file_wrapper, "\n")
           end
         end
         close(file_wrapper)
         format && format_file(path_wrapper, YASStyle())
       end
+    end
+  end
+
+  if print_include
+    for str in list_include
+      println(str)
     end
   end
 end
