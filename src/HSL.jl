@@ -43,6 +43,7 @@ include("wrappers.jl")
 include("hsl_ma57.jl")
 include("hsl_ma97.jl")
 include("kb07.jl")
+include("ma27.jl")
 include("mc21.jl")
 include("mc77.jl")
 

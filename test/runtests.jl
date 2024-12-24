@@ -1,6 +1,7 @@
 using HSL
 using LinearAlgebra, SparseArrays
 using Test, Random
+using Quadmath
 
 Random.seed!(666)  # Random tests are diabolical
 
@@ -10,6 +11,7 @@ if LIBHSL_isfunctional()
   include("test_hsl_ma57.jl")
   include("test_hsl_ma97.jl")
   include("test_kb07.jl")
+  include("test_ma27.jl")
   include("test_mc21.jl")
   include("test_mc77.jl")
 else
