@@ -6,14 +6,14 @@ using JuliaFormatter
 
 include("rewriter.jl")
 
-function wrapper(name::String, headers::Vector{String}, optimized::Bool)
+function wrapper(library::String, name::String, headers::Vector{String}, optimized::Bool)
 
   @info "Wrapping $name"
 
   cd(@__DIR__)
-  include_dir = joinpath(HSL_jll.artifact_dir, "include", "libhsl")
+  include_dir = joinpath(HSL_jll.artifact_dir, "include", library)
   options = load_options(joinpath(@__DIR__, "hsl.toml"))
-  options["general"]["output_file_path"] = joinpath("..", "src", "C", "$(name).jl")
+  options["general"]["output_file_path"] = joinpath("..", "src", "C", library, "$(name).jl")
 
   if name != "libhsl"
     solver = split(name, "_")[2]
@@ -46,80 +46,81 @@ function hsl_headers(include::String, package::String, precisions::Vector{Char})
   return headers
 end
 
-function main(name::String="all"; optimized::Bool=false)
-  include = joinpath(HSL_jll.artifact_dir, "include", "libhsl")
+function main(name::String="all"; library::String="libhsl", optimized::Bool=false)
+  (library == "libhsl") || (library == "hsl_subset") || error("The library $library is not supported.")
+  include = joinpath(HSL_jll.artifact_dir, "include", library)
 
   if name == "all" || name == "libhsl"
-    wrapper("libhsl", [joinpath(include, "libhsl.h")], optimized)
+    wrapper(library, "libhsl", [joinpath(include, "libhsl.h")], optimized)
   end
 
   if name == "all" || name == "hsl_ma48"
     precisions = ['s', 'd']
-    wrapper("hsl_ma48", hsl_headers(include, "hsl_ma48", precisions), optimized)
+    wrapper(library, "hsl_ma48", hsl_headers(include, "hsl_ma48", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_ma57"
     precisions = ['s', 'd']
-    wrapper("hsl_ma57", hsl_headers(include, "hsl_ma57", precisions), optimized)
+    wrapper(library, "hsl_ma57", hsl_headers(include, "hsl_ma57", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_ma77"
     precisions = ['s', 'd']
-    wrapper("hsl_ma77", hsl_headers(include, "hsl_ma77", precisions), optimized)
+    wrapper(library, "hsl_ma77", hsl_headers(include, "hsl_ma77", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_ma86"
     precisions = ['s', 'd', 'c', 'z']
-    wrapper("hsl_ma86", hsl_headers(include, "hsl_ma86", precisions), optimized)
+    wrapper(library, "hsl_ma86", hsl_headers(include, "hsl_ma86", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_ma87"
     precisions = ['s', 'd', 'c', 'z']
-    wrapper("hsl_ma87", hsl_headers(include, "hsl_ma87", precisions), optimized)
+    wrapper(library, "hsl_ma87", hsl_headers(include, "hsl_ma87", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_ma97"
     precisions = ['s', 'd', 'c', 'z']
-    wrapper("hsl_ma97", hsl_headers(include, "hsl_ma97", precisions), optimized)
+    wrapper(library, "hsl_ma97", hsl_headers(include, "hsl_ma97", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mc64"
     precisions = ['s', 'd', 'c', 'z']
-    wrapper("hsl_mc64", hsl_headers(include, "hsl_mc64", precisions), optimized)
+    wrapper(library, "hsl_mc64", hsl_headers(include, "hsl_mc64", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mc68"
     precisions = ['i']
-    wrapper("hsl_mc68", hsl_headers(include, "hsl_mc68", precisions), optimized)
+    wrapper(library, "hsl_mc68", hsl_headers(include, "hsl_mc68", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mc69"
     precisions = ['s', 'd', 'c', 'z']
-    wrapper("hsl_mc69", hsl_headers(include, "hsl_mc69", precisions), optimized)
+    wrapper(library, "hsl_mc69", hsl_headers(include, "hsl_mc69", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mc78"
     precisions = ['i', 'l']
-    wrapper("hsl_mc78", hsl_headers(include, "hsl_mc78", precisions), optimized)
+    wrapper(library, "hsl_mc78", hsl_headers(include, "hsl_mc78", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mc79"
     precisions = ['i']
-    wrapper("hsl_mc79", hsl_headers(include, "hsl_mc79", precisions), optimized)
+    wrapper(library, "hsl_mc79", hsl_headers(include, "hsl_mc79", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mi20"
     precisions = ['s', 'd']
-    wrapper("hsl_mi20", hsl_headers(include, "hsl_mi20", precisions), optimized)
+    wrapper(library, "hsl_mi20", hsl_headers(include, "hsl_mi20", precisions), optimized)
   end
 
   if name == "all" || name == "hsl_mi28"
     precisions = ['s', 'd']
-    wrapper("hsl_mi28", hsl_headers(include, "hsl_mi28", precisions), optimized)
+    wrapper(library, "hsl_mi28", hsl_headers(include, "hsl_mi28", precisions), optimized)
   end
 end
 
 # If we want to use the file as a script with `julia wrapper.jl`
 if abspath(PROGRAM_FILE) == @__FILE__
-  main()
+  main("all"; library="libhsl", optimized=true)
 end
