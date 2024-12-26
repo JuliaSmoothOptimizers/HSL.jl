@@ -19,6 +19,16 @@ mutable struct Ma48Control{T, INT}
   diagonal_pivoting::INT
   fill_in::INT
   switch_mode::INT
+
+  Ma48Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma48Control{T, INT}(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp,
+                               ldiag, btf, struct_, maxit, factor_blocking, solve_blas, pivoting,
+                               diagonal_pivoting, fill_in, switch_mode) where {T,INT}
+    return new{T, INT}(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp, ldiag,
+                       btf, struct_, maxit, factor_blocking, solve_blas, pivoting,
+                       diagonal_pivoting, fill_in, switch_mode)
+  end
 end
 
 mutable struct Ma48Ainfo{T, INT}
@@ -39,6 +49,15 @@ mutable struct Ma48Ainfo{T, INT}
   lblock::INT
   sblock::INT
   tblock::Int64
+
+  Ma48Ainfo{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma48Ainfo{T, INT}(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize,
+                             leni_factorize, ncmpa, rank, drop, struc_rank, oor, dup, stat, lblock,
+                             sblock, tblock) where {T,INT}
+    return new{T, INT}(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize, leni_factorize,
+                       ncmpa, rank, drop, struc_rank, oor, dup, stat, lblock, sblock, tblock)
+  end
 end
 
 mutable struct Ma48Finfo{T, INT}
@@ -51,12 +70,24 @@ mutable struct Ma48Finfo{T, INT}
   drop::Int64
   rank::INT
   stat::INT
+
+  Ma48Finfo{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma48Finfo{T, INT}(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop,
+                             rank, stat) where {T,INT}
+    return new{T, INT}(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop, rank,
+                       stat)
+  end
 end
 
 mutable struct Ma48Sinfo{INT}
   flag::INT
   more::INT
   stat::INT
+
+  Ma48Sinfo{INT}() where {INT} = new{INT}()
+
+  Ma48Sinfo{INT}(flag, more, stat) where {INT} = new{INT}(flag, more, stat)
 end
 
 function ma48_initialize(::Type{Float32}, ::Type{Int32}, factors)

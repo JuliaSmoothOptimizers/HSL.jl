@@ -10,6 +10,15 @@ mutable struct Ma87Control{T, INT}
   diag_zero_minus::T
   diag_zero_plus::T
   unused::NTuple{40, Cchar}
+
+  Ma87Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma87Control{T, INT}(f_arrays, diagnostics_level, unit_diagnostics, unit_error,
+                               unit_warning, nemin, nb, pool_size, diag_zero_minus, diag_zero_plus,
+                               unused) where {T,INT}
+    return new{T, INT}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning,
+                       nemin, nb, pool_size, diag_zero_minus, diag_zero_plus, unused)
+  end
 end
 
 mutable struct Ma87Info{T, INT}
@@ -23,6 +32,14 @@ mutable struct Ma87Info{T, INT}
   stat::INT
   num_zero::INT
   unused::NTuple{40, Cchar}
+
+  Ma87Info{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma87Info{T, INT}(detlog, flag, maxdepth, num_factor, num_flops, num_nodes, pool_size,
+                            stat, num_zero, unused) where {T,INT}
+    return new{T, INT}(detlog, flag, maxdepth, num_factor, num_flops, num_nodes, pool_size, stat,
+                       num_zero, unused)
+  end
 end
 
 function ma87_default_control(::Type{Float32}, ::Type{Int32}, control)

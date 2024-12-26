@@ -158,6 +158,8 @@ function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
           routine = code * "end\n"
           if name == "hsl_mc68"
             endswith(fname, "_i") || error("The symbol $fname should have the suffix _i")
+            pp_fname = replace(pp_fname, "control_d" => "control_i")
+            pp_fname = replace(pp_fname, "order_d" => "order_i")
             routine = replace(routine, "function $fname(" => "function $(fname_generic)(::Type{$ipc_}, ")
           else
             endswith(fname, "_d") || error("The symbol $fname should have the suffix _d")
@@ -191,11 +193,30 @@ function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
         structure = replace(structure, "ipc_" => "INT")
         if !contains(code, "rpc_")
           structure = replace(structure, structure_name => generic_structure_name * "{INT}")
+          types = "{INT}"
           push!(info_structures, (structure_name, generic_structure_name, false))
         else
           structure = replace(structure, structure_name => generic_structure_name * "{T,INT}")
+          types = "{T,INT}"
           push!(info_structures, (structure_name, generic_structure_name, true))
         end
+
+        # Add two constructors for each structure
+        arguments = ""
+        lines = split(code, "\n", keepempty=false)
+        for line in lines
+          if contains(line, "::")
+            argument = split(line, "::")[1][3:end]
+            if arguments == ""
+              arguments *= argument
+            else
+              arguments *= ", $argument"
+            end
+          end
+        end
+        structure = replace(structure, "end\n" => "\n  " * generic_structure_name * "$types() where $types = new$types()\nend\n")
+        structure = replace(structure, "end\n" => "\n  " * generic_structure_name * "$types($arguments) where $types = new$types($arguments)\nend\n")
+
         structures = structures * structure * "\n"
       else
         text = text * code

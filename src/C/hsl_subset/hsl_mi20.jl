@@ -22,6 +22,19 @@ mutable struct Mi20Control{T, INT}
   print::INT
   error::INT
   one_pass_coarsen::INT
+
+  Mi20Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Mi20Control{T, INT}(f_arrays, aggressive, c_fail, max_levels, max_points, reduction,
+                               st_method, st_parameter, testing, trunc_parameter, coarse_solver,
+                               coarse_solver_its, damping, err_tol, levels, pre_smoothing, smoother,
+                               post_smoothing, v_iterations, print_level, print, error,
+                               one_pass_coarsen) where {T,INT}
+    return new{T, INT}(f_arrays, aggressive, c_fail, max_levels, max_points, reduction, st_method,
+                       st_parameter, testing, trunc_parameter, coarse_solver, coarse_solver_its,
+                       damping, err_tol, levels, pre_smoothing, smoother, post_smoothing,
+                       v_iterations, print_level, print, error, one_pass_coarsen)
+  end
 end
 
 mutable struct Mi20SolveControl{T, INT}
@@ -33,6 +46,15 @@ mutable struct Mi20SolveControl{T, INT}
   max_its::INT
   preconditioner_side::INT
   rel_tol::T
+
+  Mi20SolveControl{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Mi20SolveControl{T, INT}(abs_tol, breakdown_tol, gmres_restart, init_guess,
+                                    krylov_solver, max_its, preconditioner_side,
+                                    rel_tol) where {T,INT}
+    return new{T, INT}(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver, max_its,
+                       preconditioner_side, rel_tol)
+  end
 end
 
 mutable struct Mi20Info{T, INT}
@@ -44,6 +66,13 @@ mutable struct Mi20Info{T, INT}
   getrf_info::INT
   iterations::INT
   residual::T
+
+  Mi20Info{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Mi20Info{T, INT}(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations,
+                            residual) where {T,INT}
+    return new{T, INT}(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations, residual)
+  end
 end
 
 function mi20_default_control(::Type{Float32}, ::Type{Int32}, control)

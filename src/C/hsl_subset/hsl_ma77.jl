@@ -28,6 +28,19 @@ mutable struct Ma77Control{T, INT}
   ispare::NTuple{5, INT}
   lspare::NTuple{5, Int64}
   rspare::NTuple{5, T}
+
+  Ma77Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma77Control{T, INT}(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning,
+                               bits, buffer_lpage, buffer_npage, file_size, maxstore, storage,
+                               nemin, maxit, infnorm, thresh, nb54, action, multiplier, nb64, nbi,
+                               small, static_, storage_indef, u, umin, consist_tol, ispare, lspare,
+                               rspare) where {T,INT}
+    return new{T, INT}(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning, bits,
+                       buffer_lpage, buffer_npage, file_size, maxstore, storage, nemin, maxit,
+                       infnorm, thresh, nb54, action, multiplier, nb64, nbi, small, static_,
+                       storage_indef, u, umin, consist_tol, ispare, lspare, rspare)
+  end
 end
 
 mutable struct Ma77Info{T, INT}
@@ -65,6 +78,20 @@ mutable struct Ma77Info{T, INT}
   ispare::NTuple{5, INT}
   lspare::NTuple{5, Int64}
   rspare::NTuple{5, T}
+
+  Ma77Info{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma77Info{T, INT}(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange,
+                            maxdepth, maxfront, minstore, ndelay, nfactor, nflops, niter, nsup,
+                            num_neg, num_nothresh, num_perturbed, ntwo, stat, index, nio_read,
+                            nio_write, nwd_read, nwd_write, num_file, storage, tree_nodes,
+                            unit_restart, unused, usmall, ispare, lspare, rspare) where {T,INT}
+    return new{T, INT}(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange,
+                       maxdepth, maxfront, minstore, ndelay, nfactor, nflops, niter, nsup, num_neg,
+                       num_nothresh, num_perturbed, ntwo, stat, index, nio_read, nio_write,
+                       nwd_read, nwd_write, num_file, storage, tree_nodes, unit_restart, unused,
+                       usmall, ispare, lspare, rspare)
+  end
 end
 
 function ma77_default_control(::Type{Float32}, ::Type{Int32}, control)

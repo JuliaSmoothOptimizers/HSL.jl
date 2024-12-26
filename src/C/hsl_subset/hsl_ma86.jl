@@ -14,6 +14,15 @@ mutable struct Ma86Control{T, INT}
   u::T
   umin::T
   scaling::INT
+
+  Ma86Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma86Control{T, INT}(f_arrays, diagnostics_level, unit_diagnostics, unit_error,
+                               unit_warning, nemin, nb, action, nbi, pool_size, small_, static_, u,
+                               umin, scaling) where {T,INT}
+    return new{T, INT}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning,
+                       nemin, nb, action, nbi, pool_size, small_, static_, u, umin, scaling)
+  end
 end
 
 mutable struct Ma86Info{T, INT}
@@ -33,6 +42,16 @@ mutable struct Ma86Info{T, INT}
   pool_size::INT
   stat::INT
   usmall::T
+
+  Ma86Info{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma86Info{T, INT}(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor,
+                            num_flops, num_neg, num_nodes, num_nothresh, num_perturbed, num_two,
+                            pool_size, stat, usmall) where {T,INT}
+    return new{T, INT}(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor,
+                       num_flops, num_neg, num_nodes, num_nothresh, num_perturbed, num_two,
+                       pool_size, stat, usmall)
+  end
 end
 
 function ma86_default_control(::Type{Float32}, ::Type{Int32}, control)
