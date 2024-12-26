@@ -29,16 +29,16 @@ mutable struct ma77_control{T}
   lspare::NTuple{5, Clong}
   rspare::NTuple{5, T}
 
-  ma77_control{T}() where {T} = new()
+  ma77_control{T}() where {T} = new{T}()
 
   function ma77_control{T}(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning, bits,
                            buffer_lpage, buffer_npage, file_size, maxstore, storage, nemin, maxit,
                            infnorm, thresh, nb54, action, multiplier, nb64, nbi, small, static_,
                            storage_indef, u, umin, consist_tol, ispare, lspare, rspare) where {T}
-    return new(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning, bits,
-               buffer_lpage, buffer_npage, file_size, maxstore, storage, nemin, maxit, infnorm,
-               thresh, nb54, action, multiplier, nb64, nbi, small, static_, storage_indef, u, umin,
-               consist_tol, ispare, lspare, rspare)
+    return new{T}(f_arrays, print_level, unit_diagnostics, unit_error, unit_warning, bits,
+                  buffer_lpage, buffer_npage, file_size, maxstore, storage, nemin, maxit, infnorm,
+                  thresh, nb54, action, multiplier, nb64, nbi, small, static_, storage_indef, u,
+                  umin, consist_tol, ispare, lspare, rspare)
   end
 end
 
@@ -82,17 +82,18 @@ mutable struct ma77_info{T}
   lspare::NTuple{5, Clong}
   rspare::NTuple{5, T}
 
-  ma77_info{T}() where {T} = new()
+  ma77_info{T}() where {T} = new{T}()
 
   function ma77_info{T}(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange,
                         maxdepth, maxfront, minstore, ndelay, nfactor, nflops, niter, nsup, num_neg,
                         num_nothresh, num_perturbed, ntwo, stat, index, nio_read, nio_write,
                         nwd_read, nwd_write, num_file, storage, tree_nodes, unit_restart, unused,
                         usmall, ispare, lspare, rspare) where {T}
-    return new(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange, maxdepth,
-               maxfront, minstore, ndelay, nfactor, nflops, niter, nsup, num_neg, num_nothresh,
-               num_perturbed, ntwo, stat, index, nio_read, nio_write, nwd_read, nwd_write, num_file,
-               storage, tree_nodes, unit_restart, unused, usmall, ispare, lspare, rspare)
+    return new{T}(detlog, detsign, flag, iostat, matrix_dup, matrix_rank, matrix_outrange, maxdepth,
+                  maxfront, minstore, ndelay, nfactor, nflops, niter, nsup, num_neg, num_nothresh,
+                  num_perturbed, ntwo, stat, index, nio_read, nio_write, nwd_read, nwd_write,
+                  num_file, storage, tree_nodes, unit_restart, unused, usmall, ispare, lspare,
+                  rspare)
   end
 end
 

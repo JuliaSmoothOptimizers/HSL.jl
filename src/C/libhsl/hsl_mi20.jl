@@ -23,17 +23,17 @@ mutable struct mi20_control{T}
   error::Cint
   one_pass_coarsen::Cint
 
-  mi20_control{T}() where {T} = new()
+  mi20_control{T}() where {T} = new{T}()
 
   function mi20_control{T}(f_arrays, aggressive, c_fail, max_levels, max_points, reduction,
                            st_method, st_parameter, testing, trunc_parameter, coarse_solver,
                            coarse_solver_its, damping, err_tol, levels, pre_smoothing, smoother,
                            post_smoothing, v_iterations, print_level, print, error,
                            one_pass_coarsen) where {T}
-    return new(f_arrays, aggressive, c_fail, max_levels, max_points, reduction, st_method,
-               st_parameter, testing, trunc_parameter, coarse_solver, coarse_solver_its, damping,
-               err_tol, levels, pre_smoothing, smoother, post_smoothing, v_iterations, print_level,
-               print, error, one_pass_coarsen)
+    return new{T}(f_arrays, aggressive, c_fail, max_levels, max_points, reduction, st_method,
+                  st_parameter, testing, trunc_parameter, coarse_solver, coarse_solver_its, damping,
+                  err_tol, levels, pre_smoothing, smoother, post_smoothing, v_iterations,
+                  print_level, print, error, one_pass_coarsen)
   end
 end
 
@@ -51,12 +51,12 @@ mutable struct mi20_solve_control{T}
   preconditioner_side::Cint
   rel_tol::T
 
-  mi20_solve_control{T}() where {T} = new()
+  mi20_solve_control{T}() where {T} = new{T}()
 
   function mi20_solve_control{T}(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver,
                                  max_its, preconditioner_side, rel_tol) where {T}
-    return new(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver, max_its,
-               preconditioner_side, rel_tol)
+    return new{T}(abs_tol, breakdown_tol, gmres_restart, init_guess, krylov_solver, max_its,
+                  preconditioner_side, rel_tol)
   end
 end
 
@@ -74,11 +74,11 @@ mutable struct mi20_info{T}
   iterations::Cint
   residual::T
 
-  mi20_info{T}() where {T} = new()
+  mi20_info{T}() where {T} = new{T}()
 
   function mi20_info{T}(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations,
                         residual) where {T}
-    return new(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations, residual)
+    return new{T}(flag, clevels, cpoints, cnnz, stat, getrf_info, iterations, residual)
   end
 end
 

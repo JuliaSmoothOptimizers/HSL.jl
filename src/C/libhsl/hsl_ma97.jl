@@ -19,14 +19,14 @@ mutable struct ma97_control{T}
   ispare::NTuple{5, Cint}
   rspare::NTuple{10, T}
 
-  ma97_control{T}() where {T} = new()
+  ma97_control{T}() where {T} = new{T}()
 
   function ma97_control{T}(f_arrays, action, nemin, multiplier, ordering, print_level, scaling,
                            small, u, unit_diagnostics, unit_error, unit_warning, factor_min,
                            solve_blas3, solve_min, solve_mf, consist_tol, ispare, rspare) where {T}
-    return new(f_arrays, action, nemin, multiplier, ordering, print_level, scaling, small, u,
-               unit_diagnostics, unit_error, unit_warning, factor_min, solve_blas3, solve_min,
-               solve_mf, consist_tol, ispare, rspare)
+    return new{T}(f_arrays, action, nemin, multiplier, ordering, print_level, scaling, small, u,
+                  unit_diagnostics, unit_error, unit_warning, factor_min, solve_blas3, solve_min,
+                  solve_mf, consist_tol, ispare, rspare)
   end
 end
 
@@ -56,15 +56,15 @@ mutable struct ma97_info{T}
   ispare::NTuple{4, Cint}
   rspare::NTuple{10, T}
 
-  ma97_info{T}() where {T} = new()
+  ma97_info{T}() where {T} = new{T}()
 
   function ma97_info{T}(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange,
                         matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor, num_flops,
                         num_neg, num_sup, num_two, ordering, stat, maxsupernode, ispare,
                         rspare) where {T}
-    return new(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange, matrix_missing_diag,
-               maxdepth, maxfront, num_delay, num_factor, num_flops, num_neg, num_sup, num_two,
-               ordering, stat, maxsupernode, ispare, rspare)
+    return new{T}(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange,
+                  matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor, num_flops,
+                  num_neg, num_sup, num_two, ordering, stat, maxsupernode, ispare, rspare)
   end
 end
 

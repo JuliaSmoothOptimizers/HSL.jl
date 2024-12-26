@@ -24,14 +24,14 @@ mutable struct ma48_control{T}
   fill_in::Cint
   switch_mode::Cint
 
-  ma48_control{T}() where {T} = new()
+  ma48_control{T}() where {T} = new{T}()
 
   function ma48_control{T}(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp,
                            ldiag, btf, struct_, maxit, factor_blocking, solve_blas, pivoting,
                            diagonal_pivoting, fill_in, switch_mode) where {T}
-    return new(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp, ldiag, btf,
-               struct_, maxit, factor_blocking, solve_blas, pivoting, diagonal_pivoting, fill_in,
-               switch_mode)
+    return new{T}(f_arrays, multiplier, u, switch_, drop, tolerance, cgce, lp, wp, mp, ldiag, btf,
+                  struct_, maxit, factor_blocking, solve_blas, pivoting, diagonal_pivoting, fill_in,
+                  switch_mode)
   end
 end
 
@@ -58,13 +58,13 @@ mutable struct ma48_ainfo{T}
   sblock::Cint
   tblock::Clong
 
-  ma48_ainfo{T}() where {T} = new()
+  ma48_ainfo{T}() where {T} = new{T}()
 
   function ma48_ainfo{T}(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize,
                          leni_factorize, ncmpa, rank, drop, struc_rank, oor, dup, stat, lblock,
                          sblock, tblock) where {T}
-    return new(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize, leni_factorize, ncmpa,
-               rank, drop, struc_rank, oor, dup, stat, lblock, sblock, tblock)
+    return new{T}(ops, flag, more, lena_analyse, lenj_analyse, lena_factorize, leni_factorize,
+                  ncmpa, rank, drop, struc_rank, oor, dup, stat, lblock, sblock, tblock)
   end
 end
 
@@ -79,11 +79,11 @@ mutable struct ma48_finfo{T}
   rank::Cint
   stat::Cint
 
-  ma48_finfo{T}() where {T} = new()
+  ma48_finfo{T}() where {T} = new{T}()
 
   function ma48_finfo{T}(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop, rank,
                          stat) where {T}
-    return new(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop, rank, stat)
+    return new{T}(ops, flag, more, size_factor, lena_factorize, leni_factorize, drop, rank, stat)
   end
 end
 
