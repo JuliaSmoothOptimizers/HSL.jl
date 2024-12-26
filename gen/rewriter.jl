@@ -79,8 +79,6 @@ function libhsl_rewrite!(path::String, name::String, optimized::Bool)
         if contains(code, "mutable struct")
           structure = code * "end\n"
           structure_name = split(split(code, "mutable struct ")[2], "\n")[1]
-          structure = replace(structure, "end\n" => "\n  " * structure_name * "() where T = new()\nend\n")
-
           arguments = ""
           lines = split(code, "\n", keepempty=false)
           for line in lines
@@ -93,7 +91,8 @@ function libhsl_rewrite!(path::String, name::String, optimized::Bool)
               end
             end
           end
-          structure = replace(structure, "end\n" => "\n  " * structure_name * "($arguments) where T = new($arguments)\nend\n")
+          structure = replace(structure, "end\n" => "\n  " * structure_name * "() where T = new{T}()\nend\n")
+          structure = replace(structure, "end\n" => "\n  " * structure_name * "($arguments) where T = new{T}($arguments)\nend\n")
           text = text * structure
         else
           text = text * code * "end\n"
@@ -106,9 +105,12 @@ function libhsl_rewrite!(path::String, name::String, optimized::Bool)
           text = replace(text, "$(solver)_sinfo{$type}" => "$(solver)_sinfo")
           text = replace(text, Regex("$(solver)_sinfo(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_sinfo\\1"))
         end
+        text = replace(text, "ma48_sinfo() = new{T}()" => "ma48_sinfo() = new()")
+        text = replace(text, "ma48_sinfo(flag, more, stat) = new{T}(flag, more, stat)" => "ma48_sinfo(flag, more, stat) = new(flag, more, stat)")
       end
 
       if name == "hsl_mc64"
+        text = replace(text, "new{T}" => "new")
         for type in ("T", "Float32", "Float64")
           text = replace(text, "$(solver)_control{$type}" => "$(solver)_control")
           text = replace(text, Regex("$(solver)_control(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_control\\1"))
@@ -118,6 +120,7 @@ function libhsl_rewrite!(path::String, name::String, optimized::Bool)
       end
 
       if name == "hsl_mc68" || name == "hsl_mc78" || name == "hsl_mc79"
+        text = replace(text, "new{T}" => "new")
         for type in ("T", "Cint", "Clong")
           text = replace(text, "$(solver)_control{$type}" => "$(solver)_control")
           text = replace(text, Regex("$(solver)_control(\\([^)]*\\)) where T") => SubstitutionString("$(solver)_control\\1"))

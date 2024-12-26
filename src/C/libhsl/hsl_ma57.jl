@@ -28,16 +28,16 @@ mutable struct ma57_control{T}
   ispare::NTuple{5, Cint}
   rspare::NTuple{10, T}
 
-  ma57_control{T}() where {T} = new()
+  ma57_control{T}() where {T} = new{T}()
 
   function ma57_control{T}(f_arrays, multiplier, reduce, u, static_tolerance, static_level,
                            tolerance, convergence, consist, lp, wp, mp, sp, ldiag, nemin,
                            factorblocking, solveblocking, la, liw, maxla, maxliw, pivoting, thresh,
                            ordering, scaling, rank_deficient, ispare, rspare) where {T}
-    return new(f_arrays, multiplier, reduce, u, static_tolerance, static_level, tolerance,
-               convergence, consist, lp, wp, mp, sp, ldiag, nemin, factorblocking, solveblocking,
-               la, liw, maxla, maxliw, pivoting, thresh, ordering, scaling, rank_deficient, ispare,
-               rspare)
+    return new{T}(f_arrays, multiplier, reduce, u, static_tolerance, static_level, tolerance,
+                  convergence, consist, lp, wp, mp, sp, ldiag, nemin, factorblocking, solveblocking,
+                  la, liw, maxla, maxliw, pivoting, thresh, ordering, scaling, rank_deficient,
+                  ispare, rspare)
   end
 end
 
@@ -70,12 +70,12 @@ mutable struct ma57_ainfo{T}
   ispare::NTuple{5, Cint}
   rspare::NTuple{10, T}
 
-  ma57_ainfo{T}() where {T} = new()
+  ma57_ainfo{T}() where {T} = new{T}()
 
   function ma57_ainfo{T}(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu,
                          niradu, ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare) where {T}
-    return new(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu, niradu,
-               ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare)
+    return new{T}(opsa, opse, flag, more, nsteps, nrltot, nirtot, nrlnec, nirnec, nrladu, niradu,
+                  ncmpa, ordering, oor, dup, maxfrt, stat, ispare, rspare)
   end
 end
 
@@ -115,14 +115,14 @@ mutable struct ma57_finfo{T}
   ispare::NTuple{5, Cint}
   rspare::NTuple{10, T}
 
-  ma57_finfo{T}() where {T} = new()
+  ma57_finfo{T}() where {T} = new{T}()
 
   function ma57_finfo{T}(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu,
                          nirbdu, nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay,
                          signc, static_, modstep, rank, stat, ispare, rspare) where {T}
-    return new(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu, nirbdu,
-               nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay, signc, static_,
-               modstep, rank, stat, ispare, rspare)
+    return new{T}(opsa, opse, opsb, maxchange, smin, smax, flag, more, maxfrt, nebdu, nrlbdu,
+                  nirbdu, nrltot, nirtot, nrlnec, nirnec, ncmpbr, ncmpbi, ntwo, neig, delay, signc,
+                  static_, modstep, rank, stat, ispare, rspare)
   end
 end
 
@@ -144,10 +144,10 @@ mutable struct ma57_sinfo{T}
   ispare::NTuple{5, Cint}
   rspare::NTuple{10, T}
 
-  ma57_sinfo{T}() where {T} = new()
+  ma57_sinfo{T}() where {T} = new{T}()
 
   function ma57_sinfo{T}(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare) where {T}
-    return new(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare)
+    return new{T}(cond, cond2, berr, berr2, error, flag, stat, ispare, rspare)
   end
 end
 

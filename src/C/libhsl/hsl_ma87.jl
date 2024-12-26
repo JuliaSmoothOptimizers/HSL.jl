@@ -11,12 +11,12 @@ mutable struct ma87_control{T}
   diag_zero_plus::T
   unused::NTuple{40, Cchar}
 
-  ma87_control{T}() where {T} = new()
+  ma87_control{T}() where {T} = new{T}()
 
   function ma87_control{T}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning,
                            nemin, nb, pool_size, diag_zero_minus, diag_zero_plus, unused) where {T}
-    return new(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin, nb,
-               pool_size, diag_zero_minus, diag_zero_plus, unused)
+    return new{T}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin,
+                  nb, pool_size, diag_zero_minus, diag_zero_plus, unused)
   end
 end
 
@@ -36,12 +36,12 @@ mutable struct ma87_info{T}
   num_zero::Cint
   unused::NTuple{40, Cchar}
 
-  ma87_info{T}() where {T} = new()
+  ma87_info{T}() where {T} = new{T}()
 
   function ma87_info{T}(detlog, flag, maxdepth, num_factor, num_flops, num_nodes, pool_size, stat,
                         num_zero, unused) where {T}
-    return new(detlog, flag, maxdepth, num_factor, num_flops, num_nodes, pool_size, stat, num_zero,
-               unused)
+    return new{T}(detlog, flag, maxdepth, num_factor, num_flops, num_nodes, pool_size, stat,
+                  num_zero, unused)
   end
 end
 

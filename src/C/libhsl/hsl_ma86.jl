@@ -15,13 +15,13 @@ mutable struct ma86_control{T}
   umin::T
   scaling::Cint
 
-  ma86_control{T}() where {T} = new()
+  ma86_control{T}() where {T} = new{T}()
 
   function ma86_control{T}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning,
                            nemin, nb, action, nbi, pool_size, small_, static_, u, umin,
                            scaling) where {T}
-    return new(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin, nb,
-               action, nbi, pool_size, small_, static_, u, umin, scaling)
+    return new{T}(f_arrays, diagnostics_level, unit_diagnostics, unit_error, unit_warning, nemin,
+                  nb, action, nbi, pool_size, small_, static_, u, umin, scaling)
   end
 end
 
@@ -47,13 +47,13 @@ mutable struct ma86_info{T}
   stat::Cint
   usmall::T
 
-  ma86_info{T}() where {T} = new()
+  ma86_info{T}() where {T} = new{T}()
 
   function ma86_info{T}(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor,
                         num_flops, num_neg, num_nodes, num_nothresh, num_perturbed, num_two,
                         pool_size, stat, usmall) where {T}
-    return new(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor, num_flops,
-               num_neg, num_nodes, num_nothresh, num_perturbed, num_two, pool_size, stat, usmall)
+    return new{T}(detlog, detsign, flag, matrix_rank, maxdepth, num_delay, num_factor, num_flops,
+                  num_neg, num_nodes, num_nothresh, num_perturbed, num_two, pool_size, stat, usmall)
   end
 end
 
