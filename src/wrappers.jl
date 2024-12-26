@@ -19,6 +19,17 @@ include("C/libhsl/hsl_mc79.jl")
 include("C/libhsl/hsl_mi20.jl")
 include("C/libhsl/hsl_mi28.jl")
 
+include("C/hsl_subset/hsl_ma48.jl")
+include("C/hsl_subset/hsl_ma57.jl")
+include("C/hsl_subset/hsl_ma77.jl")
+include("C/hsl_subset/hsl_ma86.jl")
+include("C/hsl_subset/hsl_ma87.jl")
+include("C/hsl_subset/hsl_ma97.jl")
+include("C/hsl_subset/hsl_mc64.jl")
+include("C/hsl_subset/hsl_mc68.jl")
+include("C/hsl_subset/hsl_mi20.jl")
+include("C/hsl_subset/hsl_mi28.jl")
+
 # Wrappers for HSL packages written in Fortran 77
 include("Fortran/libhsl/btf.jl")
 include("Fortran/libhsl/ea16.jl")

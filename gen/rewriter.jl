@@ -134,6 +134,7 @@ end
 function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
   text = read(path, String)
   structures = ""
+  info_structures = Tuple{String, String, Bool}[]
   if optimized
     text = replace(text, "struct " => "mutable struct ")
     text = replace(text, "hsl_longc_" => Int64)
@@ -166,6 +167,10 @@ function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
           routine = replace(routine, "ipc_" => ipc_)
           routine = replace(routine, "rpc_" => rpc_)
 
+          # Update the type of the structures
+          routine = replace(routine, "_d}" => "_d{$rpc_,$ipc_}}")
+          routine = replace(routine, "_i}" => "_i{$rpc_,$ipc_}}")
+
           # Float128 should be passed by value as a Cfloat128
           routine = replace(routine, "::Float128" => "::Cfloat128")
 
@@ -173,7 +178,7 @@ function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
         end
       elseif contains(code, "struct")
         structure = code * "end\n"
-        structure_name = split(split(code, "struct ")[2], "\n")[1]
+        structure_name = split(split(code, "struct ")[2], "\n")[1] |> String
         generic_structure_name = structure_name[1:end-2] |> String
         generic_structure_name = 'M' * generic_structure_name[2:end]
         generic_structure_name = replace(generic_structure_name, "_solve_control" => "SolveControl")
@@ -186,8 +191,10 @@ function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
         structure = replace(structure, "ipc_" => "INT")
         if !contains(code, "rpc_")
           structure = replace(structure, structure_name => generic_structure_name * "{INT}")
+          push!(info_structures, (structure_name, generic_structure_name, false))
         else
           structure = replace(structure, structure_name => generic_structure_name * "{T,INT}")
+          push!(info_structures, (structure_name, generic_structure_name, true))
         end
         structures = structures * structure * "\n"
       else
@@ -197,6 +204,18 @@ function hsl_subset_rewrite!(path::String, name::String, optimized::Bool)
   end
   text = structures * "\n" * text
   startswith(text, '\n') && (text = text[2:end])
+
+  # Rename the structures in the wrappers
+  for (old_struct, new_struct, bool) in info_structures
+    if bool
+      text = replace(text, "Ptr{$old_struct" => "Ref{$new_struct")
+    else
+      for precision in ("Float32", "Float64", "Float128")
+        text = replace(text, "Ptr{$old_struct{$precision,Int32}}" => "Ref{$new_struct{Int32}}")
+        text = replace(text, "Ptr{$old_struct{$precision,Int64}}" => "Ref{$new_struct{Int64}}")
+      end
+    end
+  end
 
   write(path, text)
   format_file(path, YASStyle())
