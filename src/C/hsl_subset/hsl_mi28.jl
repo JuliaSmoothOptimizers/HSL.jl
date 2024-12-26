@@ -14,6 +14,15 @@ mutable struct Mi28Control{T, INT}
   tau2::T
   unit_error::INT
   unit_warning::INT
+
+  Mi28Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Mi28Control{T, INT}(f_arrays, alpha, check, iorder, iscale, lowalpha, maxshift, rrt,
+                               shift_factor, shift_factor2, small, tau1, tau2, unit_error,
+                               unit_warning) where {T,INT}
+    return new{T, INT}(f_arrays, alpha, check, iorder, iscale, lowalpha, maxshift, rrt,
+                       shift_factor, shift_factor2, small, tau1, tau2, unit_error, unit_warning)
+  end
 end
 
 mutable struct Mi28Info{T, INT}
@@ -33,6 +42,15 @@ mutable struct Mi28Info{T, INT}
   size_r::Int64
   stat::INT
   alpha::T
+
+  Mi28Info{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Mi28Info{T, INT}(band_after, band_before, dup, flag, flag61, flag64, flag68, flag77,
+                            nrestart, nshift, oor, profile_before, profile_after, size_r, stat,
+                            alpha) where {T,INT}
+    return new{T, INT}(band_after, band_before, dup, flag, flag61, flag64, flag68, flag77, nrestart,
+                       nshift, oor, profile_before, profile_after, size_r, stat, alpha)
+  end
 end
 
 function mi28_default_control(::Type{Float32}, ::Type{Int32}, control)

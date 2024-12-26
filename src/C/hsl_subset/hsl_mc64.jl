@@ -5,6 +5,12 @@ mutable struct Mc64Control{INT}
   sp::INT
   ldiag::INT
   checking::INT
+
+  Mc64Control{INT}() where {INT} = new{INT}()
+
+  function Mc64Control{INT}(f_arrays, lp, wp, sp, ldiag, checking) where {INT}
+    return new{INT}(f_arrays, lp, wp, sp, ldiag, checking)
+  end
 end
 
 mutable struct Mc64Info{INT}
@@ -12,6 +18,10 @@ mutable struct Mc64Info{INT}
   more::INT
   strucrank::INT
   stat::INT
+
+  Mc64Info{INT}() where {INT} = new{INT}()
+
+  Mc64Info{INT}(flag, more, strucrank, stat) where {INT} = new{INT}(flag, more, strucrank, stat)
 end
 
 function mc64_default_control(::Type{Float32}, ::Type{Int32}, control)

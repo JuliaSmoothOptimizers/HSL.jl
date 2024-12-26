@@ -18,6 +18,17 @@ mutable struct Ma97Control{T, INT}
   consist_tol::T
   ispare::NTuple{5, INT}
   rspare::NTuple{10, T}
+
+  Ma97Control{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma97Control{T, INT}(f_arrays, action, nemin, multiplier, ordering, print_level, scaling,
+                               small, u, unit_diagnostics, unit_error, unit_warning, factor_min,
+                               solve_blas3, solve_min, solve_mf, consist_tol, ispare,
+                               rspare) where {T,INT}
+    return new{T, INT}(f_arrays, action, nemin, multiplier, ordering, print_level, scaling, small,
+                       u, unit_diagnostics, unit_error, unit_warning, factor_min, solve_blas3,
+                       solve_min, solve_mf, consist_tol, ispare, rspare)
+  end
 end
 
 mutable struct Ma97Info{T, INT}
@@ -41,6 +52,17 @@ mutable struct Ma97Info{T, INT}
   maxsupernode::INT
   ispare::NTuple{4, INT}
   rspare::NTuple{10, T}
+
+  Ma97Info{T, INT}() where {T,INT} = new{T, INT}()
+
+  function Ma97Info{T, INT}(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange,
+                            matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor,
+                            num_flops, num_neg, num_sup, num_two, ordering, stat, maxsupernode,
+                            ispare, rspare) where {T,INT}
+    return new{T, INT}(flag, flag68, flag77, matrix_dup, matrix_rank, matrix_outrange,
+                       matrix_missing_diag, maxdepth, maxfront, num_delay, num_factor, num_flops,
+                       num_neg, num_sup, num_two, ordering, stat, maxsupernode, ispare, rspare)
+  end
 end
 
 function ma97_default_control(::Type{Float32}, ::Type{Int32}, control)
