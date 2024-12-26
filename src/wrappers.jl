@@ -180,3 +180,29 @@ include("Fortran/hsl_subset/mi24.jl")
 include("Fortran/hsl_subset/mi26.jl")
 include("Fortran/hsl_subset/ym01.jl")
 include("Fortran/hsl_subset/ym11.jl")
+
+# MadNLP
+is_supported(::Val{:ma27}, ::DataType) = false
+is_supported(::Val{:ma27}, ::Type{Float32}) = true
+is_supported(::Val{:ma27}, ::Type{Float64}) = true
+is_supported(::Val{:ma27}, ::Type{Float128}) = LIBHSL_version() ≥ v"2024.11.28"
+
+is_supported(::Val{:ma57}, ::DataType) = false
+is_supported(::Val{:ma57}, ::Type{Float32}) = true
+is_supported(::Val{:ma57}, ::Type{Float64}) = true
+is_supported(::Val{:ma57}, ::Type{Float128}) = LIBHSL_version() > v"2024.11.28"
+
+is_supported(::Val{:hsl_ma77}, ::DataType) = false
+is_supported(::Val{:hsl_ma77}, ::Type{Float32}) = true
+is_supported(::Val{:hsl_ma77}, ::Type{Float64}) = true
+is_supported(::Val{:hsl_ma77}, ::Type{Float128}) = LIBHSL_version() > v"2024.11.28"
+
+is_supported(::Val{:hsl_ma86}, ::DataType) = false
+is_supported(::Val{:hsl_ma86}, ::Type{Float32}) = true
+is_supported(::Val{:hsl_ma86}, ::Type{Float64}) = true
+is_supported(::Val{:hsl_ma86}, ::Type{Float128}) = LIBHSL_version() > v"2024.11.28"
+
+is_supported(::Val{:hsl_ma97}, ::DataType) = false
+is_supported(::Val{:hsl_ma97}, ::Type{Float32}) = true
+is_supported(::Val{:hsl_ma97}, ::Type{Float64}) = true
+is_supported(::Val{:hsl_ma97}, ::Type{Float128}) = LIBHSL_version() > v"2024.11.28"
