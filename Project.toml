@@ -11,7 +11,7 @@ Quadmath = "be4d8f0f-7fa4-5f49-b795-2f01399ab2dd"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
-HSL_jll = "4, 2024"
+HSL_jll = "4, 2024, 2025"
 Libdl = "1.9"
 LinearAlgebra = "1.9"
 OpenBLAS32_jll = "0.3.9"
