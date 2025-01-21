@@ -30,12 +30,14 @@ jobs:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
       - uses: julia-actions/julia-buildpkg@latest
+      - name: Set HSL_VERSION as environment variable
+        run: echo "HSL_VERSION=${{ matrix.hsl-version }}" >> $GITHUB_ENV
       - name: Install HSL_jll.jl
         shell: julia --color=yes {0}
         run: |
           using Pkg
           Pkg.activate("/scratch/github-actions/actions_runner_hsl/_work/HSL.jl/HSL.jl")
-          path_HSL_jll = "/scratch/github-actions/actions_runner_hsl/HSL_jll.jl.v" * ENV["hsl-version"]
+          path_HSL_jll = "/scratch/github-actions/actions_runner_hsl/HSL_jll.jl.v" * ENV["HSL_VERSION"]
           Pkg.develop(path=path_HSL_jll)
       - name: Test HSL.jl
         shell: julia --color=yes {0}
