@@ -35,13 +35,9 @@ Another special case occurs when $H = -I$, $G = 0$ and $c = 0$, which correspond
 
 ## HSL_MA97
 
-Supported versions:
-* 2.6.0
-* 2.7.0
+[HSL_MA97](https://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html): an OpenMP-based direct solver for symmetric linear systems. Example:
 
-[HSL_MA97](http://www.hsl.rl.ac.uk/catalogue/hsl_ma97.html): an OpenMP-based direct solver for symmetric linear systems. Example:
-
-```JULIA
+```julia
 using MatrixMarket
 using HSL
 
@@ -59,33 +55,33 @@ There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
 When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
-```JULIA
+```julia
 (r, x) = ma97_solve(A, b)
 ```
 returns $x$ that solves \eqref{LS} and residual $r := b - Ax$ corresponding to $y$ in \eqref{SP}.
 The call
-```JULIA
+```julia
 (r, x) = ma97_least_squares(A, b)
 ```
 is also defined, and is equivalent to the above.
 
 When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
-```JULIA
+```julia
 (x, y) = ma97_solve(A, b)
 ```
 returns $x$ that solves \eqref{LN} and $y$ such that $x = -A^T y$ (and therefore $A A^T (-y) = b$).
 The call
-```JULIA
+```julia
 (x, y) = ma97_min_norm(A, b)
 ```
 is also defined, and is equivalent to the above.
 
 ## HSL_MA57
 
-[HSL_MA57](http://www.hsl.rl.ac.uk/specs/ma57.pdf) version 5.2.0:
+[HSL_MA57](https://www.hsl.rl.ac.uk/specs/ma57.pdf):
 a sparse, multifrontal solver for symmetric linear systems. Example:
 
-```JULIA
+```julia
 using MatrixMarket
 using HSL
 
@@ -108,29 +104,29 @@ There is a convenience interface to solve rectangular systems that complements
 the sparse QR factorization in Julia.
 
 When $A$ is $m$-by-$n$ with $m \geq n$ and has full column rank,
-```JULIA
+```julia
 (r, x) = ma57_solve(A, b)
 ```
 returns $x$ that solves \eqref{LS} and residual $r := b - Ax$ corresponding to $y$ in \eqref{SP}.
 The call
-```JULIA
+```julia
 (r, x) = ma57_least_squares(A, b)
 ```
 is also defined, and is equivalent to the above.
 
 When $A$ is $m$-by-$n$ with $m \leq n$ and has full row rank,
-```JULIA
+```julia
 (x, y) = ma57_solve(A, b)
 ```
 returns $x$ that solves \eqref{LN} and $y$ such that $x = -A^T y$ (and therefore $A A^T (-y) = b$).
 The call
-```JULIA
+```julia
 (x, y) = ma57_min_norm(A, b)
 ```
 is also defined, and is equivalent to the above. Example:
 
 
-```JULIA
+```julia
 using MatrixMarket
 using HSL
 
