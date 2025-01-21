@@ -21,6 +21,7 @@ jobs:
         os: [ubuntu-24.04]
         julia-version: ['1.10', '1.11']
         julia-arch: [x64]
+        hsl-version: ['2024.11.28', '2025.1.19']
 
     steps:
       - uses: actions/checkout@v4
@@ -29,8 +30,20 @@ jobs:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
       - uses: julia-actions/julia-buildpkg@latest
-      - uses: julia-actions/julia-runtest@latest
+      - name: Install HSL_jll.jl
+        shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.activate("/scratch/github-actions/actions_runner_hsl/_work/HSL.jl/HSL.jl")
+          path_HSL_jll = "/scratch/github-actions/actions_runner_hsl/HSL_jll.jl.v" * ENV["hsl-version"]
+          Pkg.develop(path=path_HSL_jll)
+      - name: Test HSL.jl
+        shell: julia --color=yes {0}
+        run: |
+          using Pkg
+          Pkg.develop(path=".")
+          Pkg.test("HSL")
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v5
         with:
           file: lcov.info
