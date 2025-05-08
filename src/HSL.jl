@@ -45,6 +45,8 @@ include("hsl_ma97.jl")
 include("kb07.jl")
 include("mc19.jl")
 include("mc21.jl")
+include("mc29.jl")
+include("mc30.jl")
 include("mc77.jl")
 
 end

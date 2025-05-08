@@ -5,6 +5,8 @@ export mc19
 
 Compute diagonal scaling factors for the square sparse matrix `A` so that the nonzeros of the scaled
 matrix are as close to unity as possible in a least-squares logarithmic sense.
+
+We highly recommend to use [`mc29`](@ref) and [`mc30`](@ref) instead of `mc19`.
 """
 function mc19 end
 
