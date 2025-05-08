@@ -1,4 +1,4 @@
-using HSL
+using HSL, Quadmath
 using LinearAlgebra, SparseArrays
 using Test, Random
 
