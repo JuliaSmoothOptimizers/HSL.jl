@@ -1,30 +1,30 @@
 export mc77
 
-mutable struct mc77_control{T}
-  icntl::Vector{Cint}
+mutable struct mc77_control{T,INT}
+  icntl::Vector{INT}
   cntl::Vector{T}
 end
 
-function mc77_control{T}() where T
-  icntl = zeros(Cint, 10)
+function mc77_control{T,INT}() where {T,INT}
+  icntl = zeros(INT, 10)
   cntl = zeros(T, 10)
-  return mc77_control{T}(icntl, cntl)
+  return mc77_control{T,INT}(icntl, cntl)
 end
 
-mutable struct mc77_info{T}
-  info::Vector{Cint}
+mutable struct mc77_info{T,INT}
+  info::Vector{INT}
   rinfo::Vector{T}
 end
 
-function mc77_info{T}() where T
-  info = zeros(Cint, 10)
+function mc77_info{T,INT}() where {T,INT}
+  info = zeros(INT, 10)
   rinfo = zeros(T, 10)
-  return mc77_info{T}(info, rinfo)
+  return mc77_info{T,INT}(info, rinfo)
 end
 
 """
-    Dr, Dc = mc77(A::SparseMatrixCSC{T}, job::Integer; symmetric::Bool=false)
-    Dr, Dc = mc77(m::Integer, n::Integer, rows::Vector{Cint}, cols::Vector{Cint}, nzval::Vector{T}, job::Integer; symmetric::Bool=false)
+    Dr, Dc = mc77(A::SparseMatrixCSC{T,INT}, job::Integer; symmetric::Bool=false)
+    Dr, Dc = mc77(m::Integer, n::Integer, rows::Vector{INT}, cols::Vector{INT}, nzval::Vector{T}, job::Integer; symmetric::Bool=false)
     Dr, Dc = mc77(A::Matrix{T}, job::Integer)
 
 * job=0 Equilibrate the infinity norm of rows and columns in matrix A.
@@ -35,7 +35,7 @@ If the matrix is sparse and `symmetric` is set to `true`, only the lower triangu
 
 Let A be an m × n real matrix, and ‖•‖ₚ, p ∈ [1, ∞] a p-norm for real vectors.
 mc77 computes the scaling diagonal matrices Dr and Dc such that the p-norms of all columns and rows of
-A̅ = (Dr)⁻¹A(Dc)⁻¹ are approximately equal to 1.
+A̅ = (Dr)⁻¹ * A * (Dc)⁻¹ are approximately equal to 1.
 
 When A is symmetric Dr = Dc.
 In the case m ≠ n, mc77 allows the use of the ∞-norm only.
@@ -51,15 +51,15 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
                                                   (:mc77ic, :mc77ac, :mc77bc, :mc77cc, :ComplexF32, :Float32),
                                                   (:mc77iz, :mc77az, :mc77bz, :mc77cz, :ComplexF64, :Float64))
   @eval begin
-    function mc77(A::SparseMatrixCSC{$elty}, job::Integer; symmetric::Bool=false)
+    function mc77(A::SparseMatrixCSC{$elty,Cint}, job::Integer; symmetric::Bool=false)
       (job == -1) && error("job=$job is not supported.")
       m,n = size(A)
       nz = nnz(A)
       jcst = A.colptr
       irn = A.rowval
       a = A.nzval
-      control = mc77_control{$subty}()
-      info = mc77_info{$subty}()
+      control = mc77_control{$subty, Cint}()
+      info = mc77_info{$subty, Cint}()
       $iname(control.icntl, control.cntl)
       control.icntl[4] = 1
       if symmetric
@@ -87,8 +87,8 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
       irn = rows
       jcn = cols
       a = nzval
-      control = mc77_control{$subty}()
-      info = mc77_info{$subty}()
+      control = mc77_control{$subty, Cint}()
+      info = mc77_info{$subty, Cint}()
       $iname(control.icntl, control.cntl)
       control.icntl[4] = 1
       if symmetric
@@ -112,8 +112,8 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
       (job == -1) && error("job=$job is not supported.")
       m,n = size(A)
       lda = max(1,stride(A,2))
-      control = mc77_control{$subty}()
-      info = mc77_info{$subty}()
+      control = mc77_control{$subty, Cint}()
+      info = mc77_info{$subty, Cint}()
       $iname(control.icntl, control.cntl)
       symmetric = false
       if symmetric
@@ -133,4 +133,61 @@ for (iname, aname, bname, cname, elty, subty) in ((:mc77i , :mc77a , :mc77b , :m
       return Dr, Dc
     end
   end
+end
+
+function mc77(A::SparseMatrixCSC{T,Int64}, job::Integer; symmetric::Bool=false) where T <: Union{Float32, Float64, Float128}
+      (job == -1) && error("job=$job is not supported.")
+      m,n = size(A)
+      nz = nnz(A)
+      jcst = A.colptr
+      irn = A.rowval
+      a = A.nzval
+      control = mc77_control{T, Int64}()
+      info = mc77_info{T, Int64}()
+      mc77ir(T, Int64, control.icntl, control.cntl)
+      control.icntl[4] = 1
+      if symmetric
+        control.icntl[6] == 1
+        liw = m
+        ldw = control.icntl[5] == 0 ? nz + 2*m : 2*m
+      else
+        liw = m+n
+        ldw = control.icntl[5] == 0 ? nz + 2*(m+n) : 2*(m+n)
+      end
+      iw = zeros(Int64, liw)
+      dw = zeros(T, ldw)
+      mc77ar(T, Int64, job, m, n, nz, jcst, irn, a, iw, liw, dw, ldw, control.icntl, control.cntl, info.info, info.rinfo)
+      Dr = dw[1:m]
+      Dc = symmetric ? Dr : dw[m+1:m+n]
+      (info.info[1] == 0) || error("MC77 failed!")
+      return Dr, Dc
+    end
+
+function mc77(m::Integer, n::Integer, rows::Vector{Int64},
+              cols::Vector{Int64}, nzval::Vector{T},
+              job::Integer; symmetric::Bool=false) where T <: Union{Float32, Float64, Float128}
+  (job == -1) && error("job=$job is not supported.")
+  nz = length(nzval)
+  irn = rows
+  jcn = cols
+  a = nzval
+  control = mc77_control{T, Int64}()
+  info = mc77_info{T, Int64}()
+  mc77ir(T, Int64, control.icntl, control.cntl)
+  control.icntl[4] = 1
+  if symmetric
+    control.icntl[6] == 1
+    liw = m
+    ldw = control.icntl[5] == 0 ? nz + 2*m : 2*m
+  else
+    liw = m+n
+    ldw = control.icntl[5] == 0 ? nz + 2*(m+n) : 2*(m+n)
+  end
+  iw = zeros(Int64, liw)
+  dw = zeros(T, ldw)
+  mc77br(T, Int64, job, m, n, nz, irn, jcn, a, iw, liw, dw, ldw, control.icntl, control.cntl, info.info, info.rinfo)
+  Dr = dw[1:m]
+  Dc = symmetric ? Dr : dw[m+1:m+n]
+  (info.info[1] == 0) || error("MC77 failed!")
+  return Dr, Dc
 end

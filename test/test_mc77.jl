@@ -11,7 +11,7 @@
        0.0073 -0.2651 0.7685;
             0  0.7632 0.1924] 
 
-  for T ∈ (Float32, Float64, ComplexF32, ComplexF64)
+  @testset "$T -- Cint" for T ∈ (Float32, Float64, ComplexF32, ComplexF64)
     R = real(T)
     for M ∈ (Matrix{T}(A), SparseMatrixCSC{T,Cint}(A))
       Dr, Dc = mc77(M, 0)
@@ -33,6 +33,38 @@
         Dr, Dc = mc77(m, n, rows, cols, vals, 1)
         @test round.(Dr, digits=3) ≈ R[10.479; 56.578; 0.452]
         @test round.(Dc, digits=3) ≈ R[9.650; 66.675; 0.115]
+      end
+    end
+  end
+
+  @testset "$T -- Int64" for T ∈ (Float32, Float64, Float128)
+    M = SparseMatrixCSC{T,Int64}(A)
+    Dr, Dc = mc77(M, 0)
+    if T != Float128
+      @test round.(Dr, digits=3) ≈ T[10; 31.623; 0.729]
+      @test round.(Dc, digits=3) ≈ T[10; 31.623; 0.159]
+    end
+
+    Dr, Dc = mc77(M, 1)
+    if T != Float128
+      @test round.(Dr, digits=3) ≈ T[10.479; 56.578; 0.452]
+      @test round.(Dc, digits=3) ≈ T[9.650; 66.675; 0.115]
+    end
+
+    if isa(M, SparseMatrixCSC)
+      m,n = size(M)
+      rows, cols, vals = findnz(M)
+
+      Dr, Dc = mc77(m, n, rows, cols, vals, 0)
+      if T != Float128
+        @test round.(Dr, digits=3) ≈ T[10; 31.623; 0.729]
+        @test round.(Dc, digits=3) ≈ T[10; 31.623; 0.159]
+      end
+
+      Dr, Dc = mc77(m, n, rows, cols, vals, 1)
+      if T != Float128
+        @test round.(Dr, digits=3) ≈ T[10.479; 56.578; 0.452]
+        @test round.(Dc, digits=3) ≈ T[9.650; 66.675; 0.115]
       end
     end
   end
