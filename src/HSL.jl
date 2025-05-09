@@ -20,7 +20,7 @@ else
 end
 
 function __init__()
-  if HSL_INSTALLATION == "ARTIFACT" && VERSION ≥ v"1.9"
+  if HSL_INSTALLATION == "ARTIFACT"
     config = LinearAlgebra.BLAS.lbt_get_config()
     if !any(lib -> lib.interface == :lp64, config.loaded_libs)
       LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
@@ -42,6 +42,7 @@ include("wrappers.jl")
 # Interfaces
 include("hsl_ma57.jl")
 include("hsl_ma97.jl")
+include("hsl_mc64.jl")
 include("kb07.jl")
 include("mc19.jl")
 include("mc21.jl")

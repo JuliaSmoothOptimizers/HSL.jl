@@ -9,7 +9,7 @@ Random.seed!(666)  # Random tests are diabolical
 if LIBHSL_isfunctional()
   include("test_hsl_ma57.jl")
   include("test_hsl_ma97.jl")
-  # include("test_hsl_mc64.jl")
+  include("test_hsl_mc64.jl")
   include("test_kb07.jl")
   include("test_mc19.jl")
   include("test_mc21.jl")
