@@ -6,6 +6,6 @@ A = sparse(iA, jA, vA, 4, 4)
 @testset "mc64" begin
   @testset "$T -- $INT" for T in (Float32, Float64, Float128), INT in (Int32, Int64)
     M = SparseMatrixCSC{T,INT}(A)
-    mc64(M, 5)
+    rp, cp, u, v = mc64(M)
   end
 end
