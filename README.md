@@ -25,5 +25,5 @@ Pkg.develop(path = "/full/path/to/HSL_jll.jl")
 
 ## Additional resources
 
-* [GERAD report (Cahier du GERAD)](http://dx.doi.org/10.13140/RG.2.2.30649.54889)
-* [Poster on Julia and HSL solvers](http://dx.doi.org/10.13140/RG.2.2.35632.26883)
+* [Technical report on libHSL](http://dx.doi.org/10.13140/RG.2.2.30649.54889)
+* [Poster on libHSL](http://dx.doi.org/10.13140/RG.2.2.35632.26883)
