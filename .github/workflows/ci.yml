@@ -14,7 +14,7 @@ jobs:
   test-moonshot:
     env:
       CUDA_VISIBLE_DEVICES: 1
-      JULIA_DEPOT_PATH: /scratch/github-actions/julia_depot_hsl
+      JULIA_DEPOT_PATH: /scratch/github-actions/julia_depot_alexis
     runs-on: self-hosted
     strategy:
       matrix:
