@@ -160,7 +160,7 @@ HSL.solve!(ma86, b)
                 # Test allocations
                 @test getallocs(A, b) == 0
             end
-            
+
             # Test HSL Errors
             # Prints out annoying warning message from MC78.
             # Not sure how to avoid this.
@@ -175,4 +175,3 @@ HSL.solve!(ma86, b)
         end
     end
 end
-

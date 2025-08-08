@@ -1,92 +1,7 @@
-export Ma86, Ma86_Control, Ma86_Info
-
-const Ma86Data = Union{Float32, Float64, ComplexF32, ComplexF64}
-const Ma86Real = Union{Cfloat, Cdouble}
-
-function appendtype(fname, T)
-  typesuffix = Dict(Float32=>"s", Float64=>"d", ComplexF32=>"c", ComplexF64=>"z")
-  return string(fname) * "_" * typesuffix[T]
-end
-
-"""
-    Ma86_Control
-
-A simple wrapper around the C control structure for C HSL Ma86 interface. Consult HSL 
-  documentation for more details.
-"""
-mutable struct Ma86_Control{S <: Ma86Real}
-  f_arrays::Cint
-  diagnostics_level::Cint
-  unit_diagnostics::Cint
-  unit_error::Cint
-  unit_warning::Cint
-  nemin::Cint
-  nb::Cint
-  action::Cint
-  nbi::Cint
-  bool_size::Cint
-  small_::S
-  static_::S
-  u::S
-  umin::S
-  scaling::Cint
-  function Ma86_Control(::Type{T}) where T
-    S = data_map[T]
-    control = new{S}(0,0,0,0,0,0,0,0,0,0,zero(S),zero(S),zero(S),zero(S),0)
-    ma86_default_control(T,control)
-    control.f_arrays = 1  # Use 1-based indexing for arrays, avoiding copies.
-    return control
-  end
-end
-Ma86_Control{S}() where S <: Ma86Real = Ma86_Control(S)
-
-"""
-    Ma86_Info
-
-A simple wrapper around the C info structure for C HSL Ma86 interface. Consult HSL 
-  documentation for more details.
-"""
-mutable struct Ma86_Info{S <: Ma86Real}
-  detlog::S
-  detsign::Cint
-  flag::Cint
-  matrix_rank::Cint
-  maxdepth::Cint
-  num_delay::Cint
-  num_factor::Clong
-  num_flops::Clong
-  num_neg::Cint
-  num_nodes::Cint
-  num_nothresh::Cint
-  num_perturbed::Cint
-  num_two::Cint
-  pool_size::Cint
-  stat::Cint
-  usmall::S
-  function Ma86_Info(::Type{T}) where T <: Ma86Data
-    S = data_map[T]
-    new{S}(
-      zero(S), zero(Cint), zero(Cint), zero(Cint), zero(Cint), zero(Cint), zero(Clong), 
-      zero(Clong), zero(Cint), zero(Cint), zero(Cint), zero(Cint), zero(Cint), zero(Cint), 
-      zero(Cint), zero(S)
-    )
-  end
-end
-Ma86_Info{S}() where S <: Ma86Real = Ma86_Info(S)
-
-##############################
-# Convenience Wrapper Types 
-##############################
-struct Keep
-  ptr::Vector{Ptr{Cvoid}}
-end
-@inline Base.cconvert(::Type{Ref{Ptr{Cvoid}}}, akeep::Keep) = akeep.ptr
-@inline Base.unsafe_convert(::Type{Ptr{Ptr{Cvoid}}}, akeep::Keep) = 
-  Base.unsafe_convert(Ptr{Ptr{Cvoid}}, akeep.ptr)
-Keep() = Keep([C_NULL])
-isnull(akeep::Keep) = akeep.ptr[1] == C_NULL
+export Ma86
 
 const matrix_types86 = (herm_indef = Cint(-4), cmpl_indef = Cint(-5))
+
 const jobs86 = (
   A    = Cint(0),  # Solve Ax = b
   PL   = Cint(1),  # Solve PLx = b
@@ -101,7 +16,7 @@ Base.@kwdef mutable struct Ma86_Flags
 end
 
 """
-    Ma86{T,S}
+    Ma86{T,INT}
 
 Type for the HSL Ma86 solver, a multithreaded solver for symmetric indefinite or 
 symmetric positive definite systems.
@@ -148,58 +63,54 @@ analysis step must then be called manually before calling either `factor!` or
 To return the solution matrix, use `x = ma86 \\ b`, or to overwrite the `b` matrix use 
 `ldiv!(ma86, b)`.
 """
-mutable struct Ma86{T<:Ma86Data, S<:Ma86Real}
-  __keep::Keep
-  n::Cint
-  colptr::Vector{Cint}
-  rowval::Vector{Cint}
+mutable struct Ma86{T, INT}
+  __keep::Ref{Ptr{Cvoid}}
+  n::INT
+  colptr::Vector{INT}
+  rowval::Vector{INT}
   nzval::Vector{T}
-  control::Ma86_Control{S}
-  info::Ma86_Info{S}
-  order::Vector{Cint}
-  scale::Vector{S}
+  control::Ma86Control{T, INT}
+  info::Ma86Info{T, INT}
+  order::Vector{INT}
+  scale::Vector{T}
   flags::Ma86_Flags
-  function Ma86(colptr::Vector{<:Integer}, rowval::Vector{<:Integer}, nzval::Vector{T}, 
-                control::Ma86_Control{S}, info::Ma86_Info{S}, order::Vector{<:Integer}, 
-                scale::Vector{<:Real}; doanalyse::Bool=true) where {T <: Ma86Data, S}
-    S == data_map[T] || throw(TypeError(:Ma86, "MA86{$T, $S}\n", data_map[T], T))
-    keep = Keep()
+  function Ma86(colptr::Vector{INT}, rowval::Vector{INT}, nzval::Vector{T}, 
+                control::Ma86Control{T,INT}, info::Ma86Info{T,INT}, order::Vector{INT}, 
+                scale::Vector{T}; doanalyse::Bool=true) where {T, INT}
+    keep = Ref{Ptr{Cvoid}}()
     n = length(colptr) - 1
     @assert length(order) == n
     @assert length(scale) == n
     flags = Ma86_Flags()
-    ma86 = new{T,S}(keep, n, colptr, rowval, nzval, control, info, order, scale, flags)
+    ma86 = new{T,INT}(keep, n, colptr, rowval, nzval, control, info, order, scale, flags)
     if doanalyse
       analyse!(ma86)
     end
     finalizer(_finalize, ma86)
   end
 end
-function Ma86(colptr::Vector{<:Integer}, rowval::Vector{<:Integer}, nzval::Vector{T}; 
-              control::Ma86_Control=Ma86_Control(T), 
-              info::Ma86_Info=Ma86_Info(T), 
-              order::Vector{<:Integer}=collect(1:length(colptr)-1),
-              scale::Vector{<:Real}=fill(one(data_map[T]), length(colptr)-1),
-              kwargs...) where T
+function Ma86(colptr::Vector{INT}, rowval::Vector{INT}, nzval::Vector{T}; 
+              control::Ma86Control=Ma86Control{T,INT}(), 
+              info::Ma86Info=Ma86Info{T,INT}(), 
+              order::Vector{INT}=collect(1:length(colptr)-1),
+              scale::Vector{T}=fill(one(data_map[T]), length(colptr)-1),
+              kwargs...) where {T, INT}
   # Assumes the data is already lower triangular
   Ma86(colptr, rowval, nzval, control, info, order, scale; kwargs...)
 end
+
 function Ma86(A::SparseMatrixCSC; kwargs...)
   if !istril(A)
     A = tril(A)
   end
   Ma86(A.colptr, A.rowval, A.nzval; kwargs...)
 end
-datatype(::Ma86{T}) where T = T
-realtype(::Ma86{<:Any,S}) where S = S
 
-function _finalize(m::Ma86{T}) where T
-  if !isnull(m.__keep)
-    ma86_finalise(T, m.__keep, m.control)
-  end
+function _finalize(m::Ma86{T,INT}) where {T, INT}
+  (m.__keep[] != C_NULL) && ma86_finalise(T, INT, m.__keep, m.control)
   m.flags.isanalysisdone = false
   m.flags.isfactordone = false
-  m.__keep.ptr[1] = C_NULL
+  m.__keep[] = C_NULL
   return m
 end
 
@@ -228,45 +139,41 @@ end
 # Convenience Wrapper
 ##############################
 
-function analyse!(m::Ma86{T}) where T
-  ma86_analyse(T, m.n, m.colptr, m.rowval, m.order, m.__keep, m.control, m.info)
+function analyse!(m::Ma86{T,INT}) where {T,INT}
+  ma86_analyse(T, INT, m.n, m.colptr, m.rowval, m.order, m.__keep, m.control, m.info)
   checkerror(m, "MA86: Error during symbol analysis.")
   m.flags.isanalysisdone = true
   return nothing
 end
 
-function factor!(m::Ma86{<:Ma86Data}; matrix_type::Integer=matrix_types86.herm_indef)
-  if isnull(m.__keep) || !m.flags.isanalysisdone
+function factor!(m::Ma86{T,INT}; matrix_type::Integer=matrix_types86.herm_indef) where {T,INT}
+  if (m.__keep == C_NULL) || !m.flags.isanalysisdone
     error("Cannot call factor! before analyse!")
     return nothing
   end
-  ma86_factor(
-    Cint(matrix_type), m.n, m.colptr, m.rowval, m.nzval, m.order, m.__keep, m.control, m.info, 
-    m.scale
-  )
+  ma86_factor(T, INT, matrix_type, m.n, m.colptr, m.rowval, m.nzval, m.order, m.__keep, m.control, m.info, m.scale)
   checkerror(m, "MA86: Error during factorization.")
   m.flags.isfactordone = true
   return nothing
 end
 
-function solve!(m::Ma86{T}, x::VecOrMat{T}; job::Integer=jobs86.A) where T
+function solve!(m::Ma86{T,INT}, x::VecOrMat{T}; job::Integer=jobs86.A) where {T,INT}
   if !m.flags.isanalysisdone || !m.flags.isfactordone
     error("Cannot call solve! before factor!")
     return x
   end
   size(x,1) != m.n && throw(DimensionMismatch("x must have $(m.n) rows, got $(size(x,1))."))
-  ldx = Cint(stride(x,2))
-  nrhs = Cint(size(x,2))
-  ma86_solve(Cint(job), nrhs, ldx, x, m.order, m.__keep, m.control, m.info)
+  ma86_solve(T, INT, job, nrhs, ldx, x, m.order, m.__keep, m.control, m.info)
   checkerror(m, "MA86: Error during solve.")
   return x
 end
-solve(m::Ma86{T}, b::VecOrMat{T}; kwargs...) where T = solve!(m, copy(b); kwargs...)
 
-function factorsolve!(m::Ma86{T}, x::VecOrMat{T}; 
+solve(m::Ma86{T,INT}, b::VecOrMat{T}; kwargs...) where {T,INT} = solve!(m, copy(b); kwargs...)
+
+function factorsolve!(m::Ma86{T,INT}, x::VecOrMat{T}; 
   matrix_type::Integer=matrix_types86.herm_indef
-) where T <: Ma86Data
-  if isnull(m.__keep) || !m.flags.isanalysisdone
+) where {T,INT}
+  if (m.__keep == C_NULL) || !m.flags.isanalysisdone
     error("Cannot call factorsolve! before analyse!")
     return x 
   end
@@ -274,7 +181,7 @@ function factorsolve!(m::Ma86{T}, x::VecOrMat{T};
   ldx = Cint(stride(x,2))
   nrhs = Cint(size(x,2))
   ma86_factor_solve(
-    Cint(matrix_type), m.n, m.colptr, m.rowval, m.nzval, m.order, m.__keep, m.control, m.info, 
+    T, INT, INT(matrix_type), m.n, m.colptr, m.rowval, m.nzval, m.order, m.__keep, m.control, m.info, 
     nrhs, ldx, x, m.scale
   )
   checkerror(m, "MA86: Error during factorsolve.")
@@ -283,149 +190,19 @@ function factorsolve!(m::Ma86{T}, x::VecOrMat{T};
 end
 
 # Out-of-place version
-factorsolve(m::Ma86{T}, b::VecOrMat{T}; kwargs...) where T <: Ma86Data = 
+function factorsolve(m::Ma86{T}, b::VecOrMat{T}; kwargs...) where T
   factorsolve!(m, copy(b); kwargs...)
+end
 
 # LinearAlgebra wrappers
-function Base.:\(m::Ma86{T}, b::VecOrMat{T}) where T <: Ma86Data 
+function Base.:\(m::Ma86{T}, b::VecOrMat{T}) where T
   !m.flags.isanalysisdone && analyse!(m)
   m.flags.isfactordone && return solve(m, b)
   factorsolve(m, b)
 end
 
-function LinearAlgebra.ldiv!(m::Ma86{T}, x::VecOrMat{T}) where T <: Ma86Data
+function LinearAlgebra.ldiv!(m::Ma86{T}, x::VecOrMat{T}) where T
   !m.flags.isanalysisdone && analyse!(m)
   m.flags.isfactordone && return solve!(m, x)
   factorsolve!(m, x)
-end
-
-##############################
-# C Wrapper
-##############################
-
-for T in (Float32, Float64, ComplexF32, ComplexF64) 
-  S = data_map[T]
-
-  @eval function ma86_default_control(::Type{$T}, control::Ma86_Control{$S})
-    ccall(($(appendtype(:ma86_default_control, T)), libhsl_ma86), Cvoid,
-      (Ref{Ma86_Control{$S}},),
-      control
-    )
-  end
-
-  # Add type as argument to avoid ambiguity
-  @eval function ma86_analyse(::Type{$T}, n::Cint, ptr::Vector{Cint}, row::Vector{Cint}, 
-                              order::Vector{Cint}, keep::Keep, control::Ma86_Control, 
-                              info::Ma86_Info)
-    @assert length(ptr) == n+1
-    @assert ptr[end] == length(row) + 1
-    @assert length(order) == n
-    ccall(($(appendtype(:ma86_analyse, T)), libhsl_ma86), Cvoid,
-      (Cint, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Ptr{Cvoid}}, Ref{Ma86_Control{$S}}, 
-      Ref{Ma86_Info{$S}}),
-      n, ptr, row, order, keep, control, info
-    )
-  end
-
-  if T <: Ma86Real
-    # Note that matrix_type argument is unused in these methods
-    # Included to make the signature match for all data types
-    @eval function ma86_factor(matrix_type::Cint, n::Cint, ptr::Vector{Cint}, row::Vector{Cint}, val::Vector{$T}, 
-                              order::Vector{Cint}, keep::Keep, control::Ma86_Control{$S}, 
-                              info::Ma86_Info{$S}, scale::Vector{$S})
-      @assert length(ptr) == n+1
-      @assert length(row) + 1 == ptr[end]
-      @assert length(val) + 1 == ptr[end]
-      @assert length(order) == n
-      ccall(($(appendtype(:ma86_factor, T)), libhsl_ma86), Cvoid,
-        (Cint, Ref{Cint}, Ref{Cint}, Ref{$T}, Ref{Cint}, Ptr{Ptr{Cvoid}}, 
-        Ref{Ma86_Control{$S}}, Ref{Ma86_Info{$S}}, Ref{$S}),
-        n, ptr, row, val, order, keep, control, info, scale
-      )
-    end
-
-    @eval function ma86_factor_solve(matrix_type::Cint, n::Cint, ptr::Vector{Cint}, row::Vector{Cint}, 
-                                    val::Vector{$T}, order::Vector{Cint}, keep::Keep, 
-                                    control::Ma86_Control{$S}, info::Ma86_Info{$S}, 
-                                    nrhs::Cint, ldx::Cint, x::VecOrMat{$T}, 
-                                    scale::Vector{$S})
-      @assert length(ptr) == n+1
-      @assert length(row) + 1 == ptr[end]
-      @assert length(val) + 1 == ptr[end]
-      @assert length(order) == n
-      @assert nrhs >= 1
-      @assert ldx >= n
-      @assert length(scale) == n
-      @assert size(x,1) == n
-      @assert size(x,2) == nrhs
-      ccall(($(appendtype(:ma86_factor_solve, T)), libhsl_ma86), Cvoid,
-        (Cint, Ref{Cint}, Ref{Cint}, Ref{$T}, Ref{Cint}, Ptr{Ptr{Cvoid}}, 
-        Ref{Ma86_Control{$S}}, Ref{Ma86_Info{$S}}, Cint, Cint, Ref{$T}, Ref{$S}),
-        n, ptr, row, val, order, keep, control, info, nrhs, ldx, x, scale
-      )
-    end
-  else
-    @eval function ma86_factor(matrix_type::Cint, n::Cint, ptr::Vector{Cint}, 
-                               row::Vector{Cint}, val::Vector{$T}, 
-                               order::Vector{Cint}, keep::Keep, control::Ma86_Control{$S}, 
-                               info::Ma86_Info{$S}, scale::Vector{$S})
-      @assert matrix_type ∈ (-4,-5)
-      @assert length(ptr) == n+1
-      @assert length(row) + 1 == ptr[end]
-      @assert length(val) + 1 == ptr[end]
-      @assert length(order) == n
-      ccall(($(appendtype(:ma86_factor, T)), libhsl_ma86), Cvoid,
-        (Cint, Cint, Ref{Cint}, Ref{Cint}, Ref{$T}, Ref{Cint}, Ptr{Ptr{Cvoid}}, 
-        Ref{Ma86_Control{$S}}, Ref{Ma86_Info{$S}}, Ref{$S}),
-        matrix_type, n, ptr, row, val, order, keep, control, info, scale
-      )
-    end
-
-    @eval function ma86_factor_solve(matrix_type::Cint, n::Cint, ptr::Vector{Cint}, 
-                                     row::Vector{Cint}, val::Vector{$T}, 
-                                     order::Vector{Cint}, keep::Keep, 
-                                     control::Ma86_Control{$S}, info::Ma86_Info{$S}, 
-                                     nrhs::Cint, ldx::Cint, x::VecOrMat{$T}, 
-                                     scale::Vector{$S})
-      @assert matrix_type ∈ (-4,-5)
-      @assert length(ptr) == n+1
-      @assert length(row) + 1 == ptr[end]
-      @assert length(val) + 1 == ptr[end]
-      @assert length(order) == n
-      @assert nrhs >= 1
-      @assert ldx >= n
-      @assert length(scale) == n
-      @assert size(x,1) == n
-      @assert size(x,2) == nrhs
-      ccall(($(appendtype(:ma86_factor_solve, T)), libhsl_ma86), Cvoid,
-        (Cint, Cint, Ref{Cint}, Ref{Cint}, Ref{$T}, Ref{Cint}, Ptr{Ptr{Cvoid}}, 
-        Ref{Ma86_Control{$S}}, Ref{Ma86_Info{$S}}, Cint, Cint, Ref{$T}, Ref{$S}),
-        matrix_type, n, ptr, row, val, order, keep, control, info, nrhs, ldx, x, scale
-      )
-    end
-  end
-
-  @eval function ma86_solve(job::Cint, nrhs::Cint, ldx::Cint, x::VecOrMat{$T}, 
-                          order::Vector{Cint}, keep::Keep, control::Ma86_Control{$S}, 
-                          info::Ma86_Info{$S})
-    n = size(x,1)
-    @assert job ∈ 0:4
-    @assert nrhs >= 1
-    @assert ldx >= n
-    @assert size(x,2) == nrhs
-    ccall(($(appendtype(:ma86_solve, T)), libhsl_ma86), Cvoid,
-      (Cint, Cint, Cint, Ref{$T}, Ref{Cint}, Ptr{Ptr{Cvoid}}, Ref{Ma86_Control{$S}},
-      Ref{Ma86_Info{$S}}, Ptr{$S}),
-      job, nrhs, ldx, x, order, keep, control, info, C_NULL 
-    )
-  end
-
-  # Add type as argument to avoid ambiguity
-  @eval function ma86_finalise(::Type{$T}, keep::Keep, control::Ma86_Control{$S})
-    ccall(($(appendtype(:ma86_finalise, T)), libhsl_ma86), Cvoid,
-      (Ptr{Ptr{Cvoid}}, Ref{Ma86_Control{$S}}),
-      keep, control
-    )
-  end
-
 end
