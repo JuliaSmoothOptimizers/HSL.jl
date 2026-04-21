@@ -6,6 +6,8 @@ using SparseArrays
 using Quadmath
 
 import OpenBLAS32_jll
+import CompilerSupportLibraries_jll
+libgomp::String = CompilerSupportLibraries_jll.libgomp
 import HSL_jll
 libhsl::String = HSL_jll.libhsl
 libhsl_subset::String = HSL_jll.libhsl_subset

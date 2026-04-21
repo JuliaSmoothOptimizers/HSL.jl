@@ -3,6 +3,7 @@ uuid = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
 version = "0.5.3"
 
 [deps]
+CompilerSupportLibraries_jll = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 HSL_jll = "017b0a0e-03f4-516a-9b91-836bbd1904dd"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -11,6 +12,7 @@ Quadmath = "be4d8f0f-7fa4-5f49-b795-2f01399ab2dd"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
+CompilerSupportLibraries_jll = "1.0.5"
 HSL_jll = "4, 2024, 2025"
 Libdl = "1.9"
 LinearAlgebra = "1.9"
