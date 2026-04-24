@@ -13,8 +13,9 @@ function pa16cd(a, n, root, e, w, f, ig, cr)
                         w::Ptr{ComplexF64}, f::Ptr{Float64}, ig::Ptr{Cint}, cr::Ptr{Float64})::Cvoid
 end
 
-function pa16dd(z, n, a)
-  @ccall libhsl.pa16dd_(z::Ref{ComplexF64}, n::Ref{Cint}, a::Ptr{ComplexF64})::ComplexF64
+function pa16dd(result, z, n, a)
+  @ccall libhsl.pa16dd_(result::Ref{ComplexF64}, z::Ref{ComplexF64}, n::Ref{Cint},
+                        a::Ptr{ComplexF64})::Cvoid
 end
 
 function pa16a(a, n, root, e, w, f, ig)
@@ -32,6 +33,7 @@ function pa16c(a, n, root, e, w, f, ig, cr)
                        w::Ptr{ComplexF32}, f::Ptr{Float32}, ig::Ptr{Cint}, cr::Ptr{Float32})::Cvoid
 end
 
-function pa16d(z, n, a)
-  @ccall libhsl.pa16d_(z::Ref{ComplexF32}, n::Ref{Cint}, a::Ptr{ComplexF32})::ComplexF32
+function pa16d(result, z, n, a)
+  @ccall libhsl.pa16d_(result::Ref{ComplexF32}, z::Ref{ComplexF32}, n::Ref{Cint},
+                       a::Ptr{ComplexF32})::Cvoid
 end

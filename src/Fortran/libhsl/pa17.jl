@@ -13,6 +13,7 @@ function pa17cd(a, n, root, e, w, ig, cr)
                         w::Ptr{Float64}, ig::Ptr{Cint}, cr::Ptr{Float64})::Cvoid
 end
 
-function pa17dd(z, n, a)
-  @ccall libhsl.pa17dd_(z::Ref{ComplexF64}, n::Ref{Cint}, a::Ptr{Float64})::ComplexF64
+function pa17dd(result, z, n, a)
+  @ccall libhsl.pa17dd_(result::Ref{ComplexF64}, z::Ref{ComplexF64}, n::Ref{Cint},
+                        a::Ptr{Float64})::Cvoid
 end
