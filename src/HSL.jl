@@ -7,11 +7,11 @@ using Quadmath
 
 import OpenBLAS32_jll
 import CompilerSupportLibraries_jll
-libgomp::String = CompilerSupportLibraries_jll.libgomp
+libgomp::String = CompilerSupportLibraries_jll.libgomp_path
 import HSL_jll
-libhsl::String = HSL_jll.libhsl
-libhsl_subset::String = HSL_jll.libhsl_subset
-libhsl_subset_64::String = HSL_jll.libhsl_subset_64
+libhsl::String = HSL_jll.libhsl_path
+libhsl_subset::String = HSL_jll.libhsl_subset_path
+libhsl_subset_64::String = HSL_jll.libhsl_subset_64_path
 
 function __init__()
   if haskey(ENV, "JULIA_HSL_LIBRARY_PATH")
