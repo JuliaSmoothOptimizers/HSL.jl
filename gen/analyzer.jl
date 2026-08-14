@@ -4,7 +4,8 @@ using JuliaFormatter
 
 # libHSL
 name_hsl_package = "libhsl"
-release = "2024.11.28"
+# release = "2024.11.28"
+release = "2025.6.26"
 libhsl = "/home/alexis/Bureau/git/hsl/libhsl/libHSL.v$release/"
 
 # HSL_SUBSET
@@ -31,6 +32,29 @@ hsl_precision = Dict{Char, String}('i' => "integer",
                                    'd' => "double",
                                    'c' => "complex",
                                    'z' => "double_complex")
+
+julia_to_c = Dict{String, String}("Cvoid" => "void ",
+                                  "UInt8" => "char ",
+                                  "Ref{UInt8}" => "char *",
+                                  "Ptr{UInt8}" => "char *",
+                                  "Float32" => "float ",
+                                  "Ref{Float32}" => "float *",
+                                  "Ptr{Float32}" => "float *",
+                                  "Float64" => "double ",
+                                  "Ref{Float64}" => "double *",
+                                  "Ptr{Float64}" => "double *",
+                                  "Cint" => "int ",
+                                  "Ref{Cint}" => "int *",
+                                  "Ptr{Cint}" => "int *",
+                                  "Int64" => "long ",
+                                  "Ref{Int64}" => "long *",
+                                  "Ptr{Int64}" => "long *",
+                                  "ComplexF32" => "float _Complex ",
+                                  "Ref{ComplexF32}" => "float _Complex *",
+                                  "Ptr{ComplexF32}" => "float _Complex *",
+                                  "ComplexF64" => "double _Complex ",
+                                  "Ref{ComplexF64}" => "double _Complex *",
+                                  "Ptr{ComplexF64}" => "double _Complex *",)
 
 # Function to easily get the extension of a file
 function file_extension(file::String)
@@ -444,6 +468,9 @@ function main(name::String="all"; verbose::Bool=false, f90::Bool=false, print_in
   # We use it to update src/wrappers.jl
   list_include = String[]
 
+  # path_header = joinpath(@__DIR__, "headers", "libhsl", "libhsl.h")
+  # file_header = open(path_header, "w")
+
   for (root, dirs, files) in walkdir(libhsl)
 
     # We don't want to go inside "examples", metis" and "libhsl" folders
@@ -463,6 +490,11 @@ function main(name::String="all"; verbose::Bool=false, f90::Bool=false, print_in
 
         path_wrapper = joinpath(@__DIR__, "..", "src", "Fortran", name_hsl_package, "$(package).jl") |> normpath
         file_wrapper = open(path_wrapper, "w")
+        path_header = joinpath(@__DIR__, "headers", "libhsl", "$(package).h")
+        file_header = open(path_header, "w")
+
+        # write(file_header, '\n')
+        write(file_header, "/* C interface to Fortran routines from $(uppercase(package)) */\n")
         
         # Debug mode (also replace `package == name` by `'/' ∉ package`)
         # path_wrapper = joinpath("..", "src", "Fortran", "debug.jl")
@@ -503,8 +535,14 @@ function main(name::String="all"; verbose::Bool=false, f90::Bool=false, print_in
 
             if name_hsl_package == "libhsl"
               (fname ∉ symbols) && @warn "Unable to find the symbol $fname in the shared library libhsl."
-              write(file_wrapper, "function $signature\n")
-              write(file_wrapper, "  @ccall libhsl.$fname(")
+              if output_type ∉ ("Cvoid", "Cint", "Float32", "Float64")
+                signature = replace(signature, "$(fname[1:end-1])(" => "$(fname[1:end-1])(result,")
+                write(file_wrapper, "function $signature\n")
+                write(file_wrapper, "  @ccall libhsl.$fname(result::Ref{$(output_type)}, ")
+              else
+                write(file_wrapper, "function $signature\n")
+                write(file_wrapper, "  @ccall libhsl.$fname(")
+              end
               for k = 1:narguments
                 if types[k] == ""
                   format = false
@@ -526,8 +564,26 @@ function main(name::String="all"; verbose::Bool=false, f90::Bool=false, print_in
                 format = false
                 @warn "Unable to determine the output type"
               end
-              write(file_wrapper, ")::$(output_type)\n")
+              if output_type ∉ ("Cvoid", "Cint", "Float32", "Float64")
+                write(file_wrapper, ")::Cvoid\n")
+              else
+                write(file_wrapper, ")::$(output_type)\n")
+              end
               write(file_wrapper, "end\n")
+
+              # C Headers
+              if !("Ptr{Ptr{UInt8}}" in types)
+                if output_type ∉ ("Cvoid", "Cint", "Float32", "Float64")
+                  write(file_header, "void $fname($(julia_to_c[output_type])*result, ")
+                else
+                  write(file_header, "$(julia_to_c[output_type])$fname(")
+                end
+                for k = 1:narguments
+                  write(file_header, "$(julia_to_c[types[k]])$(arguments[k])")
+                  (k < narguments) && write(file_header, ", ")
+                end
+                write(file_header, ");\n")
+              end
 
             elseif name_hsl_package == "hsl_subset"
               if endswith(fname, "r_")
@@ -586,11 +642,14 @@ function main(name::String="all"; verbose::Bool=false, f90::Bool=false, print_in
             index < num_fnames && write(file_wrapper, "\n")
           end
         end
+        close(file_header)
         close(file_wrapper)
         format && format_file(path_wrapper, YASStyle())
       end
     end
   end
+
+  # close(file_header)
 
   if print_include
     for str in list_include
