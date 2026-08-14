@@ -93,8 +93,8 @@ mutable struct Ma97Exception <: Exception
 end
 
 mutable struct Ma97{T, S}
-  __akeep::Array{Ptr{Cvoid}}
-  __fkeep::Array{Ptr{Cvoid}}
+  __akeep::Vector{Ptr{Cvoid}}
+  __fkeep::Vector{Ptr{Cvoid}}
   n::Int
   colptr::Vector{Cint}
   rowval::Vector{Cint}
@@ -103,8 +103,8 @@ mutable struct Ma97{T, S}
   info::ma97_info{S}
 
   function Ma97{T, S}(
-    a::Array{Ptr{Cvoid}},
-    f::Array{Ptr{Cvoid}},
+    a::Vector{Ptr{Cvoid}},
+    f::Vector{Ptr{Cvoid}},
     n::Int,
     colptr::Vector{Cint},
     rowval::Vector{Cint},
