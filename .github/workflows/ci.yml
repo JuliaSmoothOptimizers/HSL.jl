@@ -7,18 +7,15 @@ on:
     tags: '*'
   pull_request:
     types: [opened, synchronize, reopened]
-  schedule:
-    - cron: '0 0 * * 0'
 
 jobs:
-  test-moonshot:
-    runs-on: moonshot
+  test:
+    runs-on: macstadium
     strategy:
       matrix:
-        os: [ubuntu-24.04]
-        julia-version: ['1.10', '1.11']
-        julia-arch: [x64]
-        hsl-version: ['2024.11.28', '2025.7.21']
+        julia-version: ['lts', '1']
+        julia-arch: [aarch64]
+        hsl-version: ['2026.8.4']
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +31,8 @@ jobs:
         run: |
           using Pkg
           Pkg.activate(".")
-          path_HSL_jll = "/scratch/github-actions/actions_runner_hsl/HSL_jll.jl.v" * ENV["HSL_VERSION"]
+          path_HSL_jll = joinpath(homedir(), ".local", "HSL_jll", "HSL_jll.jl.v" * ENV["HSL_VERSION"])
+          isdir(path_HSL_jll) || error("HSL_jll not found at $path_HSL_jll")
           Pkg.develop(path=path_HSL_jll)
       - name: Test HSL.jl
         shell: julia --color=yes {0}
