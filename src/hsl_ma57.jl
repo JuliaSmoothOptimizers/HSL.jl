@@ -296,7 +296,7 @@ for (fname, T) in ((:ma57a , Float32),
       $fname(M.n, M.nz, M.rows, M.cols, M.__lkeep, M.__keep , iwork, M.control.icntl, M.info.info, M.info.rinfo)
 
       status = M.info.info[1]
-      status > 0 && @warn "Ma57: analyze returns with code $status"
+      status > 0 && M.control.icntl[5] >= 0 && @warn "Ma57: analyze returns with code $status"
       status < 0 && throw(Ma57Exception("Ma57: Error during symbolic analysis", status))
 
       M.__lfact = M.info.info[9]
@@ -352,7 +352,7 @@ for (fname, T) in ((:ma57b , Float32),
         $fname(ma57.n, ma57.nz, ma57.vals, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, ma57.__lkeep, ma57.__keep, ma57.iwork_fact, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
         status = ma57.info.info[1]
-        status > 0 && @warn "Ma57: factorize returns with code $status"
+        status > 0 && ma57.control.icntl[5] >= 0 && @warn "Ma57: factorize returns with code $status"
         if status == -3 || status == 10
           ma57.__lfact = ceil(ma57.multiplier * ma57.info.info[17])
           resize!(ma57.__fact, ma57.__lfact)
@@ -463,7 +463,7 @@ for (fname, T) in ((:ma57c , Float32),
       $fname(j, ma57.n, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, nrhs, b, ma57.n, work, lwork, ma57.iwork_solve, ma57.control.icntl, ma57.info.info)
 
       status = ma57.info.info[1]
-      status > 0 && @warn "Ma57: solve returns with code $status"
+      status > 0 && ma57.control.icntl[5] >= 0 && @warn "Ma57: solve returns with code $status"
       status < 0 && throw(Ma57Exception("Ma57: Error during solution", status))
       return b
     end
@@ -505,7 +505,7 @@ for (fname, T) in ((:ma57d , Float32),
       $fname(job, ma57.n, ma57.nz, ma57.vals, ma57.rows, ma57.cols, ma57.__fact, ma57.__lfact, ma57.__ifact, ma57.__lifact, b, x, resid, work, iwork, ma57.control.icntl, ma57.control.cntl, ma57.info.info, ma57.info.rinfo)
 
       status = ma57.info.info[1]
-      status > 0 && @warn "Ma57: solve returns with code $status"
+      status > 0 && ma57.control.icntl[5] >= 0 && @warn "Ma57: solve returns with code $status"
       if status < 0
         ma57.control.icntl[9] = current_nitref
         throw(Ma57Exception("Ma57: Error during solution", status))
